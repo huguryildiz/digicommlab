@@ -8,6 +8,7 @@ import {
   TheoryBox,
   Formula,
   TransportControls,
+  Segmented,
 } from '@/components';
 import { t } from '@/i18n';
 import type { Scheme } from '@/lib/dsp/modulation';
@@ -25,6 +26,7 @@ import {
   BitmapView,
   type CloudPt,
 } from './panels';
+import { OptimumReceiverSection } from './OptimumReceiverSection';
 import './modulation.css';
 
 const M_OPTIONS: Record<Scheme, number[]> = {
@@ -41,6 +43,7 @@ const CLOUD_MAX = 400;
 const BATCH = 40;
 
 export function ModulationModule() {
+  const [tab, setTab] = useState<'detection' | 'optrx'>('detection');
   const [scheme, setScheme] = useState<Scheme>('mpsk');
   const [M, setM] = useState(4);
   const [ebN0Db, setEbN0Db] = useState(8);
@@ -175,7 +178,18 @@ export function ModulationModule() {
     liveSer && liveSer.total > 0 ? { ebN0Db, ser: liveSer.errors / liveSer.total } : undefined;
 
   return (
-    <div className="module-layout">
+    <div className="modulation__tabwrap">
+      <Segmented<'detection' | 'optrx'>
+        ariaLabel={t('modulation.optrx.tabs')}
+        value={tab}
+        onChange={setTab}
+        options={[
+          { value: 'detection', label: t('modulation.optrx.tab.detection') },
+          { value: 'optrx', label: t('modulation.optrx.tab.optrx') },
+        ]}
+      />
+      {tab === 'optrx' && <OptimumReceiverSection />}
+      <div className="module-layout" hidden={tab !== 'detection'}>
       <aside className="modulation__controls">
         <Panel title={t('nav.modulation')}>
           <Select<Scheme>
@@ -342,6 +356,7 @@ export function ModulationModule() {
             />
           </p>
         </TheoryBox>
+      </div>
       </div>
     </div>
   );

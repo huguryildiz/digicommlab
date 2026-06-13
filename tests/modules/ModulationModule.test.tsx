@@ -18,4 +18,19 @@ describe('ModulationModule', () => {
     fireEvent.change(screen.getByLabelText(/Order M/i), { target: { value: '4' } });
     expect(screen.getByText(/cannot be drawn in a 2-D plane/i)).toBeTruthy();
   });
+
+  it('defaults to the detection view and switches to the optimum receiver', () => {
+    render(<ModulationModule />);
+    // both tabs exist
+    const optrxTab = screen.getByRole('tab', { name: 'Optimum receiver' });
+    expect(screen.getByRole('tab', { name: 'Constellation & detection' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    // switch tabs → optimum-receiver-only readout appears
+    fireEvent.click(optrxTab);
+    expect(optrxTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText('Peak SNR 2E/N₀')).toBeInTheDocument();
+    expect(screen.getByText('Live Pₑ (Monte Carlo)')).toBeInTheDocument();
+  });
 });

@@ -80,3 +80,9 @@
   padding: 8px;
   min-height: 60px;
 }
+
+.modulation__tabwrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
