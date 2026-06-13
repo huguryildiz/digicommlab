@@ -1,11 +1,12 @@
 // src/modules/baseband/panels.tsx
 import { Canvas } from '@/lib/plot/Canvas';
 import { drawAxes, drawLine, drawVLine, drawText, linScale } from '@/lib/plot/draw';
-import type { PulseView } from './model';
+import type { PulseView, ReceiverView } from './model';
 
 const COL_P = 'var(--color-x)';
 const COL_H = 'var(--color-h)';
 const COL_Y = 'var(--color-y)';
+const COL_MARK = 'var(--color-marker)';
 
 export function PulseTimePanel({ view }: { view: PulseView }) {
   const yMax = 1.2;
@@ -43,6 +44,60 @@ export function SpectrumPanel({ view }: { view: PulseView }) {
         drawVLine(ctx, ax, -view.nyquist, 0, 1.15, 'rgba(154,167,180,0.6)', true, 1);
         drawText(ctx, ax, view.bandwidth, 1.05, 'W', COL_H, 4, -4);
         drawText(ctx, ax, view.nyquist, 0.5, '1/2T', '#9aa7b4', 4, -4);
+      }}
+    />
+  );
+}
+
+export function MatchedFilterPanel({ view }: { view: ReceiverView }) {
+  return (
+    <Canvas
+      height={200}
+      ariaLabel="Transmit pulse and its matched filter"
+      deps={[view]}
+      draw={(ctx, w, h) => {
+        const tMax = view.t[view.t.length - 1];
+        const ax = { x: linScale([-tMax, tMax], [34, w - 10]), y: linScale([-0.5, 1.2], [h - 18, 10]) };
+        drawAxes(ctx, ax, [-tMax, tMax]);
+        drawLine(ctx, ax, view.t, view.pulse, COL_P, 2);
+        drawLine(ctx, ax, view.t, view.matched, COL_H, 2, true);
+      }}
+    />
+  );
+}
+
+export function MfOutputPanel({ view }: { view: ReceiverView }) {
+  return (
+    <Canvas
+      height={200}
+      ariaLabel="Matched filter output peaking to the pulse energy at t equals T"
+      deps={[view]}
+      draw={(ctx, w, h) => {
+        const xs = view.mfOutput.map((_, i) => i);
+        const yMax = Math.max(...view.mfOutput) * 1.15;
+        const ax = { x: linScale([0, xs.length - 1], [34, w - 10]), y: linScale([-yMax * 0.3, yMax], [h - 18, 10]) };
+        drawAxes(ctx, ax, [0, xs.length - 1]);
+        drawLine(ctx, ax, xs, view.mfOutput, COL_Y, 2);
+        drawVLine(ctx, ax, view.mfPeakIndex, -yMax * 0.3, yMax, COL_MARK, false, 1.5);
+        drawText(ctx, ax, view.mfPeakIndex, view.energy, `E=${view.energy.toFixed(2)}`, COL_MARK, 6, -6);
+      }}
+    />
+  );
+}
+
+export function RrcSplitPanel({ view }: { view: ReceiverView }) {
+  return (
+    <Canvas
+      height={180}
+      ariaLabel="Two root raised cosine pulses convolve to a zero ISI raised cosine"
+      deps={[view]}
+      draw={(ctx, w, h) => {
+        const c = view.rrcCascade;
+        const xs = c.map((_, i) => i);
+        const peak = Math.max(...c);
+        const ax = { x: linScale([0, xs.length - 1], [34, w - 10]), y: linScale([-peak * 0.3, peak * 1.1], [h - 18, 10]) };
+        drawAxes(ctx, ax, [0, xs.length - 1]);
+        drawLine(ctx, ax, xs, c, COL_Y, 2);
       }}
     />
   );

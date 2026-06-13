@@ -12,11 +12,9 @@ describe('BasebandModule', () => {
     expect(screen.getByText('Eye, ISI & Equalization')).toBeTruthy();
     expect(screen.getByLabelText(/Pulse p\(t\) with zero crossings/i)).toBeTruthy();
   });
-  it('switches tabs when clicked', () => {
+  it('switches to the receiver tab and shows the matched-filter panel', () => {
     render(<BasebandModule />);
-    const receiverTab = screen.getByText('Optimum Receiver').closest('button');
-    expect(receiverTab).toBeTruthy();
-    fireEvent.click(receiverTab!);
-    expect(receiverTab!.className).toMatch(/--active/);
+    fireEvent.click(screen.getByRole('button', { name: /Optimum Receiver/i }));
+    expect(screen.getByLabelText(/Transmit pulse and its matched filter/i)).toBeTruthy();
   });
 });

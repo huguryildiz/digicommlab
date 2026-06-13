@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { t } from '@/i18n';
 import { PulseShapingSection } from './PulseShapingSection';
+import { ReceiverSection } from './ReceiverSection';
 import './baseband.css';
 
 type Tab = 'pulse' | 'receiver' | 'eye';
@@ -28,7 +29,7 @@ export function BasebandModule() {
         ))}
       </nav>
       {tab === 'pulse' && <PulseShapingSection />}
-      {tab === 'receiver' && <div className="bb-section" />}
+      {tab === 'receiver' && <ReceiverSection />}
       {tab === 'eye' && <div className="bb-section" />}
     </div>
   );
