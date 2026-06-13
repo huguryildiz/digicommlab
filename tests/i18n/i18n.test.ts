@@ -3,7 +3,7 @@ import { t } from '@/i18n';
 
 describe('t()', () => {
   it('returns the English string for a known key', () => {
-    expect(t('app.title')).toBe('DigiCommLab');
+    expect(t('app.title')).toBe('CommSysLab');
   });
 
   it('falls back to the key itself when missing', () => {

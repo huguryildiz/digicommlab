@@ -9,7 +9,7 @@ describe('textToBits', () => {
 
 describe('text <-> bits roundtrip', () => {
   it('recovers the original ASCII text', () => {
-    const s = 'Hello, EE413!';
+    const s = 'Hello, DigiComm!';
     expect(bitsToText(textToBits(s))).toBe(s);
   });
 });

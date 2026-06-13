@@ -1,8 +1,9 @@
-# DigiCommLab — Project Rules
+# CommSysLab — Project Rules
 
-EE413 Interactive Digital Communications Lab. React 18 + TypeScript + Vite. Modules
-under `src/modules/*` (sampling, modulation, …), shared UI in `src/components`, DSP in
-`src/lib/dsp`, design tokens in `src/theme`.
+CommSysLab — Interactive Communication Systems Lab. React 18 + TypeScript + Vite. Kapsam
+analog (AM/FM) + dijital (örnekleme, modülasyon/sezim, baseband) + kaynak kodlama (bilgi
+teorisi). Modüller domain'e göre `src/modules/{analog,digital,source}/*`, paylaşılan UI
+`src/components`, DSP `src/lib/dsp`, tasarım token'ları `src/theme`.
 
 ## Referans Doküman — slides/Book.pdf (ZORUNLU KURAL)
 
@@ -31,11 +32,13 @@ Yeni ekran/bileşen/modül eklerken bu stile uy; kendi rastgele renk/font uydurm
 ### Kaynak — her zaman tokenlardan tüket
 - Renk/font/boşluk/yarıçap için `src/theme/tokens.css` değişkenlerini kullan.
   Hex/px değerleri bileşenlere gömme. Yeni bir ihtiyaç varsa önce token ekle.
-- Tipografi — **premium SaaS üçlüsü** (signal_sim'in Saira'sı yerine bilinçli seçim):
-  gövde/UI `var(--font)` = **Inter**, başlık/marka `var(--font-head)` =
-  **Space Grotesk**, sayısal değer/formül/kod `var(--mono)` = **JetBrains Mono**.
-  Fontlar `index.html`'de Google Fonts ile yüklü. Bileşende ham font-family yazma,
-  her zaman bu üç tokendan birini kullan. Yeni font ekleme — bu üçlü standarttır.
+- Tipografi — **lab-dergisi üçlüsü** (premium teknik-editöryel ton; signal_sim'in
+  Saira'sından bilinçli sapma): başlık `var(--font-head)` = **Fraunces** (yüksek
+  kontrastlı, optik-boyutlu serif), gövde/UI `var(--font)` = **IBM Plex Sans**,
+  sayısal değer/formül/kod/okuma `var(--mono)` = **IBM Plex Mono**. Marka kelime-işareti
+  (`.app__brand`) serif yerine `var(--font)` (Plex Sans) kullanır. Fontlar
+  `index.html`'de Google Fonts ile yüklü. Bileşende ham font-family yazma, her zaman bu
+  üç tokendan birini kullan. Yeni font ekleme — bu üçlü standarttır.
 
 ### Palet (token isimleri)
 - Zemin: `--bg` (derin lacivert), cam panel `--bg-panel` / `--surface`, input `--surface-2`.
@@ -76,3 +79,10 @@ Yeni ekran/bileşen/modül eklerken bu stile uy; kendi rastgele renk/font uydurm
 ## Genel kurallar
 - TypeScript strict; `any` kullanma. Import alias `@/` → `src/`.
 - DSP mantığı saf fonksiyonlar olarak `src/lib/dsp`'de, UI'dan ayrık ve testli kalsın.
+- **İsimlendirme (ZORUNLU):** Ürünün adı **CommSysLab**'tır ve kurs-bağımsızdır. Repo
+  genelinde **"EE413" kurs kodunu ve eski "DigiCommLab" adını kullanma** — UI metni,
+  başlık/`<title>`, paket açıklaması, README, örnek/demo metinleri, yorumlar ve yeni
+  doküman/spec'lerde geçmesin. Ürünü tanımlarken "CommSysLab — Interactive Communication
+  Systems Lab" de.
+  *Tek istisna:* eğitmenin gerçek (git-ignored) slayt dosyalarına yapılan teknik dosya
+  atıfları `slides/EE413-CH*.pdf` olduğu gibi kalabilir (gerçek dosya adı).

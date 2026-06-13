@@ -359,7 +359,7 @@ function MessageTransmission({
   constellation: ReturnType<typeof buildModulationView>['constellation'];
 }) {
   const [mode, setMode] = useState<'text' | 'image'>('text');
-  const [text, setText] = useState('EE413 Communication Systems');
+  const [text, setText] = useState('CommSysLab');
   const [result, setResult] = useState<{
     rxText?: string;
     rxBits: number[];

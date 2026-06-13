@@ -47,8 +47,9 @@ h2,
 h3 {
   margin: 0 0 var(--space-3);
   font-family: var(--font-head);
+  font-optical-sizing: auto; /* Fraunces opsz ekseni — büyük başlıkta yüksek kontrast */
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0; /* serif başlıkta negatif/geniş tracking istemiyoruz */
 }
 
 /* Sayısal/kod içerikleri monospace */

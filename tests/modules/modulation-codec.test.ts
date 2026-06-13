@@ -21,10 +21,10 @@ describe('bit<->symbol mapping', () => {
 describe('transmit', () => {
   it('recovers text exactly at very high Eb/N0 (noiseless limit)', () => {
     const c = makeConstellation('mqam', 16);
-    const bits = textToBits('EE413');
+    const bits = textToBits('DIGICOMM');
     const r = transmit(bits, c, { ebN0Db: 50, decision: 'ml', seed: 7 });
     expect(r.bitErrors).toBe(0);
-    expect(bitsToText(r.rxBits.slice(0, bits.length))).toBe('EE413');
+    expect(bitsToText(r.rxBits.slice(0, bits.length))).toBe('DIGICOMM');
   });
 
   it('produces some errors at low Eb/N0', () => {

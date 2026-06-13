@@ -1,6 +1,6 @@
-# DigiCommLab
+# CommSysLab
 
-**EE413 Interactive Digital Communications Lab** — a browser-only, interactive learning tool
+**CommSysLab — Interactive Communication Systems Lab** — a browser-only, interactive learning tool
 covering sampling & quantization, digital modulation & detection (with MAP/ML), baseband
 transmission & eye diagrams, and Huffman coding & entropy, plus an end-to-end link simulation.
 

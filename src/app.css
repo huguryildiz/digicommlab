@@ -18,9 +18,10 @@
   flex-wrap: wrap;
 }
 .app__brand {
-  font-family: var(--font-head);
+  /* Marka tekno-bileşik bir kelime: serif yerine temiz sans (Plex Sans) */
+  font-family: var(--font);
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: -0.01em;
   margin-right: var(--space-3);
   background: linear-gradient(135deg, var(--accent), var(--accent-blue), var(--accent-2));
   -webkit-background-clip: text;

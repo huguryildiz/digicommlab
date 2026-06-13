@@ -1,9 +1,9 @@
 {
-  "name": "digicommlab",
+  "name": "commsyslab",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "EE413 Interactive Digital Communications Lab",
+  "description": "CommSysLab — Interactive Communication Systems Lab",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
