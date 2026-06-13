@@ -15,6 +15,8 @@ import type { QuantizerType } from '@/lib/dsp/quantize';
 import type { PcmCoding } from '@/lib/dsp/pcm';
 import { useSimulationLoop } from '@/lib/sim/useSimulationLoop';
 import { pcmCodeword } from '@/lib/dsp/pcm';
+import { aliasFrequency } from '@/lib/dsp/sampling';
+import { audioSupported, playSampledTone } from '@/lib/audio/sampling-audio';
 import { buildSamplingView } from './model';
 import { TimePanel, SpectrumPanel, QuantPanel, ErrorPanel } from './panels';
 import './sampling.css';
@@ -45,6 +47,8 @@ export function SamplingModule() {
   const [showRecon, setShowRecon] = useState(true);
   const [t0, setT0] = useState(0);
   const [bitLog, setBitLog] = useState<string>('');
+  const [audioToneHz, setAudioToneHz] = useState(2200);
+  const [audioFs, setAudioFs] = useState(3000);
   const lastSampleIdx = useRef(-1);
 
   const tones: Tone[] = useMemo(() => {
@@ -97,6 +101,8 @@ export function SamplingModule() {
   const pcmPreview = (loop.running ? bitLog : windowBits)
     .replace(/(.{4})/g, '$1 ')
     .trim();
+
+  const aliasPitch = aliasFrequency(audioToneHz, audioFs);
 
   return (
     <div className="module-layout">
@@ -171,6 +177,42 @@ export function SamplingModule() {
           <div className="sampling__bitstream" aria-label="PCM bitstream preview">
             {pcmPreview || '—'}
           </div>
+        </Panel>
+
+        <Panel title="🔊 Audio (aliasing & quantization)">
+          <Slider
+            label="Tone"
+            value={audioToneHz}
+            min={200}
+            max={4000}
+            step={50}
+            unit="Hz"
+            onChange={setAudioToneHz}
+          />
+          <Slider
+            label="Sampling rate"
+            value={audioFs}
+            min={500}
+            max={8000}
+            step={100}
+            unit="Hz"
+            onChange={setAudioFs}
+          />
+          <Readout label="You should hear ≈" value={aliasPitch.toFixed(0)} unit="Hz" />
+          <button
+            type="button"
+            disabled={!audioSupported()}
+            onClick={() =>
+              playSampledTone({
+                toneHz: audioToneHz,
+                sampleHz: audioFs,
+                bits,
+                type,
+              })
+            }
+          >
+            ▶ Play sampled tone
+          </button>
         </Panel>
       </aside>
 
