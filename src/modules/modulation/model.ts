@@ -2,6 +2,7 @@ import { makeConstellation, type Scheme, type Constellation } from '@/lib/dsp/mo
 import { theoreticalSer } from '@/lib/dsp/ser';
 import { n0FromEbN0Db, sigmaFromN0 } from '@/lib/dsp/awgn';
 import { mapThreshold1D } from '@/lib/dsp/detector';
+import { matchedFilter, pulseEnergy, peakSnr } from '@/lib/dsp/matchedfilter';
 import { linspace } from '@/lib/dsp/math';
 
 export type Decision = 'ml' | 'map';
@@ -142,6 +143,99 @@ export function buildModulationView(p: ModulationParams): ModulationView {
     axis1d: c.dim === 1 ? buildAxis1d(c, priors, n0) : undefined,
     theoreticalSerNow: theoreticalSer(p.scheme, p.M, p.ebN0Db),
     serCurve,
+    extent,
+  };
+}
+
+// ── Optimum receiver (Phase 1: 1-D binary / PAM), Proakis §7.5–7.6 ──────────────
+
+export interface OptRxSignalSet {
+  id: string;
+  /** i18n key for the dropdown label. */
+  labelKey: string;
+  /** Underlying 1-D scheme: 'bpsk' for binary antipodal, 'mask' for M-PAM. */
+  scheme: Scheme;
+  M: number;
+}
+
+/** Data-driven signal-set list. Phase 2/3 entries (2-D, custom) append here. */
+export const OPT_RX_SIGNAL_SETS: OptRxSignalSet[] = [
+  { id: 'binary', labelKey: 'modulation.optrx.set.binary', scheme: 'bpsk', M: 2 },
+  { id: 'pam4', labelKey: 'modulation.optrx.set.pam4', scheme: 'mask', M: 4 },
+  { id: 'pam8', labelKey: 'modulation.optrx.set.pam8', scheme: 'mask', M: 8 },
+];
+
+export interface OptRxParams {
+  signalSetId: string;
+  ebN0Db: number;
+  /** Index (into ascending amplitudes) of the symbol to display. */
+  symbolIndex: number;
+  /** Samples per symbol for waveform resolution. */
+  sps: number;
+}
+
+export interface OptRxView {
+  signalSet: OptRxSignalSet;
+  M: number;
+  amplitudes: number[]; // 1-D coordinates, ascending
+  labels: string[]; // Gray labels aligned to ascending amplitudes
+  thresholds: number[]; // M-1 midpoints between adjacent amplitudes
+  basis: number[]; // unit-energy φ[n], length sps
+  matchedIR: number[]; // h[n] = φ reversed (display)
+  symbolWaveform: number[]; // amplitudes[symbolIndex] · φ[n]
+  eb: number;
+  n0: number;
+  sigmaW: number; // per-sample time-domain noise std = √(N0/2)
+  symbolEnergy: number; // energy of the displayed symbol waveform
+  peakSnr: number; // 2E/N0 for the displayed symbol
+  theoreticalPe: number;
+  extent: number; // half-extent of the decision axis (data units)
+}
+
+/** Assemble the optimum-receiver view for a 1-D signal set. Pure. */
+export function buildOptRxView(p: OptRxParams): OptRxView {
+  const set = OPT_RX_SIGNAL_SETS.find((s) => s.id === p.signalSetId) ?? OPT_RX_SIGNAL_SETS[0];
+  const c = makeConstellation(set.scheme, set.M);
+  const eb = c.EsAvg / c.bitsPerSymbol;
+  const n0 = n0FromEbN0Db(p.ebN0Db, eb);
+  const sigmaW = sigmaFromN0(n0);
+
+  // Sort symbols by 1-D coordinate ascending; carry Gray labels along.
+  const order = c.points.map((_, i) => i).sort((a, b) => c.points[a][0] - c.points[b][0]);
+  const amplitudes = order.map((i) => c.points[i][0]);
+  const labels = order.map((i) => c.labels[i]);
+  const thresholds: number[] = [];
+  for (let k = 0; k < amplitudes.length - 1; k++) {
+    thresholds.push((amplitudes[k] + amplitudes[k + 1]) / 2);
+  }
+
+  // Unit-energy rectangular basis φ[n] = 1/√sps  (Σ φ² = 1), so the correlator
+  // output ∫r·φ has noise variance σ_w²·Σφ² = N0/2, matching the signal-space model.
+  const basis = new Array<number>(p.sps).fill(1 / Math.sqrt(p.sps));
+  const matchedIR = matchedFilter(basis);
+
+  const idx = Math.min(Math.max(p.symbolIndex, 0), amplitudes.length - 1);
+  const symbolWaveform = basis.map((b) => amplitudes[idx] * b);
+  const symbolEnergy = pulseEnergy(symbolWaveform);
+
+  const maxAmp = Math.max(...amplitudes.map((a) => Math.abs(a)), Math.sqrt(eb));
+  const extent = maxAmp + 3.5 * sigmaW;
+
+  return {
+    signalSet: set,
+    M: c.M,
+    amplitudes,
+    labels,
+    thresholds,
+    basis,
+    matchedIR,
+    symbolWaveform,
+    eb,
+    n0,
+    sigmaW,
+    symbolEnergy,
+    peakSnr: peakSnr(symbolEnergy, n0),
+    theoreticalPe: theoreticalSer(set.scheme, set.M, p.ebN0Db),
     extent,
   };
 }
