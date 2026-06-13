@@ -128,7 +128,7 @@ describe('estimators', () => {
   });
 });
 
-import { theoreticalAutocorr, theoreticalPsd, filterMagSq } from '@/lib/dsp/random';
+import { theoreticalAutocorr, filterMagSq } from '@/lib/dsp/random';
 
 describe('theoretical references', () => {
   it('sine theoretical autocorr is (A^2/2)cos(2π f0 τ)', () => {
