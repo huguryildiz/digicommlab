@@ -1,0 +1,30 @@
+import { describe, it, expect } from 'vitest';
+import { outputSnrDb, demodulationGainDb, type AnalogScheme } from '@/lib/dsp/analognoise';
+
+const p = { amIndex: 0.5, beta: 5, messagePower: 0.5, emphasis: false, W: 15000 };
+
+describe('outputSnrDb / demodulationGainDb', () => {
+  it('DSB and SSB have unity gain (output SNR == channel SNR)', () => {
+    expect(outputSnrDb('dsb', 20, p)).toBeCloseTo(20, 6);
+    expect(outputSnrDb('ssb', 20, p)).toBeCloseTo(20, 6);
+    expect(demodulationGainDb('dsb', p)).toBeCloseTo(0, 6);
+    expect(demodulationGainDb('ssb', p)).toBeCloseTo(0, 6);
+  });
+
+  it('conventional AM loses SNR (gain < 0 dB) via modulation efficiency', () => {
+    expect(demodulationGainDb('am', p)).toBeLessThan(0);
+    // gain equals 10log10(efficiency); efficiency = a^2 P /(1 + a^2 P)
+    const eff = (p.amIndex ** 2 * p.messagePower) / (1 + p.amIndex ** 2 * p.messagePower);
+    expect(demodulationGainDb('am', p)).toBeCloseTo(10 * Math.log10(eff), 6);
+  });
+
+  it('FM output SNR scales as beta^2 (~+6 dB per doubling of beta)', () => {
+    const a = outputSnrDb('fm', 30, { ...p, beta: 4 });
+    const b = outputSnrDb('fm', 30, { ...p, beta: 8 });
+    expect(b - a).toBeCloseTo(6.02, 1); // doubling beta → 4x SNR → +6.02 dB
+  });
+
+  it('FM gives a large positive demodulation gain at high beta', () => {
+    expect(demodulationGainDb('fm', { ...p, beta: 5 })).toBeGreaterThan(10);
+  });
+});
