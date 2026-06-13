@@ -51,8 +51,10 @@ function symbolSampler(M: number, priors: number[] | undefined): (u: number) => 
     cdf.push(acc);
   }
   return (u: number) => {
+    // Strict `<` matches the uniform sampler's floor(u*M) convention exactly,
+    // so MAP with equal priors reproduces ML's symbol stream deterministically.
     const x = u * acc;
-    for (let i = 0; i < M; i++) if (x <= cdf[i]) return i;
+    for (let i = 0; i < M; i++) if (x < cdf[i]) return i;
     return M - 1;
   };
 }
