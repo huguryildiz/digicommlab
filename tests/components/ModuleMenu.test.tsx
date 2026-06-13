@@ -12,9 +12,9 @@ function renderMenu(route = '/modulation') {
 }
 
 describe('ModuleMenu', () => {
-  it('renders nine items, live ones as links to their routes', () => {
+  it('renders ten items, live ones as links to their routes', () => {
     renderMenu();
-    expect(screen.getAllByRole('listitem')).toHaveLength(9);
+    expect(screen.getAllByRole('listitem')).toHaveLength(10);
     expect(screen.getByRole('link', { name: /Fourier & Spectrum/i })).toHaveAttribute('href', '/fourier');
     expect(screen.getByRole('link', { name: /Analog Noise & SNR/i })).toHaveAttribute('href', '/analog-noise');
     expect(screen.getByRole('link', { name: /Modulation & Detection/i })).toHaveAttribute('href', '/modulation');

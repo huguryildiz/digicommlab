@@ -14,6 +14,7 @@ import { SamplingModule } from '@/modules/sampling-quantization/SamplingModule';
 import { ModulationModule } from '@/modules/modulation/ModulationModule';
 import { BasebandModule } from '@/modules/baseband/BasebandModule';
 import { InfoTheoryModule } from '@/modules/infotheory/InfoTheoryModule';
+import { ChannelCodingModule } from '@/modules/channel-coding/ChannelCodingModule';
 import './theme/global.css';
 import './components/components.css';
 import './pages/pages.css';
@@ -91,6 +92,7 @@ function Shell() {
           <Route path="/sampling" element={<SamplingModule />} />
           <Route path="/modulation" element={<ModulationModule />} />
           <Route path="/information-theory" element={<InfoTheoryModule />} />
+          <Route path="/channel-coding" element={<ChannelCodingModule />} />
           <Route path="/baseband" element={<BasebandModule />} />
           <Route path="/end-to-end" element={<ModulePlaceholder title={t('nav.endToEnd')} />} />
         </Routes>

@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { LANDING_MODULES } from '@/pages/landing/modules.config';
 
 describe('LANDING_MODULES', () => {
-  it('has all nine modules numbered 01..09 in chapter order', () => {
+  it('has all ten modules numbered 01..10 in chapter order', () => {
     expect(LANDING_MODULES.map((m) => m.num)).toEqual([
-      '01', '02', '03', '04', '05', '06', '07', '08', '09',
+      '01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
     ]);
   });
 
@@ -18,6 +18,7 @@ describe('LANDING_MODULES', () => {
       'infotheory',
       'modulation',
       'baseband',
+      'channel-coding',
       'end-to-end',
     ]);
   });
