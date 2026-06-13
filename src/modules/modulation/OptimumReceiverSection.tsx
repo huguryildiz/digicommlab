@@ -9,6 +9,7 @@ import {
   DemodPanel,
   DecisionAxisPanel,
   ConstellationLandingPanel,
+  CorrelatorBankPanel,
 } from './optreceiver-panels';
 
 const SPS = 64;
@@ -72,7 +73,9 @@ export function OptimumReceiverSection() {
   const decisionTitle =
     view.kind === '2d'
       ? t('modulation.optrx.panel.landing')
-      : t('modulation.optrx.panel.decision');
+      : view.kind === 'orthogonal'
+        ? t('modulation.optrx.panel.bank')
+        : t('modulation.optrx.panel.decision');
 
   return (
     <div className="module-layout">
@@ -152,6 +155,7 @@ export function OptimumReceiverSection() {
         <Panel title={decisionTitle}>
           {view.kind === '1d' && <DecisionAxisPanel view={view} reception={reception} />}
           {view.kind === '2d' && <ConstellationLandingPanel view={view} reception={reception} />}
+          {view.kind === 'orthogonal' && <CorrelatorBankPanel view={view} reception={reception} />}
         </Panel>
 
         <TheoryBox title={t('modulation.optrx.theory.title')}>

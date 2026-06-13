@@ -145,3 +145,35 @@ describe('buildOptRxView (2-D PSK/QAM)', () => {
     expect(peHi).toBeLessThan(peLo);
   });
 });
+
+describe('buildOptRxView (orthogonal FSK)', () => {
+  it('4-FSK: kind orthogonal, dim 4, 4 orthonormal tone basis', () => {
+    const v = buildOptRxView({ signalSetId: 'fsk4', ebN0Db: 8, symbolIndex: 0, sps: 64, cycles: 2 });
+    expect(v.kind).toBe('orthogonal');
+    expect(v.dim).toBe(4);
+    expect(v.M).toBe(4);
+    expect(v.basis).toHaveLength(4);
+    const dot = (a: number[], b: number[]) => a.reduce((s, x, i) => s + x * b[i], 0);
+    expect(dot(v.basis[0], v.basis[0])).toBeCloseTo(1, 9);
+    expect(dot(v.basis[0], v.basis[1])).toBeCloseTo(0, 9);
+  });
+
+  it('4-FSK reception: M-component statistic, decision = argmax at high SNR', () => {
+    const v = buildOptRxView({ signalSetId: 'fsk4', ebN0Db: 40, symbolIndex: 3, sps: 64, cycles: 2 });
+    const rx = simulateReception(v, 3, makeRng(11));
+    expect(rx.statistic).toHaveLength(4);
+    let argmax = 0;
+    for (let k = 1; k < 4; k++) if (rx.statistic[k] > rx.statistic[argmax]) argmax = k;
+    expect(rx.decided).toBe(3);
+    expect(argmax).toBe(3);
+  });
+
+  it('BFSK: kind orthogonal, dim 2; Monte-Carlo Pe drops with Eb/N0', () => {
+    const lo = buildOptRxView({ signalSetId: 'bfsk', ebN0Db: 2, symbolIndex: 0, sps: 64, cycles: 2 });
+    const hi = buildOptRxView({ signalSetId: 'bfsk', ebN0Db: 12, symbolIndex: 0, sps: 64, cycles: 2 });
+    expect(lo.dim).toBe(2);
+    const peLo = monteCarloPe(lo, 5000, makeRng(4)).errors;
+    const peHi = monteCarloPe(hi, 5000, makeRng(4)).errors;
+    expect(peHi).toBeLessThan(peLo);
+  });
+});

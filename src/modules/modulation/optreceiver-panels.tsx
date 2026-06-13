@@ -183,3 +183,42 @@ export function ConstellationLandingPanel({
     />
   );
 }
+
+/** (c-orthogonal) Bar chart of the M correlator outputs; the largest (= decision) is highlighted. */
+export function CorrelatorBankPanel({
+  view,
+  reception,
+}: {
+  view: OptRxView;
+  reception: OptRxReception;
+}) {
+  const M = view.M;
+  const stats = reception.statistic;
+  const correct = reception.decided === reception.txIndex;
+  const ymax = Math.max(...stats, 1e-6) * 1.2;
+  const ymin = Math.min(...stats, 0) * 1.1;
+  const bw = 0.62;
+  return (
+    <Canvas
+      height={220}
+      ariaLabel="Correlator-bank outputs; the largest is the decision"
+      deps={[view, reception]}
+      draw={(ctx, w, h) => {
+        const ax = axesFor(w, h, [-0.5, M - 0.5], [ymin, ymax]);
+        drawLine(ctx, ax, [-0.5, M - 0.5], [0, 0], COL.axis, 1);
+        for (let k = 0; k < M; k++) {
+          const isDecided = k === reception.decided;
+          const fill = isDecided ? (correct ? COL.sample : COL.err) : alpha(CHART.blue, 0.55);
+          const left = ax.x(k - bw / 2);
+          const right = ax.x(k + bw / 2);
+          const yTop = ax.y(Math.max(stats[k], 0));
+          const yBot = ax.y(Math.min(stats[k], 0));
+          ctx.fillStyle = fill;
+          ctx.fillRect(left, yTop, right - left, yBot - yTop);
+          drawText(ctx, ax, k, Math.max(stats[k], 0), view.labels[k], COL.label, -6, -8);
+          if (k === reception.txIndex) drawText(ctx, ax, k, 0, 'tx', COL.tx, -4, 14);
+        }
+      }}
+    />
+  );
+}
