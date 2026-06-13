@@ -128,3 +128,110 @@ function genNrz(p: ProcessParams, rng: () => number): Float64Array[] {
   }
   return out;
 }
+
+/** Ensemble average at each time index: m_X[n] = (1/M) Σ_m x_m[n]. */
+export function ensembleMean(ensemble: Float64Array[]): Float64Array {
+  const N = ensemble[0].length;
+  const m = new Float64Array(N);
+  for (const x of ensemble) for (let n = 0; n < N; n++) m[n] += x[n];
+  for (let n = 0; n < N; n++) m[n] /= ensemble.length;
+  return m;
+}
+
+/** Biased autocovariance of a single realization for lags 0..maxLag. */
+export function timeAutocorr(x: Float64Array, maxLag: number): Float64Array {
+  const N = x.length;
+  const mean = x.reduce((s, v) => s + v, 0) / N;
+  const r = new Float64Array(maxLag + 1);
+  for (let k = 0; k <= maxLag; k++) {
+    let acc = 0;
+    for (let n = 0; n < N - k; n++) acc += (x[n] - mean) * (x[n + k] - mean);
+    r[k] = acc / N;
+  }
+  return r;
+}
+
+/** Autocorrelation averaged across the ensemble (lags 0..maxLag). */
+export function ensembleAutocorr(ensemble: Float64Array[], maxLag: number): Float64Array {
+  const r = new Float64Array(maxLag + 1);
+  for (const x of ensemble) {
+    const rk = timeAutocorr(x, maxLag);
+    for (let k = 0; k <= maxLag; k++) r[k] += rk[k];
+  }
+  for (let k = 0; k <= maxLag; k++) r[k] /= ensemble.length;
+  return r;
+}
+
+/** One-sided averaged periodogram (bins 0..N/2). Magnitude-squared of the FFT,
+ *  averaged over the ensemble. Absolute scaling verified vs Proakis §4.3 later. */
+export function periodogram(ensemble: Float64Array[]): Float64Array {
+  const N = ensemble[0].length;
+  const half = Math.floor(N / 2);
+  const acc = new Float64Array(half + 1);
+  for (const x of ensemble) {
+    const X = fft(Array.from(x));
+    for (let k = 0; k <= half; k++) acc[k] += (X[k].re * X[k].re + X[k].im * X[k].im) / N;
+  }
+  for (let k = 0; k <= half; k++) acc[k] /= ensemble.length;
+  return acc;
+}
+
+/** Theoretical autocorrelation R_X(τ) per process kind, evaluated at given lags (seconds). */
+export function theoreticalAutocorr(p: ProcessParams, taus: Float64Array): Float64Array {
+  const r = new Float64Array(taus.length);
+  const T = 1 / p.f0;
+  for (let i = 0; i < taus.length; i++) {
+    const tau = taus[i];
+    switch (p.kind) {
+      case 'randphase-sine':
+        r[i] = (p.amplitude ** 2 / 2) * Math.cos(2 * Math.PI * p.f0 * tau);
+        break;
+      case 'binary-nrz':
+        r[i] = Math.abs(tau) < T ? p.amplitude ** 2 * (1 - Math.abs(tau) / T) : 0;
+        break;
+      case 'white-gaussian':
+      case 'colored':
+        r[i] = tau === 0 ? (p.n0 / 2) * p.fs : 0; // discrete white spike (relative)
+        break;
+    }
+  }
+  return r;
+}
+
+/** |H(f)|^2 of the colored-process filter at given frequencies (Hz). */
+export function filterMagSq(p: ProcessParams, freqs: Float64Array): Float64Array {
+  const h = new Float64Array(freqs.length);
+  for (let i = 0; i < freqs.length; i++) {
+    const f = Math.abs(freqs[i]);
+    h[i] = p.filterKind === 'ideal-lpf' ? (f <= p.cutoff ? 1 : 0) : 1 / (1 + (f / p.cutoff) ** 2);
+  }
+  return h;
+}
+
+/** Theoretical PSD S_X(f) per kind at given frequencies (Hz).
+ *  Sine returns a sparse two-line approximation (impulse mass placed at the nearest bin). */
+export function theoreticalPsd(p: ProcessParams, freqs: Float64Array): Float64Array {
+  const s = new Float64Array(freqs.length);
+  const T = 1 / p.f0;
+  for (let i = 0; i < freqs.length; i++) {
+    const f = freqs[i];
+    switch (p.kind) {
+      case 'white-gaussian':
+        s[i] = p.n0 / 2;
+        break;
+      case 'colored':
+        s[i] = (p.n0 / 2) * filterMagSq(p, Float64Array.from([f]))[0];
+        break;
+      case 'binary-nrz': {
+        const x = Math.PI * f * T;
+        const sinc = x === 0 ? 1 : Math.sin(x) / x;
+        s[i] = p.amplitude ** 2 * T * sinc * sinc;
+        break;
+      }
+      case 'randphase-sine':
+        s[i] = 0; // line spectrum — drawn as stems by the section, not a continuous curve
+        break;
+    }
+  }
+  return s;
+}
