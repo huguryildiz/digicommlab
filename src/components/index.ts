@@ -1,6 +1,7 @@
 export { Slider } from './Slider';
 export { Toggle } from './Toggle';
 export { Select } from './Select';
+export { Segmented } from './Segmented';
 export { NumberInput } from './NumberInput';
 export { Formula } from './Formula';
 export { Readout } from './Readout';
