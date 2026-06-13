@@ -8,6 +8,8 @@ import {
   bscTransition,
   becTransition,
   mutualInformation,
+  awgnHardCrossover,
+  awgnSoftCapacityPerUse,
 } from '@/lib/dsp/capacity';
 
 describe('bscCapacity = 1 − H_b(ε)', () => {
@@ -79,5 +81,19 @@ describe('mutualInformation I(X;Y) = H(Y) − H(Y|X) (Eq. 9.2.5)', () => {
       }
     }
     expect(best).toBeCloseTo(0.5, 2);
+  });
+});
+
+describe('awgnHardCrossover = Q(√(2·Eb/N0)) (Eq. 9.1.2)', () => {
+  it('is 0.5 at Eb/N0=0 and decreases as Eb/N0 grows', () => {
+    expect(awgnHardCrossover(0)).toBeCloseTo(0.5, 10);
+    expect(awgnHardCrossover(4)).toBeLessThan(awgnHardCrossover(1));
+  });
+});
+
+describe('awgnSoftCapacityPerUse = ½log2(1+2·Eb/N0) (Eq. 9.2.15)', () => {
+  it('is 0 at Eb/N0=0 and 0.5 bit/use at Eb/N0=0.5', () => {
+    expect(awgnSoftCapacityPerUse(0)).toBeCloseTo(0, 12);
+    expect(awgnSoftCapacityPerUse(0.5)).toBeCloseTo(0.5, 12);
   });
 });

@@ -1,6 +1,7 @@
 // Ref: Proakis & Salehi §9.2 (Channel Capacity): BSC capacity C = 1 − H_b(ε) and the
 // Shannon-Hartley AWGN capacity C = B·log2(1 + SNR). Bkz. docs/book-reference.md.
 import { binaryEntropy } from './entropy';
+import { qfunc } from './math';
 
 /** Capacity of a binary symmetric channel with crossover probability ε: C = 1 − H_b(ε). */
 export function bscCapacity(eps: number): number {
@@ -66,4 +67,16 @@ export function mutualInformation(px: number[], P: number[][]): number {
     }
   }
   return I;
+}
+
+// Ref: §9.1 Eq. 9.1.2 — antipodal AWGN with hard decisions induces a BSC.
+/** BSC crossover from hard-decision antipodal AWGN: ε = Q(√(2·Eb/N0)); ebN0 is linear. */
+export function awgnHardCrossover(ebN0: number): number {
+  return qfunc(Math.sqrt(2 * ebN0));
+}
+
+// Ref: §9.2 Eq. 9.2.15 — unconstrained Gaussian capacity per use; antipodal SNR = 2·Eb/N0.
+/** Unconstrained Gaussian capacity per use given Eb/N0 (linear): ½·log2(1 + 2·Eb/N0). */
+export function awgnSoftCapacityPerUse(ebN0: number): number {
+  return 0.5 * Math.log2(1 + 2 * ebN0);
 }
