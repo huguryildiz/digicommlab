@@ -4,8 +4,8 @@
  * source → sampling → source coding → modulation → channel → detection → sink.
  */
 export type ModuleStatus = 'live' | 'soon';
-export type VizKind = 'constellation' | 'sampling' | 'entropy' | 'linkpulse' | 'fourier' | 'amfm';
-export type BentoArea = 'mod' | 'rp' | 'samp' | 'info' | 'base' | 'e2e' | 'four' | 'anal';
+export type VizKind = 'constellation' | 'sampling' | 'entropy' | 'linkpulse' | 'fourier' | 'amfm' | 'fading';
+export type BentoArea = 'mod' | 'rp' | 'samp' | 'info' | 'base' | 'e2e' | 'four' | 'anal' | 'wl';
 
 export interface LandingModule {
   id: string;
@@ -104,6 +104,17 @@ export const LANDING_MODULES: LandingModule[] = [
     route: '/baseband',
     status: 'soon',
     area: 'base',
+  },
+  {
+    id: 'wireless',
+    num: '09',
+    titleKey: 'wl.title',
+    descKey: 'wl.subtitle',
+    chapter: 'CH 10',
+    route: '/wireless',
+    status: 'live',
+    area: 'wl',
+    viz: 'fading',
   },
   {
     id: 'end-to-end',

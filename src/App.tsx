@@ -10,6 +10,7 @@ import { SamplingModule } from '@/modules/sampling-quantization/SamplingModule';
 import { ModulationModule } from '@/modules/modulation/ModulationModule';
 import { BasebandModule } from '@/modules/baseband/BasebandModule';
 import { InfoTheoryModule } from '@/modules/infotheory/InfoTheoryModule';
+import { WirelessModule } from '@/modules/wireless/WirelessModule';
 import './theme/global.css';
 import './components/components.css';
 import './pages/pages.css';
@@ -23,6 +24,7 @@ const NAV = [
   { to: '/sampling', key: 'nav.sampling' },
   { to: '/modulation', key: 'nav.modulation' },
   { to: '/baseband', key: 'nav.baseband' },
+  { to: '/wireless', key: 'nav.wireless' },
   { to: '/information-theory', key: 'nav.infotheory' },
   { to: '/end-to-end', key: 'nav.endToEnd' },
 ];
@@ -60,6 +62,7 @@ export default function App() {
             <Route path="/sampling" element={<SamplingModule />} />
             <Route path="/modulation" element={<ModulationModule />} />
             <Route path="/baseband" element={<BasebandModule />} />
+            <Route path="/wireless" element={<WirelessModule />} />
             <Route path="/information-theory" element={<InfoTheoryModule />} />
             <Route path="/end-to-end" element={<ModulePlaceholder title={t('nav.endToEnd')} />} />
           </Routes>

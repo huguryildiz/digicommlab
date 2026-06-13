@@ -319,6 +319,7 @@
     'mod mod anal'
     'rp rp rp'
     'samp info base'
+    'wl wl wl'
     'e2e e2e e2e';
 }
 .tile {
@@ -391,6 +392,9 @@
 }
 .tile--rp {
   grid-area: rp;
+}
+.tile--wl {
+  grid-area: wl;
 }
 .tile:nth-child(1) {
   animation-delay: 0.05s;
