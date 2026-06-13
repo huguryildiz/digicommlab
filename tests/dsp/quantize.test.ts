@@ -7,6 +7,8 @@ import {
   quantizationError,
   sqnrTheoreticalDb,
   sqnrMeasuredDb,
+  levelValues,
+  quantizationNoisePower,
 } from '@/lib/dsp/quantize';
 
 describe('numLevels & step', () => {
@@ -81,5 +83,24 @@ describe('sqnrMeasuredDb edge cases', () => {
     // these land exactly on midrise levels for mMax=1, bits=2 -> zero error
     const q = quantizeSignal(values, 1, 2, 'midrise');
     expect(sqnrMeasuredDb(values, q)).toBe(Infinity);
+  });
+});
+
+describe('levelValues', () => {
+  it('midrise: L levels at (k+0.5)*delta, ascending', () => {
+    expect(levelValues(1, 2, 'midrise')).toEqual([-0.75, -0.25, 0.25, 0.75]);
+  });
+  it('midtread: L levels at k*delta including zero, ascending', () => {
+    expect(levelValues(1, 2, 'midtread')).toEqual([-1, -0.5, 0, 0.5]);
+  });
+  it('has exactly L = 2^bits entries', () => {
+    expect(levelValues(2, 3, 'midrise')).toHaveLength(8);
+  });
+});
+
+describe('quantizationNoisePower', () => {
+  it('equals delta^2 / 12', () => {
+    // mMax=1, bits=2 -> delta=0.5 -> 0.25/12
+    expect(quantizationNoisePower(1, 2)).toBeCloseTo(0.25 / 12, 12);
   });
 });

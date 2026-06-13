@@ -62,3 +62,21 @@ export function sqnrMeasuredDb(values: number[], quantized: number[]): number {
   if (noisePower === 0) return Infinity;
   return 10 * Math.log10(meanSquare(values) / noisePower);
 }
+
+/** The L = 2^bits representation levels (ascending). Mirrors `quantize`:
+ *  midrise at (k+0.5)*Δ, midtread at k*Δ, for k in [-L/2, L/2-1]. */
+export function levelValues(mMax: number, bits: number, type: QuantizerType): number[] {
+  const L = numLevels(bits);
+  const d = (2 * mMax) / L;
+  const out: number[] = [];
+  for (let k = -L / 2; k <= L / 2 - 1; k++) {
+    out.push(type === 'midrise' ? (k + 0.5) * d : k * d);
+  }
+  return out;
+}
+
+/** Uniform-quantizer noise power E[Q^2] = Δ^2 / 12. */
+export function quantizationNoisePower(mMax: number, bits: number): number {
+  const d = step(mMax, bits);
+  return (d * d) / 12;
+}
