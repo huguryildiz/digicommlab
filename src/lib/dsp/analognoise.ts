@@ -39,10 +39,11 @@ export function demodulationGainDb(scheme: AnalogScheme, p: SnrParams): number {
   return 10 * Math.log10(snrImprovement(scheme, p));
 }
 
-/** Pre/de-emphasis linear improvement factor for FM. Grows with β (wider deviation
- *  benefits more from de-emphasis). Confirm the exact integral form vs Proakis §5.3.2. */
+/** Pre/de-emphasis linear improvement factor for FM (Proakis §5.3.2). The book's exact
+ *  factor depends on the de-emphasis cutoff and W (filter-specific); we use a monotonic
+ *  β²-growth approximation suitable for the teaching curve (improvement grows with deviation). */
 function emphasisFactor(beta: number): number {
-  return 1 + (beta * beta) / 3; // monotonic in β; replace with book expression if it differs
+  return 1 + (beta * beta) / 3;
 }
 
 /** Pre/de-emphasis SNR gain in dB for FM (Proakis §5.3.2, p. 250). */
@@ -82,6 +83,6 @@ export function measuredSnrDb(noisy: Float64Array, reference: Float64Array): num
   }
   errP /= reference.length;
   const sigP = power(reference);
-  if (errP <= 0) return 999;
+  if (errP <= 0 || sigP <= 0) return 999; // 999 dB sentinel: perfect or empty reference
   return 10 * Math.log10(sigP / errP);
 }
