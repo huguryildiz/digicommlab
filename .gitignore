@@ -21,7 +21,12 @@ yarn-error.log*
 # Test coverage
 coverage/
 
-# Course materials — instructor's private lecture PDFs.
+# Course materials — instructor's private PDFs (textbook + lecture slides).
 # Excluded by default because the repo may be published for GitHub Pages.
-# Remove this line if you intend to version the slides.
-slides/
+# Remove this line if you intend to version the reference PDFs.
+refs/
+
+# Local AI / project config — not versioned.
+.claude/
+CLAUDE.md
+docs/
