@@ -102,3 +102,27 @@ export function biAwgnCapacityPerUse(ebN0: number): number {
   const integral = (step / 3) * s;
   return 1 - integral;
 }
+
+// Ref: §9.3 Eq. 9.3.5 / 9.3.7 — minimum Eb/N0 for spectral efficiency r = R/W.
+/** Minimum Eb/N0 (linear) for reliable comms at spectral efficiency r: (2^r − 1)/r. */
+export function shannonLimitEbN0Min(r: number): number {
+  return (2 ** r - 1) / r;
+}
+
+/** Minimum Eb/N0 in dB at spectral efficiency r; → −1.59 dB as r→0. */
+export function shannonLimitEbN0MinDb(r: number): number {
+  return 10 * Math.log10(shannonLimitEbN0Min(r));
+}
+
+/** log2(e): the normalized infinite-bandwidth capacity ceiling C/(P/N0) (Eq. 9.3.1). */
+export const LOG2E = Math.LOG2E;
+
+/** The absolute Shannon limit Eb/N0 = ln2, in dB ≈ −1.59 dB (Eq. 9.3.7). */
+export const SHANNON_LIMIT_DB = 10 * Math.log10(Math.LN2);
+
+// Ref: §9.3 Eq. 9.3.1 / Fig. 9.10 — capacity vs bandwidth, normalized by P/N0.
+/** Normalized capacity C/(P/N0) as a function of u = W/(P/N0): u·log2(1+1/u); → log2(e). */
+export function capacityVsBandwidthNorm(u: number): number {
+  if (u <= 0) return 0;
+  return u * Math.log2(1 + 1 / u);
+}

@@ -11,6 +11,11 @@ import {
   awgnHardCrossover,
   awgnSoftCapacityPerUse,
   biAwgnCapacityPerUse,
+  shannonLimitEbN0Min,
+  shannonLimitEbN0MinDb,
+  capacityVsBandwidthNorm,
+  LOG2E,
+  SHANNON_LIMIT_DB,
 } from '@/lib/dsp/capacity';
 
 describe('bscCapacity = 1 − H_b(ε)', () => {
@@ -111,5 +116,27 @@ describe('biAwgnCapacityPerUse (binary-input AWGN capacity, Problem 9.5)', () =>
   it('never exceeds the unconstrained Gaussian capacity', () => {
     expect(biAwgnCapacityPerUse(1)).toBeLessThan(awgnSoftCapacityPerUse(1));
     expect(biAwgnCapacityPerUse(1)).toBeGreaterThan(0);
+  });
+});
+
+describe('Shannon limit (Eq. 9.3.5 / 9.3.7)', () => {
+  it('needs Eb/N0 = (2^r − 1)/r; 0 dB at r=1', () => {
+    expect(shannonLimitEbN0Min(1)).toBeCloseTo(1, 12);
+    expect(shannonLimitEbN0MinDb(1)).toBeCloseTo(0, 10);
+  });
+  it('approaches the −1.59 dB absolute limit as r→0', () => {
+    expect(shannonLimitEbN0MinDb(1e-3)).toBeCloseTo(SHANNON_LIMIT_DB, 2);
+    expect(SHANNON_LIMIT_DB).toBeCloseTo(-1.5917, 3);
+  });
+});
+
+describe('capacityVsBandwidthNorm = u·log2(1+1/u) (Eq. 9.3.1, Fig. 9.10)', () => {
+  it('is 0 at u=0 and approaches log2(e) as u→∞', () => {
+    expect(capacityVsBandwidthNorm(0)).toBe(0);
+    expect(LOG2E).toBeCloseTo(1.442695, 5);
+    expect(capacityVsBandwidthNorm(1000)).toBeCloseTo(LOG2E, 2);
+  });
+  it('is monotone increasing in u', () => {
+    expect(capacityVsBandwidthNorm(200)).toBeGreaterThan(capacityVsBandwidthNorm(50));
   });
 });
