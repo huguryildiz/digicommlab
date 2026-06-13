@@ -26,13 +26,16 @@ export function buildSeriesSynth(
   f0: number,
   N: number,
   duty: number = 0.5,
+  tStart: number = 0, // animation: scroll the time window by tStart seconds
 ): SeriesSynthView {
   const tDuration = 3 / f0; // 3 periods
   const tSamples = 512;
+  // Local (fixed) display axis [0, tDuration]; the signal is sampled tStart ahead,
+  // so increasing tStart scrolls the waveform left while the axis stays put.
   const time = linspace(0, tDuration, tSamples);
 
-  const ideal = time.map((t) => periodicWave(kind, f0, t, duty));
-  const partial = time.map((t) => seriesPartialSum(kind, f0, N, t, duty));
+  const ideal = time.map((t) => periodicWave(kind, f0, tStart + t, duty));
+  const partial = time.map((t) => seriesPartialSum(kind, f0, N, tStart + t, duty));
 
   const coeffs = seriesCoeffs(kind, f0, N, duty);
   const freqs = coeffs.map((c) => c.freq);
@@ -62,20 +65,22 @@ export function buildSpectrumAnalyzer(
   fs: number = 100,
   N: number = 512,
   windowType: WindowType = 'hann',
+  tStart: number = 0, // animation: scroll the displayed time window
 ): SpectrumAnalyzerView {
   const time = linspace(0, N / fs, N);
-  const signal = time.map((t) => {
-    if (signalType === 'tones') {
-      return evalSignal(tones, t);
-    } else if (waveKind && f0) {
-      return periodicWave(waveKind, f0, t);
-    }
+  const sampleAt = (t: number): number => {
+    if (signalType === 'tones') return evalSignal(tones, t);
+    if (waveKind && f0) return periodicWave(waveKind, f0, t);
     return 0;
-  });
+  };
+  // Displayed signal scrolls with tStart; the spectrum is computed from a fixed
+  // (tStart-independent) buffer so a stationary signal keeps a stationary spectrum.
+  const signal = time.map((t) => sampleAt(tStart + t));
+  const fftBuf = time.map((t) => sampleAt(t));
 
   // Apply window
   const w = windowFunc(windowType, N);
-  const windowed = signal.map((s, i) => s * w[i]);
+  const windowed = fftBuf.map((s, i) => s * w[i]);
 
   // FFT
   const spec = spectrum(windowed, fs);
@@ -107,6 +112,7 @@ export function buildFilter(
   fc2?: number,
   signalFreq: number = 50,
   fs: number = 500,
+  tStart: number = 0, // animation: scroll the displayed time waves
 ): FilterView {
   const freqs = linspace(0, fs / 2, 256);
   const filterMag = freqs.map((f) => transferMag(filterType, f, fc, fc2));
@@ -114,15 +120,14 @@ export function buildFilter(
   // Example input signal: sum of three tones
   const N = 512;
   const time = linspace(0, N / fs, N);
-  const timeSigInput = time.map((t) => {
-    return (
-      Math.cos(2 * Math.PI * (signalFreq - 50) * t) +
-      Math.cos(2 * Math.PI * signalFreq * t) +
-      Math.cos(2 * Math.PI * (signalFreq + 50) * t)
-    );
-  });
+  const sigAt = (t: number): number =>
+    Math.cos(2 * Math.PI * (signalFreq - 50) * t) +
+    Math.cos(2 * Math.PI * signalFreq * t) +
+    Math.cos(2 * Math.PI * (signalFreq + 50) * t);
+  // Displayed input scrolls with tStart; spectrum from a fixed buffer (stationary).
+  const timeSigInput = time.map((t) => sigAt(tStart + t));
 
-  const spec = spectrum(timeSigInput, fs);
+  const spec = spectrum(time.map((t) => sigAt(t)), fs);
   const inputMag = spec.mag;
   const outputMag = spec.mag.map((m, i) => {
     const f = spec.freq[i];
@@ -161,23 +166,23 @@ export function buildPairs(
 ): PairsView {
   const pair = ftPair(kind, param);
 
-  // Apply time shift in frequency domain as phase ramp
-  const freqShifted = pair.freq.mag.map((mag) => {
-    // Phase shift doesn't affect magnitude in this display
-    return mag * ampScale;
-  });
+  // Time shift t₀ does not affect |X(f)| (only the phase), so the magnitude plot
+  // is unchanged; the time pulse slides. Proakis §2.2.2: x(t−t₀) ↔ X(f)e^{−j2πft₀}.
+  const freqShifted = pair.freq.mag.map((mag) => mag * ampScale);
 
-  // Time-domain shift
-  const timeShifted = pair.time.x.map((x, i) => {
-    const t = pair.time.t[i];
-    return (t - timeShift >= -pair.time.t[pair.time.t.length - 1] / 2 &&
-      t - timeShift <= pair.time.t[pair.time.t.length - 1] / 2)
-      ? x * ampScale
-      : 0;
+  // Slide the time pulse by t₀ via a circular roll of the sample array.
+  const t = pair.time.t;
+  const x = pair.time.x;
+  const n = x.length;
+  const dt = n > 1 ? t[1] - t[0] : 1;
+  const shiftIdx = Math.round(timeShift / dt);
+  const timeShifted = x.map((_, i) => {
+    const j = ((i - shiftIdx) % n + n) % n;
+    return x[j] * ampScale;
   });
 
   return {
-    timeDomain: { t: pair.time.t, x: timeShifted },
+    timeDomain: { t, x: timeShifted },
     freqDomain: { f: pair.freq.f, mag: freqShifted },
   };
 }
@@ -198,16 +203,16 @@ export function buildAnalytic(
   fm: number,
   m: number, // modulation index
   fs: number = 1000,
+  tStart: number = 0, // animation: scroll the bandpass signal
 ): AnalyticView {
   const N = 512;
   const time = linspace(0, N / fs, N);
 
-  // AM signal: (1 + m*cos(2π*fm*t)) * cos(2π*fc*t)
-  const signal = time.map(
-    (t) =>
-      (1 + m * Math.cos(2 * Math.PI * fm * t)) *
-      Math.cos(2 * Math.PI * fc * t),
-  );
+  // AM signal: (1 + m*cos(2π*fm*t)) * cos(2π*fc*t), scrolled by tStart.
+  const signal = time.map((t) => {
+    const tt = tStart + t;
+    return (1 + m * Math.cos(2 * Math.PI * fm * tt)) * Math.cos(2 * Math.PI * fc * tt);
+  });
 
   const result = lowpassEquivalent(signal, fc, fs);
 

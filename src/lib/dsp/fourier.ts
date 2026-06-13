@@ -67,7 +67,7 @@ export function seriesCoeffs(
       for (let n = 1; n <= N; n++) {
         // cₙ = (2/π) * sinc(n*d) * sin(π*n*d) / n
         // Standard form: sinc envelope
-        const c = (2 / Math.PI) * sinc(n * duty) * Math.sin(Math.PI * n * duty) / n;
+        const c = ((2 / Math.PI) * sinc(n * duty) * Math.sin(Math.PI * n * duty)) / n;
         lines.push({ freq: n * f0, mag: Math.abs(c) });
       }
       break;
@@ -115,12 +115,7 @@ export type FilterType = 'lpf' | 'hpf' | 'bpf' | 'rc';
  * - bpf: ideal bandpass from fc to fc2
  * - rc: first-order RC lowpass, 1/√(1+(f/fc)²)
  */
-export function transferMag(
-  type: FilterType,
-  f: number,
-  fc: number,
-  fc2?: number,
-): number {
+export function transferMag(type: FilterType, f: number, fc: number, fc2?: number): number {
   const absF = Math.abs(f);
   switch (type) {
     case 'lpf':

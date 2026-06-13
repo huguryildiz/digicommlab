@@ -1,5 +1,13 @@
 import { Canvas } from '@/lib/plot/Canvas';
-import { linScale, drawLine, drawStems, drawVLine, drawAxes, drawText, type Axes } from '@/lib/plot/draw';
+import {
+  linScale,
+  drawLine,
+  drawStems,
+  drawVLine,
+  drawAxes,
+  drawText,
+  type Axes,
+} from '@/lib/plot/draw';
 import { CHART, alpha } from '@/lib/plot/colors';
 import { t } from '@/i18n';
 import type {
@@ -170,16 +178,7 @@ export function FmModulatorPanel({ view }: { view: AnalogFmView }) {
     drawStems(ctx, ax, view.sidebandFreqs, view.sidebandMags, CHART.blue, 2);
 
     // Carson bandwidth marker
-    drawVLine(
-      ctx,
-      ax,
-      view.sidebandFreqs[0],
-      0,
-      maxMag,
-      CHART.pink,
-      true,
-      1,
-    );
+    drawVLine(ctx, ax, view.sidebandFreqs[0], 0, maxMag, CHART.pink, true, 1);
     drawVLine(
       ctx,
       ax,
@@ -217,12 +216,7 @@ export function FmModulatorPanel({ view }: { view: AnalogFmView }) {
       </div>
       <div className="analog__panel-third">
         <div className="analog__label">{t('analog.fm.spectrum')}</div>
-        <Canvas
-          height={160}
-          draw={drawBessel}
-          deps={[view]}
-          ariaLabel="Bessel sidebands"
-        />
+        <Canvas height={160} draw={drawBessel} deps={[view]} ariaLabel="Bessel sidebands" />
       </div>
     </div>
   );
@@ -287,7 +281,15 @@ export function DemodulationPanel({ view }: { view: AnalogDemodView }) {
     drawAxes(ctx, ax, [view.time[0], view.time[view.time.length - 1]]);
     // Original message (green) vs recovered (blue, dashed when distorted).
     drawLine(ctx, ax, view.time, view.original, CHART.green, 2);
-    drawLine(ctx, ax, view.time, view.recovered, view.faithful ? CHART.blue : CHART.red, 1.8, !view.faithful);
+    drawLine(
+      ctx,
+      ax,
+      view.time,
+      view.recovered,
+      view.faithful ? CHART.blue : CHART.red,
+      1.8,
+      !view.faithful,
+    );
     drawText(ctx, ax, view.time[view.time.length - 1], lo, 't (s)', CHART.dim, -30, 12);
     drawText(ctx, ax, view.time[0], hi, 'm(t)', CHART.dim, -30, -5);
   };
@@ -310,17 +312,25 @@ export function DemodulationPanel({ view }: { view: AnalogDemodView }) {
     <div className="analog__demod-panel">
       <div className="analog__panel-half">
         <div className="analog__label">{t('analog.demod.recovered')}</div>
-        <Canvas height={200} draw={drawRecovery} deps={[view]} ariaLabel={t('analog.demod.recovered')} />
+        <Canvas
+          height={200}
+          draw={drawRecovery}
+          deps={[view]}
+          ariaLabel={t('analog.demod.recovered')}
+        />
       </div>
       {view.carrierEst && (
         <div className="analog__panel-half">
           <div className="analog__label">{t('analog.demod.carrier')}</div>
-          <Canvas height={200} draw={drawCarrier} deps={[view]} ariaLabel={t('analog.demod.carrier')} />
+          <Canvas
+            height={200}
+            draw={drawCarrier}
+            deps={[view]}
+            ariaLabel={t('analog.demod.carrier')}
+          />
         </div>
       )}
-      {!view.faithful && (
-        <div className="analog__warning">{t('analog.demod.warning')}</div>
-      )}
+      {!view.faithful && <div className="analog__warning">{t('analog.demod.warning')}</div>}
     </div>
   );
 }
@@ -328,7 +338,13 @@ export function DemodulationPanel({ view }: { view: AnalogDemodView }) {
 /**
  * Superheterodyne receiver panel: chain blocks + frequency-translation plot.
  */
-export function SuperheterodynePanel({ view }: { view: AnalogSuperView }) {
+export function SuperheterodynePanel({
+  view,
+  clock = 0,
+}: {
+  view: AnalogSuperView;
+  clock?: number;
+}) {
   const drawPlan = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     const fMax = Math.max(view.imageFreq, view.loFreq) * 1.1;
     const ax: Axes = {
@@ -346,9 +362,22 @@ export function SuperheterodynePanel({ view }: { view: AnalogSuperView }) {
     drawStems(ctx, ax, [view.ifLine], [0.9], CHART.blue, 3);
     drawText(ctx, ax, view.ifLine, 0.9, 'f_IF', CHART.blue, 2, -8);
     drawText(ctx, ax, fMax, 0, 'f (Hz)', CHART.dim, -30, 12);
+
+    // Animated down-conversion: a packet slides from f_c down to f_IF, looping.
+    const phase = (((clock * 0.5) % 1) + 1) % 1; // 0..1 every 2 s at speed 1
+    const fMarker = view.stationFreq + (view.ifLine - view.stationFreq) * phase;
+    const yMarker = 1 + (0.9 - 1) * phase;
+    ctx.fillStyle = CHART.pink;
+    ctx.shadowColor = CHART.pink;
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.arc(ax.x(fMarker), ax.y(yMarker), 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
   };
 
-  const fmt = (hz: number) => (hz >= 1e6 ? `${(hz / 1e6).toFixed(3)} MHz` : `${(hz / 1e3).toFixed(1)} kHz`);
+  const fmt = (hz: number) =>
+    hz >= 1e6 ? `${(hz / 1e6).toFixed(3)} MHz` : `${(hz / 1e3).toFixed(1)} kHz`;
 
   return (
     <div className="analog__super-panel">
@@ -364,7 +393,12 @@ export function SuperheterodynePanel({ view }: { view: AnalogSuperView }) {
         <span className="analog__chain-block">{t('analog.super.audio')}</span>
       </div>
       <div className="analog__label">{t('analog.super.plan')}</div>
-      <Canvas height={220} draw={drawPlan} deps={[view]} ariaLabel={t('analog.super.plan')} />
+      <Canvas
+        height={220}
+        draw={drawPlan}
+        deps={[view, clock]}
+        ariaLabel={t('analog.super.plan')}
+      />
       <div className="analog__readouts">
         <span className="analog__chain-block">f_LO = {fmt(view.loFreq)}</span>
         <span className="analog__chain-block">f_image = {fmt(view.imageFreq)}</span>

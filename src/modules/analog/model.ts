@@ -130,7 +130,7 @@ export interface AnalogSuperView {
 /**
  * Build AM modulation view: time-domain waveforms + spectrum.
  */
-export function buildAnalogAmView(p: AnalogAmParams): AnalogAmView {
+export function buildAnalogAmView(p: AnalogAmParams, tStart = 0): AnalogAmView {
   // Message signal (single tone for simplicity)
   const msg = [{ freq: p.messageFreq, amp: 1 }];
   const fm = p.messageFreq;
@@ -142,15 +142,14 @@ export function buildAnalogAmView(p: AnalogAmParams): AnalogAmView {
   const duration = Math.max(3 / fm, 10 / fc);
   const fs = Math.max(20 * fc, 100 * fm); // Nyquist: 2*max(fc, fm)
   const N = Math.ceil(fs * duration);
+  // Local (fixed) display axis [0, duration]; sampling tStart ahead scrolls the wave.
   const time = linspace(0, duration, N);
 
-  const message = time.map((t) => evalSignal(msg, t));
-  const carrier = time.map((t) => Math.cos(2 * Math.PI * fc * t));
-  const modulated = time.map((t) => amSignal(p.mode, msg, fc, Ac, a, t));
+  const message = time.map((t) => evalSignal(msg, tStart + t));
+  const carrier = time.map((t) => Math.cos(2 * Math.PI * fc * (tStart + t)));
+  const modulated = time.map((t) => amSignal(p.mode, msg, fc, Ac, a, tStart + t));
   const envelope =
-    p.mode === 'conventional'
-      ? time.map((t) => amEnvelope(msg, Ac, a, t))
-      : undefined;
+    p.mode === 'conventional' ? time.map((t) => amEnvelope(msg, Ac, a, tStart + t)) : undefined;
 
   // Spectrum: compute FFT and extract positive frequencies
   // For simplicity, use analytic spectrum for single-tone message
@@ -203,7 +202,7 @@ export function buildAnalogAmView(p: AnalogAmParams): AnalogAmView {
 /**
  * Build FM modulation view: constant-envelope waveform + Bessel spectrum.
  */
-export function buildAnalogFmView(p: AnalogFmParams): AnalogFmView {
+export function buildAnalogFmView(p: AnalogFmParams, tStart = 0): AnalogFmView {
   const msg = [{ freq: p.messageFreq, amp: 1 }];
   const fm = p.messageFreq;
   const fc = p.carrierFreq;
@@ -214,15 +213,12 @@ export function buildAnalogFmView(p: AnalogFmParams): AnalogFmView {
   const duration = 5 / fm;
   const fs = Math.max(20 * fc, 50 * fm);
   const N = Math.ceil(fs * duration);
+  // Local (fixed) display axis; sampling tStart ahead scrolls the wave.
   const time = linspace(0, duration, N);
 
-  const message = time.map((t) => evalSignal(msg, t));
-  const modulated = time.map((t) =>
-    angleSignal(p.mode, msg, fc, Ac, beta, t),
-  );
-  const instFreq = time.map((t) =>
-    p.mode === 'fm' ? instantFreq(msg, fc, beta, t) : fc,
-  );
+  const message = time.map((t) => evalSignal(msg, tStart + t));
+  const modulated = time.map((t) => angleSignal(p.mode, msg, fc, Ac, beta, tStart + t));
+  const instFreq = time.map((t) => (p.mode === 'fm' ? instantFreq(msg, fc, beta, tStart + t) : fc));
 
   // Bessel spectrum: sidebands at fc±n·fm with amplitude |Jn(β)|
   const sidebandFreqs: number[] = [];
@@ -298,7 +294,7 @@ function movingAverage(x: number[], win: number): number[] {
  * Build demodulation view: recovered message vs original for the chosen detector.
  * Proakis §3.2.5 (AM detectors) & §3.3.3 (PLL / FM discriminator).
  */
-export function buildAnalogDemodView(p: AnalogDemodParams): AnalogDemodView {
+export function buildAnalogDemodView(p: AnalogDemodParams, tStart = 0): AnalogDemodView {
   const ap = p.amParams ?? {
     mode: 'conventional' as AmMode,
     messageFreq: 1000,
@@ -320,9 +316,10 @@ export function buildAnalogDemodView(p: AnalogDemodParams): AnalogDemodView {
   const duration = 3 / fm;
   const fs = Math.max(20 * fc, 100 * fm);
   const N = Math.ceil(fs * duration);
+  // Local (fixed) display axis; sampling tStart ahead scrolls every trace.
   const time = linspace(0, duration, N);
   const msg = [{ freq: fm, amp: 1 }];
-  const original = time.map((tt) => evalSignal(msg, tt));
+  const original = time.map((tt) => evalSignal(msg, tStart + tt));
 
   // Lowpass window ~ one carrier period, to strip the 2·fc product term.
   const win = Math.max(2, Math.round(fs / fc));
@@ -337,7 +334,7 @@ export function buildAnalogDemodView(p: AnalogDemodParams): AnalogDemodView {
       // Proakis §3.2.5: envelope detector tracks Ac[1 + a·mn(t)]; valid only when a ≤ 1.
       const a = ap.modIndex;
       recovered = time.map((tt) => {
-        const env = amEnvelope(msg, ap.carrierAmp, a, tt);
+        const env = amEnvelope(msg, ap.carrierAmp, a, tStart + tt);
         return env / ap.carrierAmp - 1; // remove carrier offset -> a·mn(t)
       });
       faithful = a <= 1; // a>1 -> envelope distortion
@@ -345,25 +342,33 @@ export function buildAnalogDemodView(p: AnalogDemodParams): AnalogDemodView {
     }
     case 'coherent': {
       // Proakis §3.2.5: LPF{ u(t)·cos(2π fc t) } ∝ ½ m(t) (DSB-SC coherent detector).
-      const prod = time.map((tt) => amSignal('dsb', msg, fc, ap.carrierAmp, ap.modIndex, tt) * Math.cos(2 * Math.PI * fc * tt));
+      const prod = time.map(
+        (tt) =>
+          amSignal('dsb', msg, fc, ap.carrierAmp, ap.modIndex, tStart + tt) *
+          Math.cos(2 * Math.PI * fc * (tStart + tt)),
+      );
       recovered = movingAverage(prod, win).map((v) => 2 * v); // undo the ½ factor
       break;
     }
     case 'pll': {
       // Proakis §3.3.3: PLL estimates the carrier phase θ̂(t); cos(θ̂) recovers the carrier.
-      const u = time.map((tt) => Math.cos(2 * Math.PI * fc * tt));
+      const u = time.map((tt) => Math.cos(2 * Math.PI * fc * (tStart + tt)));
       const theta = pllRecoverPhase(u, fc, fs);
       carrierTrue = u;
       carrierEst = theta.map((th) => Math.cos(th));
       // Coherent detection with the recovered carrier.
-      const prod = time.map((tt, n) => amSignal('dsb', msg, fc, ap.carrierAmp, ap.modIndex, tt) * (carrierEst as number[])[n]);
+      const prod = time.map(
+        (tt, n) =>
+          amSignal('dsb', msg, fc, ap.carrierAmp, ap.modIndex, tStart + tt) *
+          (carrierEst as number[])[n],
+      );
       recovered = movingAverage(prod, win).map((v) => 2 * v);
       break;
     }
     case 'fmdiscrim':
     default: {
       // Proakis §3.3.3: discriminator output ∝ f_i(t) − f_c ∝ m(t).
-      const fi = time.map((tt) => instantFreq(msg, fp.carrierFreq, fp.modIndex, tt));
+      const fi = time.map((tt) => instantFreq(msg, fp.carrierFreq, fp.modIndex, tStart + tt));
       recovered = fi.map((f) => (f - fp.carrierFreq) / fp.modIndex);
       break;
     }

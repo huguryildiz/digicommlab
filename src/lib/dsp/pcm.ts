@@ -11,12 +11,7 @@ export type PcmCoding = 'nbc' | 'gray';
  * uses round; both clamp the integer level k to [-L/2, L/2-1] and offset by
  * L/2 so the smallest level maps to 0 and the largest to L-1.
  */
-export function codeIndex(
-  value: number,
-  mMax: number,
-  bits: number,
-  type: QuantizerType,
-): number {
+export function codeIndex(value: number, mMax: number, bits: number, type: QuantizerType): number {
   const L = numLevels(bits);
   const d = (2 * mMax) / L;
   const k =

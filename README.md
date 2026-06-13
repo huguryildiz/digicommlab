@@ -109,17 +109,17 @@ The landing page renders this chain interactively; each block links straight int
 
 ## 🏗️ Technical Architecture
 
-| Layer | Stack |
-| --- | --- |
-| **Frontend** | React 18 · TypeScript (strict) · Vite · React Router v6 (HashRouter) |
-| **Math typesetting** | KaTeX |
-| **Audio** | Web Audio API — playback of sampled / quantized signals |
-| **Rendering** | Custom Canvas + SVG plotting primitives (no chart library) |
-| **DSP core** | Pure, framework-free TypeScript in `src/lib/dsp` |
-| **Styling** | CSS design tokens — dark glassmorphism + neon glow, light theme |
-| **Testing** | Vitest · Testing Library · jsdom |
-| **Tooling** | ESLint · Prettier · `tsc --noEmit` |
-| **Deployment** | Vercel (static SPA, relative `base`) |
+| Layer                | Stack                                                                |
+| -------------------- | -------------------------------------------------------------------- |
+| **Frontend**         | React 18 · TypeScript (strict) · Vite · React Router v6 (HashRouter) |
+| **Math typesetting** | KaTeX                                                                |
+| **Audio**            | Web Audio API — playback of sampled / quantized signals              |
+| **Rendering**        | Custom Canvas + SVG plotting primitives (no chart library)           |
+| **DSP core**         | Pure, framework-free TypeScript in `src/lib/dsp`                     |
+| **Styling**          | CSS design tokens — dark glassmorphism + neon glow, light theme      |
+| **Testing**          | Vitest · Testing Library · jsdom                                     |
+| **Tooling**          | ESLint · Prettier · `tsc --noEmit`                                   |
+| **Deployment**       | Vercel (static SPA, relative `base`)                                 |
 
 ### System shape
 

@@ -34,7 +34,10 @@ export function buildHuffman(
 
   const insert = (node: HuffmanNode): void => {
     let i = 0;
-    while (i < nodes.length && (afterEquals ? nodes[i].prob <= node.prob : nodes[i].prob < node.prob)) {
+    while (
+      i < nodes.length &&
+      (afterEquals ? nodes[i].prob <= node.prob : nodes[i].prob < node.prob)
+    ) {
       i++;
     }
     nodes.splice(i, 0, node);

@@ -1,11 +1,13 @@
 export const analog: Record<string, string> = {
-  // Panel selector
+  // Animation + panel selector
+  'analog.animation': 'Animation',
   'analog.panel.select': 'Panel',
 
   // Navigation & landing
   'nav.analog': 'Analog AM/FM',
   'landing.mod.analog.title': 'Analog AM/FM Modulation',
-  'landing.mod.analog.desc': 'Explore amplitude and frequency modulation, envelope detection, and FM synthesis.',
+  'landing.mod.analog.desc':
+    'Explore amplitude and frequency modulation, envelope detection, and FM synthesis.',
 
   // AM Modulator panel
   'analog.am.title': 'AM Modulator',

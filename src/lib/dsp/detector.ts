@@ -22,12 +22,7 @@ export function detectML(r: number[], points: number[][]): number {
 }
 
 /** MAP detection: argmin_i { ||r - s_i||^2 - N0 * ln P(s_i) }. */
-export function detectMAP(
-  r: number[],
-  points: number[][],
-  priors: number[],
-  n0: number,
-): number {
+export function detectMAP(r: number[], points: number[][], priors: number[], n0: number): number {
   let best = 0;
   let bestMetric = Infinity;
   for (let i = 0; i < points.length; i++) {
@@ -46,12 +41,6 @@ export function detectMAP(
  * x* = (s0+s1)/2 + N0*ln(p0/p1) / (2*(s1-s0)).
  * Reduces to the midpoint when p0 = p1.
  */
-export function mapThreshold1D(
-  s0: number,
-  s1: number,
-  p0: number,
-  p1: number,
-  n0: number,
-): number {
+export function mapThreshold1D(s0: number, s1: number, p0: number, p1: number, n0: number): number {
   return (s0 + s1) / 2 + (n0 * Math.log(p0 / p1)) / (2 * (s1 - s0));
 }

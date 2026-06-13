@@ -130,7 +130,9 @@ export function angleSignal(
     let phaseDeviation = 0;
     for (const tone of msg) {
       // Integral of amp*cos(2π f τ + φ) is amp*sin(2π f τ + φ)/(2π f)
-      const integral = tone.amp * Math.sin(2 * Math.PI * tone.freq * t + (tone.phase ?? 0)) / (2 * Math.PI * tone.freq || 1e-10);
+      const integral =
+        (tone.amp * Math.sin(2 * Math.PI * tone.freq * t + (tone.phase ?? 0))) /
+        (2 * Math.PI * tone.freq || 1e-10);
       phaseDeviation += 2 * Math.PI * k * integral;
     }
     // Proakis §3.3.1: u(t) = Ac·cos(2π fc t + Δφ)

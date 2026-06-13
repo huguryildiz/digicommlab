@@ -5,7 +5,11 @@
 export const fourier: Record<string, string> = {
   'nav.fourier': 'Fourier & Spectrum',
   'landing.mod.fourier.title': 'Fourier & Spectrum',
-  'landing.mod.fourier.desc': 'Analyze signals in the frequency domain. Fourier series, DFT, filters, and analytical signals.',
+  'landing.mod.fourier.desc':
+    'Analyze signals in the frequency domain. Fourier series, DFT, filters, and analytical signals.',
+
+  // Animation
+  'fourier.animation': 'Animation',
 
   // Panel titles
   'fourier.panel.synthesis': 'Fourier Series Synthesis',

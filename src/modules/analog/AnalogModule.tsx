@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Panel,
   Slider,
@@ -6,8 +6,10 @@ import {
   Readout,
   TheoryBox,
   Formula,
+  TransportControls,
 } from '@/components';
 import { t } from '@/i18n';
+import { useSimulationLoop } from '@/lib/sim/useSimulationLoop';
 import type { AmMode, AngleMode } from '@/lib/dsp/analog';
 import {
   buildAnalogAmView,
@@ -56,6 +58,22 @@ export function AnalogModule() {
   // Module selection
   const [activePanel, setActivePanel] = useState<ActivePanel>('am');
 
+  // Shared animation clock (seconds). One transport drives every panel.
+  const [clock, setClock] = useState(0);
+  const loop = useSimulationLoop({
+    ticksPerSecond: 30,
+    onTick: (_dt, simTime) => setClock(simTime),
+    onReset: () => setClock(0),
+  });
+  useEffect(() => {
+    const reduce =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduce) loop.start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const amParams: AnalogAmParams = useMemo(
     () => ({
       mode: amMode,
@@ -78,20 +96,20 @@ export function AnalogModule() {
     [fmMode, fmMsgFreq, fmCarrierFreq, fmCarrierAmp, fmModIndex],
   );
 
-  const amView = useMemo(() => buildAnalogAmView(amParams), [amParams]);
-  const fmView = useMemo(() => buildAnalogFmView(fmParams), [fmParams]);
-  const powerView = useMemo(
-    () => buildAnalogPowerView({ amParams }),
-    [amParams],
-  );
+  const amView = useMemo(() => buildAnalogAmView(amParams, clock), [amParams, clock]);
+  const fmView = useMemo(() => buildAnalogFmView(fmParams, clock), [fmParams, clock]);
+  const powerView = useMemo(() => buildAnalogPowerView({ amParams }), [amParams]);
   const demodView = useMemo(
     () =>
-      buildAnalogDemodView({
-        method: demodMethod,
-        amParams,
-        fmParams,
-      }),
-    [demodMethod, amParams, fmParams],
+      buildAnalogDemodView(
+        {
+          method: demodMethod,
+          amParams,
+          fmParams,
+        },
+        clock,
+      ),
+    [demodMethod, amParams, fmParams, clock],
   );
   const superView = useMemo(
     () => buildAnalogSuperView({ stationFreq, ifFreq }),
@@ -101,6 +119,9 @@ export function AnalogModule() {
   return (
     <div className="module-layout">
       <aside className="analog__controls">
+        <Panel title={t('analog.animation')}>
+          <TransportControls loop={loop} />
+        </Panel>
         <Panel title={t('nav.analog')}>
           <Select<ActivePanel>
             label={t('analog.panel.select')}
@@ -264,10 +285,7 @@ export function AnalogModule() {
                 value={(amCarrierFreq - amMsgFreq).toFixed(0)}
                 unit="Hz"
               />
-              <Readout
-                label={t('analog.am.modIndex')}
-                value={amModIndex.toFixed(2)}
-              />
+              <Readout label={t('analog.am.modIndex')} value={amModIndex.toFixed(2)} />
               <Readout
                 label={t('analog.readout.efficiency')}
                 value={`${(powerView.efficiency * 100).toFixed(1)}%`}
@@ -276,24 +294,21 @@ export function AnalogModule() {
           )}
           {activePanel === 'fm' && (
             <>
-              <Readout
-                label={t('analog.fm.modIndex')}
-                value={fmModIndex.toFixed(2)}
-              />
+              <Readout label={t('analog.fm.modIndex')} value={fmModIndex.toFixed(2)} />
               <Readout
                 label={t('analog.fm.carson')}
                 value={(fmView.carsonBw / 1000).toFixed(1)}
                 unit="kHz"
               />
-              <Readout
-                label={t('analog.fm.sidebands')}
-                value={fmView.sidebandFreqs.length}
-              />
+              <Readout label={t('analog.fm.sidebands')} value={fmView.sidebandFreqs.length} />
             </>
           )}
           {activePanel === 'demod' && (
             <>
-              <Readout label={t('analog.demod.method')} value={t(`analog.demod.method.${demodMethod}`)} />
+              <Readout
+                label={t('analog.demod.method')}
+                value={t(`analog.demod.method.${demodMethod}`)}
+              />
               <Readout
                 label={t('analog.demod.fidelity')}
                 value={t(demodView.faithful ? 'analog.demod.faithful' : 'analog.demod.distorted')}
@@ -303,8 +318,17 @@ export function AnalogModule() {
           )}
           {activePanel === 'super' && (
             <>
-              <Readout label={t('analog.super.lo')} value={(superView.loFreq / 1000).toFixed(0)} unit="kHz" />
-              <Readout label={t('analog.super.image')} value={(superView.imageFreq / 1000).toFixed(0)} unit="kHz" tone="warn" />
+              <Readout
+                label={t('analog.super.lo')}
+                value={(superView.loFreq / 1000).toFixed(0)}
+                unit="kHz"
+              />
+              <Readout
+                label={t('analog.super.image')}
+                value={(superView.imageFreq / 1000).toFixed(0)}
+                unit="kHz"
+                tone="warn"
+              />
             </>
           )}
           {activePanel === 'power' && (
@@ -348,7 +372,7 @@ export function AnalogModule() {
           )}
           {activePanel === 'super' && (
             <Panel title={t('analog.super.title')}>
-              <SuperheterodynePanel view={superView} />
+              <SuperheterodynePanel view={superView} clock={clock} />
             </Panel>
           )}
         </div>
@@ -366,7 +390,10 @@ export function AnalogModule() {
               </p>
               <p>
                 <strong>SSB-USB:</strong>
-                <Formula tex="u(t) = A_c[m_n(t)\\cos(2\\pi f_c t) - \\hat{m}_n(t)\\sin(2\\pi f_c t)]" block />
+                <Formula
+                  tex="u(t) = A_c[m_n(t)\\cos(2\\pi f_c t) - \\hat{m}_n(t)\\sin(2\\pi f_c t)]"
+                  block
+                />
               </p>
             </>
           )}
@@ -402,7 +429,10 @@ export function AnalogModule() {
             <>
               <p>
                 <strong>{t('analog.demod.method.coherent')}:</strong>
-                <Formula tex="\\mathrm{LPF}\\{u(t)\\cos 2\\pi f_c t\\} \\propto \\tfrac{1}{2} m(t)" block />
+                <Formula
+                  tex="\\mathrm{LPF}\\{u(t)\\cos 2\\pi f_c t\\} \\propto \\tfrac{1}{2} m(t)"
+                  block
+                />
               </p>
               <p>
                 <strong>{t('analog.demod.method.envelope')}:</strong>

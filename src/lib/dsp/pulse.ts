@@ -31,8 +31,7 @@ export function rootRaisedCosine(t: number, alpha: number, T: number): number {
     return (alpha / Math.SQRT2) * (a + b);
   }
   const num =
-    Math.sin(Math.PI * tau * (1 - alpha)) +
-    4 * alpha * tau * Math.cos(Math.PI * tau * (1 + alpha));
+    Math.sin(Math.PI * tau * (1 - alpha)) + 4 * alpha * tau * Math.cos(Math.PI * tau * (1 + alpha));
   const den = Math.PI * tau * (1 - (4 * alpha * tau) ** 2);
   return num / den;
 }
@@ -44,7 +43,11 @@ export function pulseWaveform(kind: PulseKind, alpha: number, sps: number, span:
   for (let i = -span * sps; i <= span * sps; i++) {
     const t = i / sps;
     out.push(
-      kind === 'rrc' ? rootRaisedCosine(t, alpha, T) : kind === 'sinc' ? sinc(t / T) : raisedCosine(t, alpha, T),
+      kind === 'rrc'
+        ? rootRaisedCosine(t, alpha, T)
+        : kind === 'sinc'
+          ? sinc(t / T)
+          : raisedCosine(t, alpha, T),
     );
   }
   return out;
@@ -62,7 +65,7 @@ export function raisedCosineSpectrum(f: number, alpha: number, T: number): numbe
   const f2 = (1 + alpha) / (2 * T);
   if (af <= f1) return 1;
   if (af > f2) return 0;
-  return 0.5 * (1 + Math.cos((Math.PI * T / alpha) * (af - f1)));
+  return 0.5 * (1 + Math.cos(((Math.PI * T) / alpha) * (af - f1)));
 }
 
 /** Raised-cosine first-null / absolute bandwidth W = (1+α)/(2T). */

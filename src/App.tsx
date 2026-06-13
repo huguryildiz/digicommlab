@@ -58,10 +58,7 @@ export default function App() {
             <Route path="/modulation" element={<ModulationModule />} />
             <Route path="/baseband" element={<BasebandModule />} />
             <Route path="/information-theory" element={<InfoTheoryModule />} />
-            <Route
-              path="/end-to-end"
-              element={<ModulePlaceholder title={t('nav.endToEnd')} />}
-            />
+            <Route path="/end-to-end" element={<ModulePlaceholder title={t('nav.endToEnd')} />} />
           </Routes>
         </main>
       </div>

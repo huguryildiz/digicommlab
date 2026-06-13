@@ -3,7 +3,7 @@
  * Proakis & Salehi §2.1–§2.5.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { t } from '@/i18n';
 import { Panel } from '@/components/Panel';
 import { Slider } from '@/components/Slider';
@@ -11,6 +11,8 @@ import { Select } from '@/components/Select';
 import { Readout } from '@/components/Readout';
 import { TheoryBox } from '@/components/TheoryBox';
 import { Formula } from '@/components/Formula';
+import { TransportControls } from '@/components/TransportControls';
+import { useSimulationLoop } from '@/lib/sim/useSimulationLoop';
 import type { Periodic, Tone } from '@/lib/dsp/signals';
 import type { WindowType } from '@/lib/dsp/window';
 import {
@@ -38,12 +40,29 @@ import './fourier.css';
  * - Panel 5: Bandpass signals & Hilbert transform
  */
 export function FourierModule() {
+  // Shared animation clock (seconds). One transport drives every panel.
+  const [clock, setClock] = useState(0);
+  const loop = useSimulationLoop({
+    ticksPerSecond: 30,
+    onTick: (_dt, simTime) => setClock(simTime),
+    onReset: () => setClock(0),
+  });
+  // Auto-play on mount unless the user prefers reduced motion.
+  useEffect(() => {
+    const reduce =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduce) loop.start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Panel 1: Series Synthesis
   const [waveKind, setWaveKind] = useState<Periodic>('square');
   const [f0, setF0] = useState(1);
   const [N, setN] = useState(20);
   const [duty, setDuty] = useState(0.5);
-  const seriesSynthData = buildSeriesSynth(waveKind, f0, N, duty);
+  const seriesSynthData = buildSeriesSynth(waveKind, f0, N, duty, clock);
 
   // Panel 2: Spectrum Analyzer
   const [analyzerType, setAnalyzerType] = useState<'tones' | 'wave'>('tones');
@@ -61,30 +80,37 @@ export function FourierModule() {
     fsAnalyzer,
     Math.min(numSamples, 512),
     windowType,
+    clock,
   );
 
   // Panel 3: Filter
   const [filterType, setFilterType] = useState<'lpf' | 'hpf' | 'bpf' | 'rc'>('lpf');
   const [fc, setFc] = useState(30);
   const [fc2, setFc2] = useState(70);
-  const filterData = buildFilter(filterType, fc, fc2, freq1, 500);
+  const filterData = buildFilter(filterType, fc, fc2, freq1, 500, clock);
 
   // Panel 4: FT Pairs
   const [pairKind, setPairKind] = useState<'rect' | 'tri' | 'gauss'>('rect');
   const [pairParam, setPairParam] = useState(0.1);
   const [timeShift, setTimeShift] = useState(0);
   const [ampScale, setAmpScale] = useState(1);
-  const pairsData = buildPairs(pairKind, pairParam, timeShift, ampScale);
+  // Animate the time-shift t₀: manual offset plus a clock-driven slide.
+  const pairsData = buildPairs(pairKind, pairParam, timeShift + clock, ampScale);
 
   // Panel 5: Bandpass & Hilbert
   const [fcBP, setFcBP] = useState(200);
   const [fm, setFm] = useState(10);
   const [m, setM] = useState(0.5);
-  const analyticData = buildAnalytic(fcBP, fm, m);
+  const analyticData = buildAnalytic(fcBP, fm, m, 1000, clock);
 
   return (
     <div className="module-layout">
       <aside className="fourier__controls">
+        {/* Animation transport — drives every panel from one clock */}
+        <Panel title={t('fourier.animation')}>
+          <TransportControls loop={loop} />
+        </Panel>
+
         {/* Panel 1 Controls */}
         <Panel title={t('fourier.panel.synthesis')}>
           <Select

@@ -67,7 +67,8 @@ export const en: Record<string, string> = {
   'modulation.readout.serTheory': 'Theoretical Pₑ',
   'modulation.readout.serLive': 'Live SER',
   'modulation.readout.errors': 'Errors / total',
-  'modulation.notDrawable': 'This constellation has N > 2 dimensions and cannot be drawn in a 2-D plane. The SER curve and live error counting below still work.',
+  'modulation.notDrawable':
+    'This constellation has N > 2 dimensions and cannot be drawn in a 2-D plane. The SER curve and live error counting below still work.',
   'modulation.runSweep': 'Run simulated sweep',
   'modulation.legend.theory': 'Theory',
   'modulation.legend.sim': 'Simulated',
@@ -189,7 +190,8 @@ export const en: Record<string, string> = {
   'landing.mod.infotheory.desc':
     'Entropy, prefix codes and the Kraft inequality, Huffman, Lempel-Ziv, and channel capacity — five interactive tabs.',
   'landing.mod.baseband.title': 'Baseband & Eye',
-  'landing.mod.baseband.desc': 'Nyquist pulse shaping, ISI and the eye diagram for bandlimited channels.',
+  'landing.mod.baseband.desc':
+    'Nyquist pulse shaping, ISI and the eye diagram for bandlimited channels.',
   'landing.mod.e2e.title': 'End-to-End Link',
   'landing.mod.e2e.desc':
     'The full chain wired together — source coding → modulation → channel → detection, with a live link budget.',
