@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { t } from '@/i18n';
 import { PulseShapingSection } from './PulseShapingSection';
 import { ReceiverSection } from './ReceiverSection';
+import { EyeEqualizationSection } from './EyeEqualizationSection';
 import './baseband.css';
 
 type Tab = 'pulse' | 'receiver' | 'eye';
@@ -30,7 +31,7 @@ export function BasebandModule() {
       </nav>
       {tab === 'pulse' && <PulseShapingSection />}
       {tab === 'receiver' && <ReceiverSection />}
-      {tab === 'eye' && <div className="bb-section" />}
+      {tab === 'eye' && <EyeEqualizationSection />}
     </div>
   );
 }

@@ -10,6 +10,9 @@ import {
 import { matchedFilter, matchedFilterOutput, correlate, pulseEnergy, peakSnr, convolve } from '@/lib/dsp/matchedfilter';
 import { sigmaFromN0 } from '@/lib/dsp/awgn';
 import { makeRng } from '@/lib/sim/sources';
+import { eyeTraces, eyeMetrics, type EyeTrace } from '@/lib/dsp/eye';
+import { zeroForcingTaps, mmseTaps, residualIsi } from '@/lib/dsp/equalizer';
+import { randomBitSource, type Bit } from '@/lib/sim/sources';
 
 export interface PulseParams {
   kind: PulseKind;
@@ -93,5 +96,70 @@ export function buildReceiverView(p: ReceiverParams): ReceiverView {
     correlatorValue: correlate(received, pulse),
     mfAtT: mfOutput[pulse.length - 1],
     rrcCascade: convolve(rrc, rrc),
+  };
+}
+
+export type EqualizerKind = 'off' | 'zf' | 'mmse';
+
+export interface EyeParams {
+  M: 2 | 4;
+  channel: number[];
+  equalizer: EqualizerKind;
+  nTaps: number;
+  noiseVar: number;
+  sps: number;
+}
+
+export interface EyeView {
+  tracesBefore: EyeTrace[];
+  tracesAfter: EyeTrace[];
+  eqTaps: number[];
+  combined: number[];
+  eyeHeightBefore: number;
+  eyeHeightAfter: number;
+  residualIsi: number;
+  sps: number;
+}
+
+function pamLevels(bits: Bit[], M: 2 | 4): number[] {
+  if (M === 2) return bits.map((b) => (b ? 1 : -1));
+  const out: number[] = [];
+  for (let i = 0; i + 1 < bits.length; i += 2) {
+    const idx = (bits[i] << 1) | bits[i + 1];
+    out.push([-3, -1, 3, 1][idx]);
+  }
+  return out;
+}
+
+function shapeHeld(levels: number[], sps: number): number[] {
+  const held: number[] = [];
+  for (const a of levels) for (let i = 0; i < sps; i++) held.push(a);
+  return held;
+}
+
+export function buildEyeView(p: EyeParams): EyeView {
+  const gen = randomBitSource(2024);
+  const bits: Bit[] = Array.from({ length: 256 }, () => gen());
+  const levels = pamLevels(bits, p.M);
+  const clean = shapeHeld(levels, p.sps);
+  const rx = convolve(clean, p.channel);
+  const eqTaps =
+    p.equalizer === 'zf'
+      ? zeroForcingTaps(p.channel, p.nTaps)
+      : p.equalizer === 'mmse'
+        ? mmseTaps(p.channel, p.noiseVar, p.nTaps)
+        : [1];
+  const equalized = convolve(rx, eqTaps);
+  const tracesBefore = eyeTraces(rx, p.sps, 2);
+  const tracesAfter = eyeTraces(equalized, p.sps, 2);
+  return {
+    tracesBefore,
+    tracesAfter,
+    eqTaps,
+    combined: convolve(p.channel, eqTaps),
+    eyeHeightBefore: eyeMetrics(tracesBefore, p.sps).eyeHeight,
+    eyeHeightAfter: eyeMetrics(tracesAfter, p.sps).eyeHeight,
+    residualIsi: residualIsi(p.channel, eqTaps),
+    sps: p.sps,
   };
 }

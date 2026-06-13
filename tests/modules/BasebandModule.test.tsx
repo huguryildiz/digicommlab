@@ -17,4 +17,9 @@ describe('BasebandModule', () => {
     fireEvent.click(screen.getByRole('button', { name: /Optimum Receiver/i }));
     expect(screen.getByLabelText(/Transmit pulse and its matched filter/i)).toBeTruthy();
   });
+  it('switches to the eye tab and shows the eye diagram', () => {
+    render(<BasebandModule />);
+    fireEvent.click(screen.getByRole('button', { name: /Eye, ISI & Equalization/i }));
+    expect(screen.getByLabelText(/Eye diagram before equalization/i)).toBeTruthy();
+  });
 });
