@@ -109,12 +109,14 @@ describe('estimators', () => {
   });
 
   it('sine autocorrelation matches (A^2/2)cos(2π f0 τ), normalized', () => {
-    const p = { ...base, kind: 'randphase-sine' as const, amplitude: 1, f0: 5, fs: 200, N: 1024, M: 1 };
+    const N = 1024;
+    const p = { ...base, kind: 'randphase-sine' as const, amplitude: 1, f0: 5, fs: 200, N, M: 1 };
     const r = timeAutocorr(generateEnsemble(p)[0], 80);
     const norm = r.map((v) => v / r[0]);
-    // τ = lag/fs; expected cos(2π f0 τ)
+    // τ = lag/fs; the biased estimator's expected value is the (N-k)/N taper times cos(2π f0 τ).
     for (let k = 0; k < norm.length; k += 10) {
-      const expected = Math.cos((2 * Math.PI * p.f0 * k) / p.fs);
+      const taper = (N - k) / N;
+      const expected = taper * Math.cos((2 * Math.PI * p.f0 * k) / p.fs);
       expect(norm[k]).toBeCloseTo(expected, 1);
     }
   });
