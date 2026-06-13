@@ -18,13 +18,15 @@ Platforma kitabın **Bölüm 2 (Frequency Domain Analysis of Signals and Systems
 | 1 | `/fourier` | **Fourier & Spectrum** | *Frequency Domain Analysis of Signals and Systems* | Ch 2 |
 | 2 | `/analog` | **Analog AM/FM** | *Analog Signal Transmission and Reception* | Ch 3 |
 
-Her modül **4 panel** (comprehensive derinlik) + kontroller + TheoryBox/Formula taşır;
+Her modül **5 panel** (comprehensive derinlik) + kontroller + TheoryBox/Formula taşır;
 mevcut modül desenini (sampling/modulation/infotheory) izler.
 
 ### Onaylanan kararlar
-- **İki tam ve eşit modül** (her biri kendi nav girişi + landing kartı). Ch3 kitap
-  haritasında "kapsam dışı/arka plan" notlu olsa da kullanıcı tam-eşit işlem istedi.
-- **Comprehensive derinlik:** her modülde 4 panel.
+- **İki tam ve eşit modül** (her biri kendi nav girişi + landing kartı).
+- **Comprehensive derinlik:** her modülde **5 panel** — kullanıcı talebiyle başlangıçta
+  kapsam-dışı tutulan **Hilbert/bantgeçiren (§2.5)**, **VSB (§3.2.4)**, **PLL** ve
+  **süperheterodin alıcı (§3.4)** içeri alındı.
+- **Nav sırası:** Fourier ve Analog **önce** (Ch2/Ch3 temel olduğu için), sonra mevcut modüller.
 - **Paylaşılan FFT motoru:** tek bir DFT/FFT çekirdeği iki modülün (ve ileride
   sampling/baseband'in) altında. Platformda şu an gerçek FFT yok — yalnızca
   `src/lib/dsp/spectrum.ts` analitik çizgi-spektrumu üretiyor.
@@ -75,9 +77,9 @@ export function periodicWave(kind: Periodic, f0: number, t: number, duty?: numbe
 ## 3. Modül A — Fourier & Spectrum (`/fourier`, Ch 2)
 
 Bölüm yapısı (kitap): 2.1 Fourier Serisi · 2.2 Fourier Dönüşümü (2.2.2 Özellikler s.36,
-2.2.3 Periyodik s.39) · 2.3 Güç ve Enerji s.40 · 2.4 Örnekleme s.45 · 2.5 Bantgeçiren s.49.
+2.2.3 Periyodik s.39) · 2.3 Güç ve Enerji s.40 · 2.4 Örnekleme s.45 · **2.5 Bantgeçiren s.49**.
 
-### Paneller
+### Paneller (5)
 
 **Panel 1 — Fourier Serisi Sentezleyici** *(§2.1; §2.2.3 s.39)*
 - Kontroller: dalga seç (square/triangle/sawtooth/pulse), harmonik sayısı N (1–50),
@@ -102,6 +104,13 @@ Bölüm yapısı (kitap): 2.1 Fourier Serisi · 2.2 Fourier Dönüşümü (2.2.2
   ters genişlik; ×cos(2πf_c t) → ±f_c kayma.
 - Formül: `rect(t/τ)↔τ·sinc(fτ)`, `x(t−t₀)↔X(f)e^{−j2πft₀}`, `x(at)↔(1/|a|)X(f/a)`.
 
+**Panel 5 — Bantgeçiren Sinyaller & Hilbert** *(§2.5 s.49 — doğrulandı)*
+- Kontroller: bantgeçiren sinyal kur (taşıyıcı f_c + mesaj), Hilbert/analitik gösterimi aç.
+- Görsel: **analitik sinyal** z(t)=x(t)+j·x̂(t); **I/Q (in-phase/quadrature)** alçak-geçiren
+  bileşenler x_c(t), x_s(t); **alçak-geçiren eşdeğer** x_l(t) ve zarf V(t), faz.
+- Formül: `x̂(t)=Hilbert{x}`, süzgeç `H(f)=−j·sgn(f)` (kuadratür, −π/2 faz);
+  `x(t)=Re{x_l(t)e^{j2πf_c t}}`, `V(t)=|x_l(t)|`.
+
 ### DSP — `src/lib/dsp/fourier.ts`
 ```ts
 import type { SpectralLine } from './spectrum'
@@ -115,6 +124,12 @@ export type FilterType = 'lpf' | 'hpf' | 'bpf' | 'rc'
 export function transferMag(type: FilterType, f: number, fc: number, fc2?: number): number
 /** Bilinen dönüşüm çifti örnekleri (Panel 4). */
 export function ftPair(kind: 'rect' | 'tri' | 'gauss', param: number): { time: { t: number[]; x: number[] }; freq: { f: number[]; mag: number[] } }
+/** Hilbert dönüşümü — kuadratür süzgeç H(f)=−j·sgn(f). Proakis §2.5 */
+export function hilbert(x: number[]): number[]
+/** Analitik sinyal (ön-zarf) z(t)=x(t)+j·x̂(t). */
+export function analyticSignal(x: number[]): { re: number[]; im: number[] }
+/** Alçak-geçiren eşdeğer: I/Q bileşenleri + zarf V(t). Proakis §2.5 s.49 */
+export function lowpassEquivalent(x: number[], fc: number, fs: number): { i: number[]; q: number[]; env: number[] }
 ```
 
 ---
@@ -122,21 +137,23 @@ export function ftPair(kind: 'rect' | 'tri' | 'gauss', param: number): { time: {
 ## 4. Modül B — Analog AM/FM (`/analog`, Ch 3)
 
 Bölüm yapısı (kitap): 3.1 Giriş s.70 · 3.2 AM s.71 (3.2.1 DSB-SC s.71, 3.2.2 Konvansiyonel
-s.78, 3.2.3 SSB s.81, 3.2.4 VSB s.85, 3.2.5 Modülatör/Demodülatör s.88) · 3.3 Açı
-Modülasyonu s.96 (3.3.1 FM/PM gösterimi s.97, 3.3.2 Spektral özellikler s.101, 3.3.3
-Modülatör/Demodülatör s.107).
+s.78, 3.2.3 SSB s.81, **3.2.4 VSB s.85**, 3.2.5 Modülatör/Demodülatör s.88) · 3.3 Açı
+Modülasyonu s.96 (3.3.1 FM/PM gösterimi s.97, 3.3.2 Spektral özellikler s.101,
+**3.3.3 Modülatör/Demodülatör + PLL s.107**) · **3.4 Süperheterodin alıcı s.115**.
 
-### Paneller
+### Paneller (5)
 
-**Panel 1 — AM Modülatör** *(§3.2.1–3.2.3)*
+**Panel 1 — AM Modülatör** *(§3.2.1–3.2.4)*
 - Kontroller: mesaj tonu f_m (veya çok-tonlu), taşıyıcı f_c & A_c, mod:
-  **DSB-SC / Konvansiyonel / SSB (USB/LSB)**, mod-indeksi *a*.
+  **DSB-SC / Konvansiyonel / SSB (USB/LSB) / VSB**, mod-indeksi *a*.
 - Görsel: zaman dalgası + zarf eğrisi; *a>1*'de **aşırı-modülasyon** uyarısı; spektrum
-  (konvansiyonelde taşıyıcı çizgisi + yan bantlar; DSB-SC'de taşıyıcı yok; SSB'de tek yan bant).
+  (konvansiyonelde taşıyıcı + yan bantlar; DSB-SC'de taşıyıcı yok; SSB'de tek yan bant;
+  VSB'de vestige).
 - Formüller (Book.pdf'ten doğrulandı):
   - DSB-SC: `u(t)=m(t)cos2πf_c t` *(§3.2.1, s.71)*
   - Konvansiyonel: `u(t)=A_c[1+a·mₙ(t)]cos2πf_c t`, zarf `A_c[1+a mₙ(t)]` *(§3.2.2, s.78)*
   - SSB: tek yan bant, BW = W *(§3.2.3, s.81)*
+  - VSB: DSB-SC'yi yan-bant süzgeci H(f)'den geçir → vestige kalır, BW≈W..2W *(§3.2.4, s.85)*
 
 **Panel 2 — FM / PM Modülatör** *(§3.3.1–3.3.2)*
 - Kontroller: mesaj f_m, mod-indeksi β (FM) veya k_p (PM), taşıyıcı f_c.
@@ -152,23 +169,33 @@ Modülatör/Demodülatör s.107).
 - Formüller (doğrulandı): taşıyıcı gücü `A_c²/2`, ton yan-bant gücü `A_c²a²/2`;
   ton verimi `η = a²/(2+a²)`, a=1 → **%33**; DSB-SC → η=%100 (taşıyıcı yok).
 
-**Panel 4 — Demodülasyon** *(§3.2.5 s.88; §3.3.3 s.107)*
+**Panel 4 — Demodülasyon (zarf / eşevreli / PLL / diskriminatör)** *(§3.2.5 s.88; §3.3.3 s.107)*
 - Kontroller: AM için **zarf dedektörü** (konvansiyonel) / **eşevreli** (DSB-SC);
-  FM için **diskriminatör**.
-- Görsel: geri-kazanılan mesaj vs orijinal; *a>1*'de zarf dedektör bozulması; eşevreli
-  faz hatasında zayıflama.
-- Formül: zarf ∝ `A_c[1+a mₙ(t)]`; eşevreli: `LPF{u(t)·cos2πf_c t} ∝ ½ m(t)`.
+  taşıyıcı geri-kazanımı **PLL** ile (faz-kilitli döngü); FM için **diskriminatör**.
+- Görsel: geri-kazanılan mesaj vs orijinal; *a>1*'de zarf dedektör bozulması; PLL kilit
+  durumu + eşevreli faz hatasında zayıflama.
+- Formül: zarf ∝ `A_c[1+a mₙ(t)]`; eşevreli: `LPF{u(t)·cos2πf_c t} ∝ ½ m(t)`;
+  PLL taşıyıcı fazını θ̂ kestirir *(§3.3.3, s.107)*.
+
+**Panel 5 — Süperheterodin Alıcı** *(§3.4 s.115 — doğrulandı)*
+- Kontroller: istasyon f_c seçimi, yerel osilatör f_LO; sabit IF f_IF=455 kHz.
+- Görsel: zincir **RF → karıştırıcı (×f_LO) → IF süzgeci → zarf dedektörü → ses**;
+  frekans-öteleme grafiği (RF spektrumu → IF'e iner) + **görüntü frekansı** vurgusu.
+- Formül: `f_LO=f_c+f_IF`; karıştırma → fark `f_IF` ve toplam `2f_c+f_IF`, IF yalnız
+  farkı geçirir; görüntü frekansı `f_image=f_c+2f_IF`.
 
 ### DSP — `src/lib/dsp/analog.ts`
 ```ts
 import type { Tone } from './signals'
-export type AmMode = 'dsb' | 'conventional' | 'ssb-usb' | 'ssb-lsb'
+export type AmMode = 'dsb' | 'conventional' | 'ssb-usb' | 'ssb-lsb' | 'vsb'
 /** AM modüle sinyal u(t). Proakis §3.2 */
 export function amSignal(mode: AmMode, msg: Tone[], fc: number, Ac: number, a: number, t: number): number
 /** Konvansiyonel AM zarfı = Ac[1 + a mₙ(t)]. */
 export function amEnvelope(msg: Tone[], Ac: number, a: number, t: number): number
 /** Modülasyon verimi η = a²Pmn/(1+a²Pmn). Proakis §3.2.2 */
 export function amEfficiency(a: number, Pmn: number): number
+/** VSB yan-bant süzgeci |H(f)| (vestige geçişi). Proakis §3.2.4 s.85 */
+export function vsbFilterMag(f: number, fc: number, vestige: number): number
 export type AngleMode = 'fm' | 'pm'
 /** Açı-modüle sinyal. Proakis §3.3.1 */
 export function angleSignal(mode: AngleMode, msg: Tone[], fc: number, Ac: number, k: number, t: number): number
@@ -178,6 +205,10 @@ export function instantFreq(msg: Tone[], fc: number, kf: number, t: number): num
 export function besselJ(n: number, beta: number): number
 /** Carson bant-genişliği B=2(β+1)f_m. */
 export function carsonBandwidth(beta: number, fm: number): number
+/** PLL taşıyıcı geri-kazanımı: faz kestirimi θ̂(t). Proakis §3.3.3 s.107 */
+export function pllRecoverPhase(u: number[], fc: number, fs: number): number[]
+/** Süperheterodin karıştırma: f_LO=f_c+f_IF → fark bileşeni f_IF + görüntü. Proakis §3.4 s.115 */
+export function heterodyneMix(rf: number[], fLo: number, fIf: number, fs: number): { if: number[]; image: number }
 ```
 
 ---
@@ -186,14 +217,15 @@ export function carsonBandwidth(beta: number, fm: number): number
 
 - **`src/App.tsx`:** 2 route (`/fourier`, `/analog`) + 2 NAV girişi. Nav sırası kitap
   akışına göre: **Fourier → Analog → Sampling → Modulation → Baseband → Information
-  Theory → End-to-End** (Ch2/Ch3 temel olduğu için başta).
+  Theory → End-to-End** (Ch2/Ch3 temel olduğu için başta — kullanıcı onayladı).
 - **i18n:** Her track kendi anahtarlarını ayrı fragmana yazar: `src/i18n/fourier.ts`,
   `src/i18n/analog.ts` (her biri `Record<string,string>`). `src/i18n/index.ts` birleştirir:
   `const dict = { ...en, ...fourier, ...analog }`. en.ts'e (ve birbirine) dokunulmaz.
 - **Landing `src/pages/landing/modules.config.ts`:** 2 yeni `LANDING_MODULES` kartı
   (`chapter: 'CH 2'`/`'CH 3'`, `status: 'live'`, `route`). `BentoArea` ve `VizKind`
   tipleri yeni değerlerle genişler. Her track kendi landing viz bileşenini getirir:
-  `FourierViz` (harmonik birikimi), `AmFmViz` (modüle dalga).
+  `FourierViz` (harmonik birikimi), `AmFmViz` (modüle dalga). Kartlar kitap sırasına göre
+  öne numaralanır (öneri: Fourier 01, Analog 02, mevcutlar kayar).
 
 ---
 
@@ -201,10 +233,10 @@ export function carsonBandwidth(beta: number, fm: number): number
 
 | Dosya | Kapsam |
 |---|---|
-| `tests/.../fft.test.ts` | DFT bilinen dönüşümlerle; FFT==DFT eşitliği; Parseval; ifft(fft(x))≈x |
-| `tests/.../fourier.test.ts` | kare/üçgen FS katsayıları; rect↔sinc çifti; Gibbs taşma oranı |
-| `tests/.../analog.test.ts` | AM zarfı; `amEfficiency(1, 0.5)=1/3`; Bessel Jₙ değerleri (Tablo 3.1); `carsonBandwidth` |
-| `tests/pages/*` | her modül için hafif render smoke testi |
+| `tests/.../fft.test.ts` | DFT bilinen dönüşümlerle; FFT==DFT; Parseval; ifft(fft(x))≈x |
+| `tests/.../fourier.test.ts` | kare/üçgen FS katsayıları; rect↔sinc; Gibbs taşma; **Hilbert** (−π/2 faz, analitik sinyal); I/Q eşdeğer |
+| `tests/.../analog.test.ts` | AM zarfı; `amEfficiency(1,0.5)=1/3`; Bessel Jₙ (Tablo 3.1); `carsonBandwidth`; **VSB süzgeci**; **PLL faz kilidi**; **heterodyne** f_IF/görüntü |
+| `tests/pages/*` | her modül için hafif render smoke testi (fourier, analog) |
 
 Tüm DSP testleri saf fonksiyon (UI'sız). `npm test` + `npm run build` (tsc --noEmit + vite)
 + `npm run lint` entegrasyon kapısı.
@@ -216,8 +248,8 @@ Tüm DSP testleri saf fonksiyon (UI'sız). `npm test` + `npm run build` (tsc --n
 | Faz | İş | Dosyalar | Nerede |
 |---|---|---|---|
 | **0** | Paylaşılan FFT temeli | `dsp/fft.ts`, `dsp/window.ts`, `dsp/signals.ts`(+), testleri | master (önce, sıralı) |
-| **1a** | Fourier modülü | `dsp/fourier.ts`, `modules/fourier/*`, `landing/viz/FourierViz.tsx`, `i18n/fourier.ts` | worktree `wt-fourier` |
-| **1b** | Analog modülü | `dsp/analog.ts`, `modules/analog/*`, `landing/viz/AmFmViz.tsx`, `i18n/analog.ts` | worktree `wt-analog` |
+| **1a** | Fourier modülü (5 panel + Hilbert) | `dsp/fourier.ts`, `modules/fourier/*`, `landing/viz/FourierViz.tsx`, `i18n/fourier.ts` | worktree `wt-fourier` |
+| **1b** | Analog modülü (5 panel + VSB/PLL/süperheterodin) | `dsp/analog.ts`, `modules/analog/*`, `landing/viz/AmFmViz.tsx`, `i18n/analog.ts` | worktree `wt-analog` |
 | **2** | Entegrasyon + doğrulama | `App.tsx`, `i18n/index.ts`, `modules.config.ts` + build/test/lint | master |
 
 Faz-1 ajanları **yalnız kendi** `modules/<x>/`, `dsp/<x>.ts`, `i18n/<x>.ts`,
@@ -230,35 +262,37 @@ dokunma noktaları (App.tsx, i18n/index.ts, modules.config.ts) yalnız Faz 2'de 
 
 **Yeni — paylaşılan (Faz 0):** `src/lib/dsp/fft.ts`, `src/lib/dsp/window.ts`
 **Değişen — paylaşılan (Faz 0):** `src/lib/dsp/signals.ts` (periyodik üreteçler)
-**Yeni — Fourier (Faz 1a):** `src/lib/dsp/fourier.ts`, `src/modules/fourier/FourierModule.tsx`,
-`.../model.ts`, `.../panels.tsx`, `.../fourier.css`, `src/pages/landing/viz/FourierViz.tsx`,
-`src/i18n/fourier.ts`
-**Yeni — Analog (Faz 1b):** `src/lib/dsp/analog.ts`, `src/modules/analog/AnalogModule.tsx`,
-`.../model.ts`, `.../panels.tsx`, `.../analog.css`, `src/pages/landing/viz/AmFmViz.tsx`,
-`src/i18n/analog.ts`
+**Yeni — Fourier (Faz 1a):** `src/lib/dsp/fourier.ts` (FS + filtreler + Hilbert/§2.5),
+`src/modules/fourier/FourierModule.tsx`, `.../model.ts`, `.../panels.tsx` (5 panel),
+`.../fourier.css`, `src/pages/landing/viz/FourierViz.tsx`, `src/i18n/fourier.ts`
+**Yeni — Analog (Faz 1b):** `src/lib/dsp/analog.ts` (AM[+VSB]/FM/PM + PLL + süperheterodin),
+`src/modules/analog/AnalogModule.tsx`, `.../model.ts`, `.../panels.tsx` (5 panel),
+`.../analog.css`, `src/pages/landing/viz/AmFmViz.tsx`, `src/i18n/analog.ts`
 **Değişen — entegrasyon (Faz 2):** `src/App.tsx`, `src/i18n/index.ts`,
 `src/pages/landing/modules.config.ts`
-**Yeni — testler:** `tests/.../fft.test.ts`, `fourier.test.ts`, `analog.test.ts`,
-`tests/pages/fourier`, `tests/pages/analog` smoke testleri
+**Yeni — testler:** `fft.test.ts`, `fourier.test.ts`, `analog.test.ts`,
+`tests/pages/fourier` & `tests/pages/analog` smoke testleri
 
 ---
 
 ## 9. Kapsam dışı (YAGNI)
 
-- VSB-AM (§3.2.4) tam implementasyonu — Panel 1'de seçenek olarak *opsiyonel*; ilk
-  sürümde DSB-SC/Konvansiyonel/SSB yeterli.
-- Süperheterodin alıcı, PLL, radyo/TV yayını detayları (§3.4–3.5).
-- Bantgeçiren süreç / Hilbert dönüşümü görselleştirmesi (§2.5) — ileri.
-- Gürültü etkisi (Ch5) — bu modüllerin dışında.
+- Radyo/TV yayını ayrıntıları (§3.4.2–3.4.3, FM stereo, TV) — süperheterodin AM alıcısı
+  yeterli; tam yayın zinciri dışarıda.
+- Mobil radyo sistemleri (§3.5).
+- Sinyal çoğullama (§3.2.6, FDM) — opsiyonel, ilk sürümde yok.
+- Gürültü etkisi (Ch 5) — bu modüllerin dışında.
 
 ---
 
 ## 10. Açık notlar / riskler
 
-- **Landing numaralandırma:** mevcut kartlar 01–05 numaralı. Fourier/Analog kitap
-  sırasında erken; ya 00/01 olarak öne alınır ya da 06/07 olarak eklenir. Küçük UX
-  kararı, entegrasyon fazında netleşir (öneri: kitap sırasına göre yeniden numaralama).
 - **Bessel Jₙ(β):** seri açılımı veya Tablo 3.1 değerleriyle; test referansı kitap Tablo 3.1.
-- **FFT performansı:** N≤4096 etkileşimli kullanımda yeterli; radix-2 yol ana hat,
-  DFT yalnız yedek.
+- **Hilbert sayısal:** FFT tabanlı (H(f)=−j·sgn(f) çarpımı) — `fft.ts` üstüne kurulur,
+  ayrı `fourier.ts`'te yaşar.
+- **PLL modeli:** etkileşimli demo için basitleştirilmiş ayrık-zaman faz kestirimi;
+  amaç pedagojik (kilit/kayma görselleştirmesi), tam döngü-filtre tasarımı değil.
+- **Süperheterodin:** frekanslar pedagojik ölçekte (gerçek 455 kHz IF kavramsal gösterilir,
+  görselleştirme normalize edilebilir).
+- **FFT performansı:** N≤4096 etkileşimli kullanımda yeterli; radix-2 ana hat, DFT yedek.
 - Tüm formüller koda `// Proakis §x.y, s.N` yorumuyla işlenir (CLAUDE.md zorunlu kuralı).
