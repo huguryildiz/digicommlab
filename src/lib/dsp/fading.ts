@@ -3,6 +3,9 @@
  * Proakis & Salehi §10.1.1 (Channel Models for Time-Variant Multipath Channels).
  */
 
+/** Seeded RNG returning uniform random values in [0,1). */
+type Rng = () => number;
+
 export interface Tap {
   /** Path delay in seconds. */
   delay: number;
@@ -46,4 +49,24 @@ export function coherenceBandwidth(sigmaTau: number): number {
 export function coherenceTime(fD: number): number {
   if (fD <= 0) return Infinity;
   return 1 / (2 * Math.PI * fD);
+}
+
+/**
+ * Magnitude of the channel transfer function H(f) = Σ_k g_k e^{-j2π f τ_k},
+ * where each complex tap gain g_k = sqrt(power_k)·e^{jθ_k} has a seeded random
+ * phase θ_k (fixed snapshot of the time-variant channel). Proakis §10.1.1.
+ */
+export function channelFreqResponse(taps: Tap[], freqs: number[], rng: Rng): number[] {
+  const phases = taps.map(() => 2 * Math.PI * rng());
+  const amps = taps.map((t) => Math.sqrt(t.power));
+  return freqs.map((f) => {
+    let re = 0;
+    let im = 0;
+    for (let k = 0; k < taps.length; k++) {
+      const phi = phases[k] - 2 * Math.PI * f * taps[k].delay;
+      re += amps[k] * Math.cos(phi);
+      im += amps[k] * Math.sin(phi);
+    }
+    return Math.hypot(re, im);
+  });
 }

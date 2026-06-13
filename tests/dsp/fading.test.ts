@@ -4,8 +4,10 @@ import {
   rmsDelaySpread,
   coherenceBandwidth,
   coherenceTime,
+  channelFreqResponse,
   type Tap,
 } from '@/lib/dsp/fading';
+import { makeRng } from '@/lib/dsp/random';
 
 describe('exponentialPdp', () => {
   it('returns nTaps taps with unit total power and exponential decay', () => {
@@ -41,5 +43,23 @@ describe('coherenceBandwidth / coherenceTime', () => {
   it('coherence time is inversely proportional to Doppler', () => {
     expect(coherenceTime(100)).toBeCloseTo(1 / (2 * Math.PI * 100), 9);
     expect(coherenceTime(200)).toBeLessThan(coherenceTime(100));
+  });
+});
+
+describe('channelFreqResponse', () => {
+  it('a single tap gives a flat (constant) magnitude response', () => {
+    const taps: Tap[] = [{ delay: 0, power: 1 }];
+    const freqs = [-1e6, 0, 1e6];
+    const mag = channelFreqResponse(taps, freqs, makeRng(1));
+    expect(mag[0]).toBeCloseTo(mag[1], 10);
+    expect(mag[1]).toBeCloseTo(mag[2], 10);
+  });
+  it('multiple taps produce frequency-selective notches (non-constant magnitude)', () => {
+    const taps = exponentialPdp(5, 1e-6, 0.5e-6);
+    const freqs = Array.from({ length: 256 }, (_, i) => (i - 128) * 1e4);
+    const mag = channelFreqResponse(taps, freqs, makeRng(7));
+    const max = Math.max(...mag);
+    const min = Math.min(...mag);
+    expect(max - min).toBeGreaterThan(0.1); // selective, not flat
   });
 });
