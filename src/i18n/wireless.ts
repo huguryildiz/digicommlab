@@ -168,4 +168,17 @@ export const wireless: Record<string, string> = {
   'wl.cpm.psd.title': 'Power spectrum: MSK vs QPSK',
   'wl.cpm.readout.mode': 'Scheme',
   'wl.cpm.readout.phase': 'Phase change per symbol',
+
+  // CDMA multi-user / near-far section
+  'wl.tab.cdma': 'CDMA',
+  'wl.cdma.title': 'CDMA multi-user',
+  'wl.cdma.gain': 'Processing gain L_c',
+  'wl.cdma.users': 'Active users N_u',
+  'wl.cdma.ebn0': 'E_b/N₀ (dB)',
+  'wl.cdma.nearfar': 'Near-far ratio Γ (dB)',
+  'wl.cdma.users.title': 'BER vs number of users',
+  'wl.cdma.ebn0.title': 'BER vs E_b/N₀ — power control vs near-far',
+  'wl.cdma.readout.sir': 'SIR',
+  'wl.cdma.readout.ber': 'BER at operating point',
+  'wl.cdma.readout.capacity': 'User capacity @ BER 1e-3',
 };
