@@ -12,7 +12,7 @@ export function Home() {
       <ModuleBento />
       <footer className="landing__footer">
         <span>
-          {t('landing.footer.left')} — <b>{t('landing.footer.ref')}</b>
+          {t('landing.footer.left')}
         </span>
         <span className="landing__footer-meta">
           <a

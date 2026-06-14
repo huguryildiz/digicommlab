@@ -191,7 +191,7 @@ export const en: Record<string, string> = {
   'landing.headline.l1': 'Watch a bit',
   'landing.headline.l2': 'survive the channel.',
   'landing.lead':
-    'CommSysLab is a hands-on playground for the whole communication system — from analog AM/FM to the digital link: sample, quantize, source-code, modulate, and detect, every block live and grounded in Proakis & Salehi.',
+    'CommSysLab is a hands-on playground for the whole communication system — from analog AM/FM to the digital link: sample, quantize, source-code, modulate, and detect, every block live.',
   'landing.cta.primary': 'Start with Sampling',
   'landing.cta.secondary': 'Explore the link',
   'landing.stats.modules': 'Modules',
@@ -228,7 +228,6 @@ export const en: Record<string, string> = {
   'landing.mod.e2e.desc':
     'The full chain wired together — source coding → modulation → channel → detection, with a live link budget.',
   'landing.footer.left': 'Interactive Communication Systems Lab',
-  'landing.footer.ref': 'built on Proakis & Salehi, Communication Systems Engineering',
   'landing.footer.stack': 'React · TS · Vite',
   'landing.footer.theme': 'dark / light',
   'landing.footer.dev': 'Developed by Hüseyin Uğur Yıldız',
