@@ -19,9 +19,6 @@ import type {
 
 const PAD = { l: 40, r: 20, t: 20, b: 40 };
 
-/**
- * AM Modulator panel: time-domain + spectrum.
- */
 export function AmModulatorPanel({ view }: { view: AnalogAmView }) {
   const drawTimeDomain = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     const minVal = Math.min(...view.modulated, ...view.message, ...(view.envelope ?? [0])) * 1.1;
@@ -32,55 +29,53 @@ export function AmModulatorPanel({ view }: { view: AnalogAmView }) {
       y: linScale([minVal, maxVal], [h - PAD.b, PAD.t]),
     };
 
-    drawAxes(ctx, ax, [view.time[0], view.time[view.time.length - 1]]);
+    drawAxes(ctx, ax, [view.time[0], view.time[view.time.length - 1]], {
+      grid: true,
+      domainY: [minVal, maxVal],
+      xLabel: '$t\\,[\\mathrm{s}]$',
+      yLabel: '$u(t)$',
+    });
 
-    // Modulated signal (primary)
-    ctx.strokeStyle = CHART.blue;
-    ctx.lineWidth = 1.5;
-    ctx.globalAlpha = 0.8;
+    // Modulated signal u(t) (primary, blue).
     drawLine(ctx, ax, view.time, view.modulated, CHART.blue, 1.5);
-    ctx.globalAlpha = 1;
 
-    // Envelope (if conventional AM)
+    // Envelope (conventional AM only, orange dashed, both rails).
     if (view.envelope) {
-      ctx.strokeStyle = CHART.orange;
       drawLine(ctx, ax, view.time, view.envelope, CHART.orange, 2, true);
-      ctx.strokeStyle = CHART.orange;
-      const envNeg = view.envelope.map((e) => -e);
-      drawLine(ctx, ax, view.time, envNeg, CHART.orange, 2, true);
+      drawLine(ctx, ax, view.time, view.envelope.map((e) => -e), CHART.orange, 2, true);
     }
 
-    // Message overlay
-    ctx.strokeStyle = CHART.green;
+    // Message m(t) overlay (green).
     drawLine(ctx, ax, view.time, view.message, CHART.green, 2);
 
-    // Axis labels
-    drawText(ctx, ax, view.time[view.time.length - 1], minVal, 't (s)', CHART.dim, 0, 10);
-    drawText(ctx, ax, view.time[0], maxVal, 'u(t)', CHART.dim, -30, -5);
+    // Legend.
+    drawLegend(ctx, w, [
+      { color: CHART.blue, label: 'u(t)' },
+      { color: CHART.green, label: 'm(t)' },
+      ...(view.envelope ? [{ color: CHART.orange, label: 'envelope' }] : []),
+    ]);
   };
 
   const drawSpectrum = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     if (view.specFreq.length === 0) return;
 
-    const minFreq = Math.min(...view.specFreq) - Math.max(...view.specFreq) * 0.1;
-    const maxFreq = Math.max(...view.specFreq) + Math.max(...view.specFreq) * 0.1;
-    const maxMag = Math.max(...view.specMag, 1) * 1.2;
+    const minFreq = view.specFreq[0];
+    const maxFreq = view.specFreq[view.specFreq.length - 1];
+    const maxMag = Math.max(...view.specMag, 1e-9) * 1.2;
 
     const ax: Axes = {
       x: linScale([minFreq, maxFreq], [PAD.l, w - PAD.r]),
       y: linScale([0, maxMag], [h - PAD.b, PAD.t]),
     };
 
-    drawAxes(ctx, ax, [minFreq, maxFreq]);
+    drawAxes(ctx, ax, [minFreq, maxFreq], {
+      grid: true,
+      domainY: [0, maxMag],
+      xLabel: '$f\\,[\\mathrm{Hz}]$',
+      yLabel: '$|U(f)|$',
+    });
 
-    // Stems for spectral lines
-    ctx.strokeStyle = CHART.blue;
-    ctx.fillStyle = CHART.blue;
-    drawStems(ctx, ax, view.specFreq, view.specMag, CHART.blue, 2);
-
-    // Axis labels
-    drawText(ctx, ax, maxFreq, 0, 'f (Hz)', CHART.dim, -30, 10);
-    drawText(ctx, ax, minFreq, maxMag, '|H(f)|', CHART.dim, -40, -5);
+    drawLine(ctx, ax, view.specFreq, view.specMag, CHART.blue, 1.5);
   };
 
   return (
@@ -108,6 +103,28 @@ export function AmModulatorPanel({ view }: { view: AnalogAmView }) {
       )}
     </div>
   );
+}
+
+/** Small top-right legend swatch list, drawn in screen pixels. */
+function drawLegend(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  items: { color: string; label: string }[],
+): void {
+  ctx.save();
+  ctx.font = '11px var(--mono)';
+  ctx.textBaseline = 'middle';
+  let y = PAD.t + 2;
+  for (const it of items) {
+    const textW = ctx.measureText(it.label).width;
+    const x = w - PAD.r - textW - 16;
+    ctx.fillStyle = it.color;
+    ctx.fillRect(x, y - 4, 10, 8);
+    ctx.fillStyle = CHART.text;
+    ctx.fillText(it.label, x + 14, y);
+    y += 14;
+  }
+  ctx.restore();
 }
 
 /**
