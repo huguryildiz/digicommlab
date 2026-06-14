@@ -11,7 +11,10 @@ describe('StartPage (launcher)', () => {
       </MemoryRouter>,
     );
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Choose a module/i);
-    expect(screen.getByRole('link', { name: /Sampling & Quantization/i })).toHaveAttribute('href', '/sampling');
+    expect(screen.getByRole('link', { name: /Sampling & Quantization/i })).toHaveAttribute(
+      'href',
+      '/sampling',
+    );
     expect(screen.getAllByRole('listitem')).toHaveLength(12);
   });
 });

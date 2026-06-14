@@ -16,19 +16,37 @@ describe('evalSignal', () => {
     expect(evalSignal([{ freq: 1, amp: 1 }], 0.25)).toBeCloseTo(0, 12);
   });
   it('sums components', () => {
-    expect(evalSignal([{ freq: 1, amp: 1 }, { freq: 2, amp: 3 }], 0)).toBeCloseTo(4, 12);
+    expect(
+      evalSignal(
+        [
+          { freq: 1, amp: 1 },
+          { freq: 2, amp: 3 },
+        ],
+        0,
+      ),
+    ).toBeCloseTo(4, 12);
   });
 });
 
 describe('signalBandwidth', () => {
   it('is the maximum component frequency', () => {
-    expect(signalBandwidth([{ freq: 3, amp: 1 }, { freq: 7, amp: 1 }])).toBe(7);
+    expect(
+      signalBandwidth([
+        { freq: 3, amp: 1 },
+        { freq: 7, amp: 1 },
+      ]),
+    ).toBe(7);
   });
 });
 
 describe('signalPeak', () => {
   it('is the sum of absolute amplitudes', () => {
-    expect(signalPeak([{ freq: 1, amp: 2 }, { freq: 2, amp: 3 }])).toBe(5);
+    expect(
+      signalPeak([
+        { freq: 1, amp: 2 },
+        { freq: 2, amp: 3 },
+      ]),
+    ).toBe(5);
   });
 });
 

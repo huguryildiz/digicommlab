@@ -35,7 +35,12 @@ describe('aliasFrequency', () => {
 
 describe('nyquistRate', () => {
   it('is twice the bandwidth', () => {
-    expect(nyquistRate([{ freq: 3, amp: 1 }, { freq: 7, amp: 1 }])).toBe(14);
+    expect(
+      nyquistRate([
+        { freq: 3, amp: 1 },
+        { freq: 7, amp: 1 },
+      ]),
+    ).toBe(14);
   });
 });
 

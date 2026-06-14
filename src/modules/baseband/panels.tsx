@@ -18,7 +18,10 @@ export function PulseTimePanel({ view }: { view: PulseView }) {
       deps={[view]}
       draw={(ctx, w, h) => {
         const tMax = view.t[view.t.length - 1];
-        const ax = { x: linScale([-tMax, tMax], [34, w - 10]), y: linScale([-0.4, yMax], [h - 18, 10]) };
+        const ax = {
+          x: linScale([-tMax, tMax], [34, w - 10]),
+          y: linScale([-0.4, yMax], [h - 18, 10]),
+        };
         drawAxes(ctx, ax, [-tMax, tMax]);
         for (let n = -Math.floor(tMax); n <= Math.floor(tMax); n++) {
           drawVLine(ctx, ax, n, -0.4, yMax, 'rgba(154,167,180,0.25)', true, 1);
@@ -58,7 +61,10 @@ export function MatchedFilterPanel({ view }: { view: ReceiverView }) {
       deps={[view]}
       draw={(ctx, w, h) => {
         const tMax = view.t[view.t.length - 1];
-        const ax = { x: linScale([-tMax, tMax], [34, w - 10]), y: linScale([-0.5, 1.2], [h - 18, 10]) };
+        const ax = {
+          x: linScale([-tMax, tMax], [34, w - 10]),
+          y: linScale([-0.5, 1.2], [h - 18, 10]),
+        };
         drawAxes(ctx, ax, [-tMax, tMax]);
         drawLine(ctx, ax, view.t, view.pulse, COL_P, 2);
         drawLine(ctx, ax, view.t, view.matched, COL_H, 2, true);
@@ -76,11 +82,23 @@ export function MfOutputPanel({ view }: { view: ReceiverView }) {
       draw={(ctx, w, h) => {
         const xs = view.mfOutput.map((_, i) => i);
         const yMax = Math.max(...view.mfOutput) * 1.15;
-        const ax = { x: linScale([0, xs.length - 1], [34, w - 10]), y: linScale([-yMax * 0.3, yMax], [h - 18, 10]) };
+        const ax = {
+          x: linScale([0, xs.length - 1], [34, w - 10]),
+          y: linScale([-yMax * 0.3, yMax], [h - 18, 10]),
+        };
         drawAxes(ctx, ax, [0, xs.length - 1]);
         drawLine(ctx, ax, xs, view.mfOutput, COL_Y, 2);
         drawVLine(ctx, ax, view.mfPeakIndex, -yMax * 0.3, yMax, COL_MARK, false, 1.5);
-        drawText(ctx, ax, view.mfPeakIndex, view.energy, `E=${view.energy.toFixed(2)}`, COL_MARK, 6, -6);
+        drawText(
+          ctx,
+          ax,
+          view.mfPeakIndex,
+          view.energy,
+          `E=${view.energy.toFixed(2)}`,
+          COL_MARK,
+          6,
+          -6,
+        );
       }}
     />
   );
@@ -96,7 +114,10 @@ export function RrcSplitPanel({ view }: { view: ReceiverView }) {
         const c = view.rrcCascade;
         const xs = c.map((_, i) => i);
         const peak = Math.max(...c);
-        const ax = { x: linScale([0, xs.length - 1], [34, w - 10]), y: linScale([-peak * 0.3, peak * 1.1], [h - 18, 10]) };
+        const ax = {
+          x: linScale([0, xs.length - 1], [34, w - 10]),
+          y: linScale([-peak * 0.3, peak * 1.1], [h - 18, 10]),
+        };
         drawAxes(ctx, ax, [0, xs.length - 1]);
         drawLine(ctx, ax, xs, c, COL_Y, 2);
       }}
@@ -104,7 +125,13 @@ export function RrcSplitPanel({ view }: { view: ReceiverView }) {
   );
 }
 
-function drawEye(ctx: CanvasRenderingContext2D, w: number, h: number, traces: EyeTrace[], sps: number) {
+function drawEye(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  traces: EyeTrace[],
+  sps: number,
+) {
   const cols = traces[0]?.samples.length ?? 2 * sps;
   const ax = { x: linScale([0, cols - 1], [34, w - 10]), y: linScale([-4, 4], [h - 18, 10]) };
   drawAxes(ctx, ax, [0, cols - 1]);
@@ -113,9 +140,22 @@ function drawEye(ctx: CanvasRenderingContext2D, w: number, h: number, traces: Ey
   drawVLine(ctx, ax, Math.floor(cols / 2), -4, 4, COL_MARK, true, 1.5);
 }
 
-export function EyePanel({ traces, sps, label }: { traces: EyeTrace[]; sps: number; label: string }) {
+export function EyePanel({
+  traces,
+  sps,
+  label,
+}: {
+  traces: EyeTrace[];
+  sps: number;
+  label: string;
+}) {
   return (
-    <Canvas height={220} ariaLabel={label} deps={[traces]} draw={(ctx, w, h) => drawEye(ctx, w, h, traces, sps)} />
+    <Canvas
+      height={220}
+      ariaLabel={label}
+      deps={[traces]}
+      draw={(ctx, w, h) => drawEye(ctx, w, h, traces, sps)}
+    />
   );
 }
 
@@ -128,7 +168,10 @@ export function TapStemPanel({ view }: { view: EyeView }) {
       draw={(ctx, w, h) => {
         const xs = view.eqTaps.map((_, i) => i);
         const m = Math.max(1, ...view.eqTaps.map((v) => Math.abs(v))) * 1.2;
-        const ax = { x: linScale([-0.5, view.eqTaps.length - 0.5], [34, w - 10]), y: linScale([-m, m], [h - 18, 10]) };
+        const ax = {
+          x: linScale([-0.5, view.eqTaps.length - 0.5], [34, w - 10]),
+          y: linScale([-m, m], [h - 18, 10]),
+        };
         drawAxes(ctx, ax, [-0.5, view.eqTaps.length - 0.5]);
         drawStems(ctx, ax, xs, view.eqTaps, COL_H, 3);
       }}
@@ -145,7 +188,10 @@ export function CombinedPanel({ view }: { view: EyeView }) {
       draw={(ctx, w, h) => {
         const xs = view.combined.map((_, i) => i);
         const m = Math.max(1, ...view.combined.map((v) => Math.abs(v))) * 1.2;
-        const ax = { x: linScale([-0.5, view.combined.length - 0.5], [34, w - 10]), y: linScale([-m, m], [h - 18, 10]) };
+        const ax = {
+          x: linScale([-0.5, view.combined.length - 0.5], [34, w - 10]),
+          y: linScale([-m, m], [h - 18, 10]),
+        };
         drawAxes(ctx, ax, [-0.5, view.combined.length - 0.5]);
         drawStems(ctx, ax, xs, view.combined, COL_Y, 3);
       }}

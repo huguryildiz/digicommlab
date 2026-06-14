@@ -323,7 +323,10 @@ export function FourierModule() {
             label={t('fourier.readout.power')}
             value={(Math.abs(seriesSynthData.c1Mag) ** 2).toFixed(3)}
           />
-          <Readout label={t('fourier.readout.env')} value={analyticData.envelope[256]?.toFixed(3) ?? '—'} />
+          <Readout
+            label={t('fourier.readout.env')}
+            value={analyticData.envelope[256]?.toFixed(3) ?? '—'}
+          />
         </div>
 
         {/* Plots */}
@@ -352,30 +355,25 @@ export function FourierModule() {
         {/* Theory Box */}
         <TheoryBox title={t('fourier.theory.title')}>
           <h4>{t('fourier.theory.series')}</h4>
-          <Formula
-            tex="x(t) = \sum_{n=-\infty}^{\infty} c_n e^{j2\pi n f_0 t}"
-            block
-          />
+          <Formula tex="x(t) = \sum_{n=-\infty}^{\infty} c_n e^{j2\pi n f_0 t}" block />
           <p>
-            Proakis § 2.1: Any periodic signal can be decomposed as a sum of complex exponentials at integer harmonics of the fundamental frequency.
+            Proakis § 2.1: Any periodic signal can be decomposed as a sum of complex exponentials at
+            integer harmonics of the fundamental frequency.
           </p>
 
           <h4>{t('fourier.theory.dft')}</h4>
-          <Formula
-            tex="X[k] = \sum_{n=0}^{N-1} x[n] e^{-j2\pi kn/N}"
-            block
-          />
+          <Formula tex="X[k] = \sum_{n=0}^{N-1} x[n] e^{-j2\pi kn/N}" block />
           <p>
-            Proakis § 2.2: The DFT maps N time-domain samples to N frequency bins. Windowing reduces spectral leakage.
+            Proakis § 2.2: The DFT maps N time-domain samples to N frequency bins. Windowing reduces
+            spectral leakage.
           </p>
 
           <h4>{t('fourier.theory.filter')}</h4>
-          <Formula
-            tex="Y(f) = H(f) X(f)"
-            block
-          />
+          <Formula tex="Y(f) = H(f) X(f)" block />
           <p>
-            Proakis § 2.2.2: Linear filtering is multiplication in the frequency domain. Ideal filters (bricks) have sharp cutoffs; practical filters (RC, Butterworth) roll off smoothly.
+            Proakis § 2.2.2: Linear filtering is multiplication in the frequency domain. Ideal
+            filters (bricks) have sharp cutoffs; practical filters (RC, Butterworth) roll off
+            smoothly.
           </p>
 
           <h4>{t('fourier.theory.hilbert')}</h4>
@@ -384,16 +382,15 @@ export function FourierModule() {
             block
           />
           <p>
-            Proakis § 2.5: The Hilbert transform applies a −π/2 phase shift, creating the imaginary part of the analytic signal.
+            Proakis § 2.5: The Hilbert transform applies a −π/2 phase shift, creating the imaginary
+            part of the analytic signal.
           </p>
 
           <h4>{t('fourier.theory.analytic')}</h4>
-          <Formula
-            tex="z(t) = x(t) + j\hat{x}(t)"
-            block
-          />
+          <Formula tex="z(t) = x(t) + j\hat{x}(t)" block />
           <p>
-            Proakis § 2.5: The analytic signal has a one-sided spectrum (only positive frequencies). Its envelope V(t) = |z(t)| isolates the amplitude modulation of a bandpass signal.
+            Proakis § 2.5: The analytic signal has a one-sided spectrum (only positive frequencies).
+            Its envelope V(t) = |z(t)| isolates the amplitude modulation of a bandpass signal.
           </p>
         </TheoryBox>
       </div>

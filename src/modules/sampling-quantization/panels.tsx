@@ -31,12 +31,7 @@ const COL = {
 
 const PAD = { l: 8, r: 8, t: 10, b: 10 };
 
-function axesFor(
-  w: number,
-  h: number,
-  domX: [number, number],
-  domY: [number, number],
-): Axes {
+function axesFor(w: number, h: number, domX: [number, number], domY: [number, number]): Axes {
   return {
     x: linScale(domX, [PAD.l, w - PAD.r]),
     y: linScale(domY, [h - PAD.b, PAD.t]),

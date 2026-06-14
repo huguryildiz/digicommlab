@@ -1,7 +1,15 @@
 import { useState } from 'react';
 import { Panel, Slider, Select, Toggle, Readout, Formula, TheoryBox } from '@/components';
 import { Canvas } from '@/lib/plot/Canvas';
-import { linScale, logScale, drawAxes, drawLine, drawScatter, drawVLine, drawText } from '@/lib/plot/draw';
+import {
+  linScale,
+  logScale,
+  drawAxes,
+  drawLine,
+  drawScatter,
+  drawVLine,
+  drawText,
+} from '@/lib/plot/draw';
 import { CHART, alpha } from '@/lib/plot/colors';
 import {
   shannonLimitEbN0MinDb,
@@ -67,8 +75,23 @@ export function ShannonLimitSection() {
     <div className="cc-section">
       <aside className="cc-controls">
         <Panel title={t('cc.sh.title')}>
-          <Slider label={t('cc.sh.ebn0')} value={ebN0Db} min={-2} max={20} step={0.5} unit="dB" onChange={setEbN0Db} />
-          <Slider label={t('cc.sh.r')} value={rExp} min={-1} max={1} step={0.01} onChange={setRExp} />
+          <Slider
+            label={t('cc.sh.ebn0')}
+            value={ebN0Db}
+            min={-2}
+            max={20}
+            step={0.5}
+            unit="dB"
+            onChange={setEbN0Db}
+          />
+          <Slider
+            label={t('cc.sh.r')}
+            value={rExp}
+            min={-1}
+            max={1}
+            step={0.01}
+            onChange={setRExp}
+          />
           <Readout label="r" value={r.toFixed(2)} unit="b/s/Hz" />
           <Select<BerKey>
             label={t('cc.sh.targetBer')}
@@ -81,7 +104,12 @@ export function ShannonLimitSection() {
             onChange={setBerKey}
           />
           <Toggle label={t('cc.sh.overlay')} checked={showOverlay} onChange={setShowOverlay} />
-          <Readout label={t('cc.sh.gap')} value={gap.toFixed(2)} unit="dB" tone={gap >= 0 ? 'ok' : 'err'} />
+          <Readout
+            label={t('cc.sh.gap')}
+            value={gap.toFixed(2)}
+            unit="dB"
+            tone={gap >= 0 ? 'ok' : 'err'}
+          />
         </Panel>
       </aside>
 
@@ -92,7 +120,10 @@ export function ShannonLimitSection() {
             ariaLabel="Capacity versus bandwidth"
             deps={[]}
             draw={(ctx, w, h) => {
-              const ax = { x: linScale([0, 200], [34, w - 10]), y: linScale([0, 1.6], [h - 22, 10]) };
+              const ax = {
+                x: linScale([0, 200], [34, w - 10]),
+                y: linScale([0, 1.6], [h - 22, 10]),
+              };
               drawAxes(ctx, ax, [0, 200]);
               const us: number[] = [];
               const cs: number[] = [];
@@ -102,7 +133,16 @@ export function ShannonLimitSection() {
               }
               drawLine(ctx, ax, us, cs, CHART.green, 2);
               drawLine(ctx, ax, [0, 200], [LOG2E, LOG2E], alpha(CHART.dim, 0.8), 1, true);
-              drawText(ctx, ax, 110, LOG2E, `ceiling = log₂e ≈ ${LOG2E.toFixed(3)}`, CHART.dim, 0, -6);
+              drawText(
+                ctx,
+                ax,
+                110,
+                LOG2E,
+                `ceiling = log₂e ≈ ${LOG2E.toFixed(3)}`,
+                CHART.dim,
+                0,
+                -6,
+              );
               drawText(ctx, ax, 90, 0.12, 'C/(P/N₀) vs W/(P/N₀)', CHART.dim, 0, 0);
             }}
           />
@@ -113,7 +153,10 @@ export function ShannonLimitSection() {
             ariaLabel="Spectral efficiency versus Eb/N0 with the Shannon bound"
             deps={[ebN0Db, rExp, berKey, showOverlay]}
             draw={(ctx, w, h) => {
-              const ax = { x: linScale([XMIN, XMAX], [40, w - 10]), y: logScale([RMIN, RMAX], [h - 24, 10]) };
+              const ax = {
+                x: linScale([XMIN, XMAX], [40, w - 10]),
+                y: logScale([RMIN, RMAX], [h - 24, 10]),
+              };
               // Achievable region (right of the boundary) — light green fill.
               ctx.fillStyle = alpha(CHART.green, 0.08);
               ctx.beginPath();
@@ -126,7 +169,16 @@ export function ShannonLimitSection() {
               // Boundary curve and the −1.59 dB asymptote.
               drawLine(ctx, ax, boundDb, rGrid, CHART.orange, 2);
               drawVLine(ctx, ax, SHANNON_LIMIT_DB, RMIN, RMAX, alpha(CHART.pink, 0.85), true, 1.5);
-              drawText(ctx, ax, SHANNON_LIMIT_DB, RMAX, `${SHANNON_LIMIT_DB.toFixed(2)} dB`, CHART.pink, 2, 8);
+              drawText(
+                ctx,
+                ax,
+                SHANNON_LIMIT_DB,
+                RMAX,
+                `${SHANNON_LIMIT_DB.toFixed(2)} dB`,
+                CHART.pink,
+                2,
+                8,
+              );
               // Region labels.
               drawText(ctx, ax, 13, 6, 'bandwidth-limited', CHART.dim, 0, 0);
               drawText(ctx, ax, 13, 0.2, 'power-limited', CHART.dim, 0, 0);
@@ -145,8 +197,14 @@ export function ShannonLimitSection() {
           />
         </Panel>
         <TheoryBox title={t('cc.theory')}>
-          <Formula tex="C=W\log_2\!\left(1+\frac{P}{N_0 W}\right),\qquad \lim_{W\to\infty}C=\frac{P}{N_0}\log_2 e" block />
-          <Formula tex="\frac{E_b}{N_0}\ge \frac{2^{r}-1}{r},\ \ r=\frac{R}{W};\qquad r\to 0\Rightarrow \frac{E_b}{N_0}\to\ln 2=-1.59\,\text{dB}" block />
+          <Formula
+            tex="C=W\log_2\!\left(1+\frac{P}{N_0 W}\right),\qquad \lim_{W\to\infty}C=\frac{P}{N_0}\log_2 e"
+            block
+          />
+          <Formula
+            tex="\frac{E_b}{N_0}\ge \frac{2^{r}-1}{r},\ \ r=\frac{R}{W};\qquad r\to 0\Rightarrow \frac{E_b}{N_0}\to\ln 2=-1.59\,\text{dB}"
+            block
+          />
         </TheoryBox>
       </div>
     </div>

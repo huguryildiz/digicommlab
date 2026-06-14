@@ -93,7 +93,15 @@ export function BlockCodesSection() {
           </div>
         </Panel>
         <Panel title={t('cc.bc.curveCtl')}>
-          <Slider label="Eb/N₀" value={ebN0Db} min={0} max={12} step={0.5} unit="dB" onChange={setEbN0Db} />
+          <Slider
+            label="Eb/N₀"
+            value={ebN0Db}
+            min={0}
+            max={12}
+            step={0.5}
+            unit="dB"
+            onChange={setEbN0Db}
+          />
         </Panel>
       </aside>
 
@@ -128,7 +136,11 @@ export function BlockCodesSection() {
           </p>
           <BitRow label="ĉ" bits={dec.corrected} kind="code" split={code.k} />
           <BitRow label="x̂" bits={dec.message} kind="x" />
-          <p className={recovered ? 'cc-bc-status cc-bc-status--ok' : 'cc-bc-status cc-bc-status--err'}>
+          <p
+            className={
+              recovered ? 'cc-bc-status cc-bc-status--ok' : 'cc-bc-status cc-bc-status--err'
+            }
+          >
             {recovered ? t('cc.bc.ok') : t('cc.bc.fail')} ({numErr} {t('cc.bc.errBits')}, t = {tt})
           </p>
         </Panel>
@@ -144,13 +156,24 @@ export function BlockCodesSection() {
 
         {code.n === 3 && (
           <Panel title={t('cc.bc.cube')}>
-            <Canvas height={240} ariaLabel="Hamming cube" deps={[codeId]} draw={(ctx, w, h) => drawCube(ctx, w, h, code)} />
+            <Canvas
+              height={240}
+              ariaLabel="Hamming cube"
+              deps={[codeId]}
+              draw={(ctx, w, h) => drawCube(ctx, w, h, code)}
+            />
           </Panel>
         )}
 
         <TheoryBox title={t('cc.theory')}>
-          <Formula tex="c = xG,\qquad s = rH^{\mathsf T},\qquad G=[I_k\,|\,P],\ H=[P^{\mathsf T}\,|\,I_{n-k}]" block />
-          <Formula tex="\text{Hamming}\,(2^m{-}1,\ 2^m{-}m{-}1,\ 3),\qquad t=\left\lfloor\tfrac{d_{\min}-1}{2}\right\rfloor" block />
+          <Formula
+            tex="c = xG,\qquad s = rH^{\mathsf T},\qquad G=[I_k\,|\,P],\ H=[P^{\mathsf T}\,|\,I_{n-k}]"
+            block
+          />
+          <Formula
+            tex="\text{Hamming}\,(2^m{-}1,\ 2^m{-}m{-}1,\ 3),\qquad t=\left\lfloor\tfrac{d_{\min}-1}{2}\right\rfloor"
+            block
+          />
         </TheoryBox>
       </div>
     </div>
@@ -164,7 +187,10 @@ function MatrixGrid({ m, split, identLeft }: { m: number[][]; split: number; ide
         row.map((b, j) => {
           const isIdent = identLeft ? j < split : j >= split;
           return (
-            <span key={`${i}-${j}`} className={`cc-bc-cell ${isIdent ? 'cc-bc-cell--ident' : 'cc-bc-cell--p'}`}>
+            <span
+              key={`${i}-${j}`}
+              className={`cc-bc-cell ${isIdent ? 'cc-bc-cell--ident' : 'cc-bc-cell--p'}`}
+            >
               {b}
             </span>
           );
@@ -210,7 +236,13 @@ function BitRow({
 }
 
 /** BER vs Eb/N0 (log y): uncoded, hard-decision coded, soft-decision reference. */
-function drawCodingGain(ctx: CanvasRenderingContext2D, w: number, h: number, code: LinearCode, ebN0DbCur: number): void {
+function drawCodingGain(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  code: LinearCode,
+  ebN0DbCur: number,
+): void {
   const XMIN = 0;
   const XMAX = 12;
   const YMIN = 1e-6;
@@ -240,7 +272,10 @@ function drawCodingGain(ctx: CanvasRenderingContext2D, w: number, h: number, cod
 function drawCube(ctx: CanvasRenderingContext2D, w: number, h: number, code: LinearCode): void {
   const codewords = new Set(allCodewords(code.G).map((c) => c.join('')));
   const ax = { x: linScale([0, 1], [0, w]), y: linScale([0, 1], [h, 0]) };
-  const proj = (b: number[]): [number, number] => [0.28 + b[0] * 0.46 + b[2] * 0.2, 0.76 - b[1] * 0.5 - b[2] * 0.2];
+  const proj = (b: number[]): [number, number] => [
+    0.28 + b[0] * 0.46 + b[2] * 0.2,
+    0.76 - b[1] * 0.5 - b[2] * 0.2,
+  ];
   const verts: number[][] = [];
   for (let v = 0; v < 8; v++) verts.push([(v >> 2) & 1, (v >> 1) & 1, v & 1]);
   ctx.strokeStyle = alpha(CHART.dim, 0.5);

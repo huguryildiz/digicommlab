@@ -4,7 +4,15 @@
  * field and `docs/book-reference.md`.
  */
 export type ModuleStatus = 'live' | 'soon';
-export type VizKind = 'constellation' | 'sampling' | 'entropy' | 'linkpulse' | 'fourier' | 'amfm' | 'fading' | 'noise';
+export type VizKind =
+  | 'constellation'
+  | 'sampling'
+  | 'entropy'
+  | 'linkpulse'
+  | 'fourier'
+  | 'amfm'
+  | 'fading'
+  | 'noise';
 
 export interface LandingModule {
   id: string;
@@ -116,7 +124,9 @@ export const LANDING_MODULES: LandingModule[] = [
     descKey: 'landing.mod.baseband.desc',
     chapter: 'CH 8',
     route: '/baseband',
-    status: 'soon',
+    status: 'live',
+    viz: 'linkpulse',
+    compact: true,
   },
   {
     id: 'channel-coding',

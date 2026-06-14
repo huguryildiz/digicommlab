@@ -11,9 +11,7 @@ export function Home() {
       <SignalChain />
       <ModuleBento />
       <footer className="landing__footer">
-        <span>
-          {t('landing.footer.left')}
-        </span>
+        <span>{t('landing.footer.left')}</span>
         <span className="landing__footer-meta">
           © 2026 {t('landing.footer.dev')}{' '}
           <a

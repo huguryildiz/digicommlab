@@ -1,5 +1,13 @@
 import { useMemo, useRef, useState } from 'react';
-import { Panel, Slider, Select, Readout, TheoryBox, Formula, TransportControls } from '@/components';
+import {
+  Panel,
+  Slider,
+  Select,
+  Readout,
+  TheoryBox,
+  Formula,
+  TransportControls,
+} from '@/components';
 import { t } from '@/i18n';
 import { makeRng } from '@/lib/sim/sources';
 import { useSimulationLoop } from '@/lib/sim/useSimulationLoop';
@@ -201,19 +209,23 @@ export function OptimumReceiverSection() {
               {view.kind === 'orthogonal' && (
                 <CorrelatorBankPanel view={view} reception={reception} />
               )}
-              {isCustom && view.dim >= 3 && (
-                <MinDistancePanel view={view} reception={reception} />
-              )}
+              {isCustom && view.dim >= 3 && <MinDistancePanel view={view} reception={reception} />}
             </>
           )}
         </Panel>
 
         <TheoryBox title={t('modulation.optrx.theory.title')}>
           <p>
-            <Formula tex="r_k=\int_0^T r(t)\,\varphi_k(t)\,dt \quad(\text{correlator, §7.5.1})" block />
+            <Formula
+              tex="r_k=\int_0^T r(t)\,\varphi_k(t)\,dt \quad(\text{correlator, §7.5.1})"
+              block
+            />
           </p>
           <p>
-            <Formula tex="\hat{m}=\arg\min_i \lVert r-s_i\rVert^2 \quad(\text{min-distance, §7.5.3})" block />
+            <Formula
+              tex="\hat{m}=\arg\min_i \lVert r-s_i\rVert^2 \quad(\text{min-distance, §7.5.3})"
+              block
+            />
           </p>
           <p>
             <Formula tex="\mathrm{SNR}_{\text{peak}}=\dfrac{2E}{N_0}" block />

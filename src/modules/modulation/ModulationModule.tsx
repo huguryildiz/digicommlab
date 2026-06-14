@@ -127,9 +127,7 @@ export function ModulationModule() {
         const tx = pickTx();
         const r = addAwgn(c.points[tx], view.sigma, rngRef.current);
         const rx =
-          decision === 'map'
-            ? detectMAP(r, c.points, view.priors, view.n0)
-            : detectML(r, c.points);
+          decision === 'map' ? detectMAP(r, c.points, view.priors, view.n0) : detectML(r, c.points);
         const err = rx !== tx;
         if (err) errRef.current++;
         totRef.current++;
@@ -190,173 +188,175 @@ export function ModulationModule() {
       />
       {tab === 'optrx' && <OptimumReceiverSection />}
       <div className="module-layout" hidden={tab !== 'detection'}>
-      <aside className="modulation__controls">
-        <Panel title={t('nav.modulation')}>
-          <Select<Scheme>
-            label={t('modulation.scheme')}
-            value={scheme}
-            onChange={handleScheme}
-            options={[
-              { value: 'bpsk', label: t('modulation.scheme.bpsk') },
-              { value: 'bask', label: t('modulation.scheme.bask') },
-              { value: 'bfsk', label: t('modulation.scheme.bfsk') },
-              { value: 'mpsk', label: t('modulation.scheme.mpsk') },
-              { value: 'mask', label: t('modulation.scheme.mask') },
-              { value: 'mqam', label: t('modulation.scheme.mqam') },
-              { value: 'mfsk', label: t('modulation.scheme.mfsk') },
-            ]}
-          />
-          <Select<string>
-            label={t('modulation.M')}
-            value={String(M)}
-            onChange={(v) => handleM(Number(v))}
-            options={M_OPTIONS[scheme].map((m) => ({ value: String(m), label: String(m) }))}
-          />
-          <Slider
-            label={t('modulation.ebn0')}
-            value={ebN0Db}
-            min={0}
-            max={14}
-            step={0.5}
-            unit="dB"
-            onChange={setEbN0Db}
-          />
-          <Slider
-            label={t('modulation.numSymbols')}
-            value={numSymbols}
-            min={500}
-            max={20000}
-            step={500}
-            onChange={setNumSymbols}
-          />
-          <Select<Decision>
-            label={t('modulation.decision')}
-            value={decision}
-            onChange={handleDecision}
-            options={[
-              { value: 'ml', label: t('modulation.decision.ml') },
-              { value: 'map', label: t('modulation.decision.map') },
-            ]}
-          />
-          {decision === 'map' && (
+        <aside className="modulation__controls">
+          <Panel title={t('nav.modulation')}>
+            <Select<Scheme>
+              label={t('modulation.scheme')}
+              value={scheme}
+              onChange={handleScheme}
+              options={[
+                { value: 'bpsk', label: t('modulation.scheme.bpsk') },
+                { value: 'bask', label: t('modulation.scheme.bask') },
+                { value: 'bfsk', label: t('modulation.scheme.bfsk') },
+                { value: 'mpsk', label: t('modulation.scheme.mpsk') },
+                { value: 'mask', label: t('modulation.scheme.mask') },
+                { value: 'mqam', label: t('modulation.scheme.mqam') },
+                { value: 'mfsk', label: t('modulation.scheme.mfsk') },
+              ]}
+            />
+            <Select<string>
+              label={t('modulation.M')}
+              value={String(M)}
+              onChange={(v) => handleM(Number(v))}
+              options={M_OPTIONS[scheme].map((m) => ({ value: String(m), label: String(m) }))}
+            />
             <Slider
-              label={t('modulation.prior0')}
-              value={prior0}
-              min={0.05}
-              max={0.95}
-              step={0.05}
-              onChange={setPrior0}
+              label={t('modulation.ebn0')}
+              value={ebN0Db}
+              min={0}
+              max={14}
+              step={0.5}
+              unit="dB"
+              onChange={setEbN0Db}
             />
-          )}
-          <Toggle
-            label={t('modulation.showRegions')}
-            checked={showRegions}
-            onChange={setShowRegions}
-          />
-          <Toggle
-            label={t('modulation.showLabels')}
-            checked={showLabels}
-            onChange={setShowLabels}
-          />
-          <button type="button" onClick={runSweep}>
-            {t('modulation.runSweep')}
-          </button>
-          <TransportControls loop={loop} />
-        </Panel>
-      </aside>
-
-      <div className="modulation__content">
-        <div className="modulation__readouts">
-          <Readout label={t('modulation.readout.dim')} value={view.dim} />
-          <Readout label={t('modulation.readout.bits')} value={view.bitsPerSymbol} />
-          <Readout label={t('modulation.readout.dmin')} value={view.dMin.toFixed(3)} />
-          <Readout label={t('modulation.readout.esavg')} value={view.EsAvg.toFixed(3)} />
-          <Readout label={t('modulation.readout.sigma')} value={view.sigma.toFixed(3)} />
-          <Readout
-            label={t('modulation.readout.serTheory')}
-            value={view.theoreticalSerNow.toExponential(2)}
-          />
-          <Readout
-            label={t('modulation.readout.serLive')}
-            value={livePoint ? livePoint.ser.toExponential(2) : '—'}
-            tone={livePoint ? 'ok' : undefined}
-          />
-          <Readout
-            label={t('modulation.readout.errors')}
-            value={liveSer ? `${liveSer.errors} / ${liveSer.total}` : '—'}
-          />
-        </div>
-
-        <div className="modulation__plots">
-          <Panel
-            title={
-              view.dim === 1 ? t('modulation.panel.threshold') : t('modulation.panel.constellation')
-            }
-          >
-            {view.dim === 1 ? (
-              <ThresholdPanel
-                view={view}
-                decision={decision}
-                showLabels={showLabels}
-                cloud={cloud}
+            <Slider
+              label={t('modulation.numSymbols')}
+              value={numSymbols}
+              min={500}
+              max={20000}
+              step={500}
+              onChange={setNumSymbols}
+            />
+            <Select<Decision>
+              label={t('modulation.decision')}
+              value={decision}
+              onChange={handleDecision}
+              options={[
+                { value: 'ml', label: t('modulation.decision.ml') },
+                { value: 'map', label: t('modulation.decision.map') },
+              ]}
+            />
+            {decision === 'map' && (
+              <Slider
+                label={t('modulation.prior0')}
+                value={prior0}
+                min={0.05}
+                max={0.95}
+                step={0.05}
+                onChange={setPrior0}
               />
-            ) : view.drawable ? (
-              <ConstellationPanel
-                view={view}
-                decision={decision}
-                showRegions={showRegions}
-                showLabels={showLabels}
-                cloud={cloud}
-                arrow={arrow}
-              />
-            ) : (
-              <p className="modulation__notice">{t('modulation.notDrawable')}</p>
             )}
-          </Panel>
-
-          <Panel title={t('modulation.panel.ser')}>
-            <SerCurvePanel
-              view={view}
-              ebN0Db={ebN0Db}
-              simPoints={simPoints}
-              livePoint={livePoint}
+            <Toggle
+              label={t('modulation.showRegions')}
+              checked={showRegions}
+              onChange={setShowRegions}
             />
-            <div className="modulation__legend">
-              <span className="lg-theory">{t('modulation.legend.theory')}</span>
-              <span className="lg-sim">{t('modulation.legend.sim')}</span>
-              <span className="lg-live">{t('modulation.legend.live')}</span>
-            </div>
+            <Toggle
+              label={t('modulation.showLabels')}
+              checked={showLabels}
+              onChange={setShowLabels}
+            />
+            <button type="button" onClick={runSweep}>
+              {t('modulation.runSweep')}
+            </button>
+            <TransportControls loop={loop} />
           </Panel>
+        </aside>
+
+        <div className="modulation__content">
+          <div className="modulation__readouts">
+            <Readout label={t('modulation.readout.dim')} value={view.dim} />
+            <Readout label={t('modulation.readout.bits')} value={view.bitsPerSymbol} />
+            <Readout label={t('modulation.readout.dmin')} value={view.dMin.toFixed(3)} />
+            <Readout label={t('modulation.readout.esavg')} value={view.EsAvg.toFixed(3)} />
+            <Readout label={t('modulation.readout.sigma')} value={view.sigma.toFixed(3)} />
+            <Readout
+              label={t('modulation.readout.serTheory')}
+              value={view.theoreticalSerNow.toExponential(2)}
+            />
+            <Readout
+              label={t('modulation.readout.serLive')}
+              value={livePoint ? livePoint.ser.toExponential(2) : '—'}
+              tone={livePoint ? 'ok' : undefined}
+            />
+            <Readout
+              label={t('modulation.readout.errors')}
+              value={liveSer ? `${liveSer.errors} / ${liveSer.total}` : '—'}
+            />
+          </div>
+
+          <div className="modulation__plots">
+            <Panel
+              title={
+                view.dim === 1
+                  ? t('modulation.panel.threshold')
+                  : t('modulation.panel.constellation')
+              }
+            >
+              {view.dim === 1 ? (
+                <ThresholdPanel
+                  view={view}
+                  decision={decision}
+                  showLabels={showLabels}
+                  cloud={cloud}
+                />
+              ) : view.drawable ? (
+                <ConstellationPanel
+                  view={view}
+                  decision={decision}
+                  showRegions={showRegions}
+                  showLabels={showLabels}
+                  cloud={cloud}
+                  arrow={arrow}
+                />
+              ) : (
+                <p className="modulation__notice">{t('modulation.notDrawable')}</p>
+              )}
+            </Panel>
+
+            <Panel title={t('modulation.panel.ser')}>
+              <SerCurvePanel
+                view={view}
+                ebN0Db={ebN0Db}
+                simPoints={simPoints}
+                livePoint={livePoint}
+              />
+              <div className="modulation__legend">
+                <span className="lg-theory">{t('modulation.legend.theory')}</span>
+                <span className="lg-sim">{t('modulation.legend.sim')}</span>
+                <span className="lg-live">{t('modulation.legend.live')}</span>
+              </div>
+            </Panel>
+          </div>
+
+          <MessageTransmission
+            ebN0Db={ebN0Db}
+            decision={decision}
+            priors={view.priors}
+            constellation={view.constellation}
+          />
+
+          <TheoryBox title={t('modulation.theory.title')}>
+            <p>
+              <Formula tex="\hat{s}_{\mathrm{ML}}=\arg\min_i \lVert r-s_i\rVert^2" block />
+            </p>
+            <p>
+              <Formula
+                tex="\hat{s}_{\mathrm{MAP}}=\arg\min_i\{\lVert r-s_i\rVert^2 - N_0\ln P(s_i)\}"
+                block
+              />
+            </p>
+            <p>
+              <Formula tex="x^*=\tfrac{s_0+s_1}{2}+\dfrac{N_0\ln(p_0/p_1)}{2(s_1-s_0)}" block />
+            </p>
+            <p>
+              <Formula
+                tex="P_e^{\mathrm{BPSK}}=Q\!\left(\sqrt{2E_b/N_0}\right),\quad Q(x)=\tfrac12\operatorname{erfc}\!\left(\tfrac{x}{\sqrt2}\right)"
+                block
+              />
+            </p>
+          </TheoryBox>
         </div>
-
-        <MessageTransmission
-          ebN0Db={ebN0Db}
-          decision={decision}
-          priors={view.priors}
-          constellation={view.constellation}
-        />
-
-        <TheoryBox title={t('modulation.theory.title')}>
-          <p>
-            <Formula tex="\hat{s}_{\mathrm{ML}}=\arg\min_i \lVert r-s_i\rVert^2" block />
-          </p>
-          <p>
-            <Formula
-              tex="\hat{s}_{\mathrm{MAP}}=\arg\min_i\{\lVert r-s_i\rVert^2 - N_0\ln P(s_i)\}"
-              block
-            />
-          </p>
-          <p>
-            <Formula tex="x^*=\tfrac{s_0+s_1}{2}+\dfrac{N_0\ln(p_0/p_1)}{2(s_1-s_0)}" block />
-          </p>
-          <p>
-            <Formula
-              tex="P_e^{\mathrm{BPSK}}=Q\!\left(\sqrt{2E_b/N_0}\right),\quad Q(x)=\tfrac12\operatorname{erfc}\!\left(\tfrac{x}{\sqrt2}\right)"
-              block
-            />
-          </p>
-        </TheoryBox>
-      </div>
       </div>
     </div>
   );

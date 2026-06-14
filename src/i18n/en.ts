@@ -144,7 +144,8 @@ export const en: Record<string, string> = {
   'modulation.optrx.panel.minDist': 'Decision: distance to each candidate (pick smallest)',
   'modulation.optrx.readout.dim': 'Dimension N / M',
   'modulation.optrx.custom.title': 'Custom signals sₘ(t)',
-  'modulation.optrx.custom.hint': 'Each row is a signal; each cell a constant amplitude over one time segment.',
+  'modulation.optrx.custom.hint':
+    'Each row is a signal; each cell a constant amplitude over one time segment.',
   'modulation.optrx.custom.segments': 'Segments',
   'modulation.optrx.custom.addSignal': '+ Signal',
   'modulation.optrx.custom.removeSignal': '− Signal',

@@ -70,8 +70,9 @@ export function FilterSection({ params, d }: Props) {
       />
       <Formula tex="S_Y(f)=|H(f)|^2\,S_X(f)" />
       <TheoryBox>
-        An LTI filter shapes the spectrum by |H(f)|². Filtering Gaussian white noise yields a colored
-        but still Gaussian process (Theorem 4.4.2) — the amplitude histogram stays bell-shaped.
+        An LTI filter shapes the spectrum by |H(f)|². Filtering Gaussian white noise yields a
+        colored but still Gaussian process (Theorem 4.4.2) — the amplitude histogram stays
+        bell-shaped.
       </TheoryBox>
     </Panel>
   );

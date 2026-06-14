@@ -67,7 +67,10 @@ export function PrefixKraftSection() {
   const kraft = kraftSum(lengths);
   const ud = isUniquelyDecodable(codewords);
   // Align L̄/η to the same coded symbols used by the verdicts above.
-  const Lbar = avgLength(codeRows.map((r) => r.prob), lengths);
+  const Lbar = avgLength(
+    codeRows.map((r) => r.prob),
+    lengths,
+  );
   const H = entropy(probs);
   const layout = useMemo(() => layoutBinaryTree(codesToTree(rows)), [rows]);
   const codeToSymbol = useMemo(
@@ -85,7 +88,9 @@ export function PrefixKraftSection() {
         <Panel title={t('it.prefix.code')}>
           {rows.map((r, i) => (
             <label key={i} className="it-codeword">
-              <span>{r.symbol} (p={r.prob})</span>
+              <span>
+                {r.symbol} (p={r.prob})
+              </span>
               <input value={r.code} onChange={(e) => setCode(i, e.target.value)} />
             </label>
           ))}
@@ -107,16 +112,29 @@ export function PrefixKraftSection() {
             <input value={stream} onChange={(e) => setStream(e.target.value)} />
           </label>
           <div className="it-mono">
-            {t('it.prefix.decodeOut')}: {decoded === null ? t('it.prefix.undecodable') : decoded || '—'}
+            {t('it.prefix.decodeOut')}:{' '}
+            {decoded === null ? t('it.prefix.undecodable') : decoded || '—'}
           </div>
         </Panel>
       </aside>
 
       <div className="it-content">
         <div className="it-readouts">
-          <Readout label={t('it.prefix.prefixFree')} value={prefixFree ? t('it.yes') : t('it.no')} tone={prefixFree ? 'ok' : 'warn'} />
-          <Readout label={t('it.prefix.kraft')} value={kraft.toFixed(4)} tone={kraft <= 1 + 1e-9 ? 'ok' : 'err'} />
-          <Readout label={t('it.prefix.ud')} value={ud ? t('it.yes') : t('it.no')} tone={ud ? 'ok' : 'err'} />
+          <Readout
+            label={t('it.prefix.prefixFree')}
+            value={prefixFree ? t('it.yes') : t('it.no')}
+            tone={prefixFree ? 'ok' : 'warn'}
+          />
+          <Readout
+            label={t('it.prefix.kraft')}
+            value={kraft.toFixed(4)}
+            tone={kraft <= 1 + 1e-9 ? 'ok' : 'err'}
+          />
+          <Readout
+            label={t('it.prefix.ud')}
+            value={ud ? t('it.yes') : t('it.no')}
+            tone={ud ? 'ok' : 'err'}
+          />
           <Readout label={t('it.prefix.Lbar')} value={Lbar.toFixed(3)} unit="bits" />
           <Readout label="η" value={Lbar > 0 ? efficiency(H, Lbar).toFixed(3) : '—'} />
         </div>
@@ -125,7 +143,10 @@ export function PrefixKraftSection() {
         </Panel>
         <TheoryBox title={t('it.theory.title')}>
           <p>
-            <Formula tex="\sum_k 2^{-l_k}\le 1\quad\text{(Kraft — necessary for a prefix code)}" block />
+            <Formula
+              tex="\sum_k 2^{-l_k}\le 1\quad\text{(Kraft — necessary for a prefix code)}"
+              block
+            />
           </p>
           <p>prefix ⊂ uniquely-decodable: Code-III is uniquely decodable but not a prefix code.</p>
         </TheoryBox>

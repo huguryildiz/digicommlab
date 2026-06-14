@@ -98,9 +98,7 @@ export function SamplingModule() {
   const cursorT = view.samples.t.length ? view.samples.t[view.samples.t.length - 1] : undefined;
 
   const windowBits = view.pcm.slice(0, 64).join('');
-  const pcmPreview = (loop.running ? bitLog : windowBits)
-    .replace(/(.{4})/g, '$1 ')
-    .trim();
+  const pcmPreview = (loop.running ? bitLog : windowBits).replace(/(.{4})/g, '$1 ').trim();
 
   const aliasPitch = aliasFrequency(audioToneHz, audioFs);
 
@@ -165,11 +163,7 @@ export function SamplingModule() {
               { value: 'gray', label: t('sampling.gray') },
             ]}
           />
-          <Toggle
-            label={t('sampling.reconstruct')}
-            checked={showRecon}
-            onChange={setShowRecon}
-          />
+          <Toggle label={t('sampling.reconstruct')} checked={showRecon} onChange={setShowRecon} />
           <TransportControls loop={loop} />
         </Panel>
 
@@ -233,10 +227,7 @@ export function SamplingModule() {
           />
           <Readout label={t('sampling.readout.levels')} value={2 ** bits} />
           <Readout label={t('sampling.readout.delta')} value={view.delta.toFixed(3)} />
-          <Readout
-            label={t('sampling.readout.noise')}
-            value={view.noisePower.toExponential(2)}
-          />
+          <Readout label={t('sampling.readout.noise')} value={view.noisePower.toExponential(2)} />
           <Readout
             label={t('sampling.readout.sqnrTheory')}
             value={view.sqnrTheoryDb.toFixed(2)}
@@ -244,9 +235,7 @@ export function SamplingModule() {
           />
           <Readout
             label={t('sampling.readout.sqnrMeasured')}
-            value={
-              Number.isFinite(view.sqnrMeasuredDb) ? view.sqnrMeasuredDb.toFixed(2) : '∞'
-            }
+            value={Number.isFinite(view.sqnrMeasuredDb) ? view.sqnrMeasuredDb.toFixed(2) : '∞'}
             unit="dB"
           />
         </div>
@@ -276,13 +265,22 @@ export function SamplingModule() {
             <Formula tex="f_s \ge 2W \quad\text{(Nyquist)}" block />
           </p>
           <p>
-            <Formula tex="g_R(t)=\sum_n g(nT_s)\,\operatorname{sinc}\!\left(\tfrac{t-nT_s}{T_s}\right)" block />
+            <Formula
+              tex="g_R(t)=\sum_n g(nT_s)\,\operatorname{sinc}\!\left(\tfrac{t-nT_s}{T_s}\right)"
+              block
+            />
           </p>
           <p>
-            <Formula tex="\Delta=\dfrac{2m_{\max}}{L},\quad L=2^{R},\quad E[Q^2]=\dfrac{\Delta^2}{12}" block />
+            <Formula
+              tex="\Delta=\dfrac{2m_{\max}}{L},\quad L=2^{R},\quad E[Q^2]=\dfrac{\Delta^2}{12}"
+              block
+            />
           </p>
           <p>
-            <Formula tex="\mathrm{SQNR_{dB}}=10\log_{10}\!\left(\dfrac{3P_M}{m_{\max}^{2}}\right)+6.02\,R" block />
+            <Formula
+              tex="\mathrm{SQNR_{dB}}=10\log_{10}\!\left(\dfrac{3P_M}{m_{\max}^{2}}\right)+6.02\,R"
+              block
+            />
           </p>
         </TheoryBox>
       </div>

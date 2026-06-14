@@ -89,7 +89,12 @@ describe('gramSchmidt', () => {
   });
 
   it('throws on ragged (unequal-length) input', () => {
-    expect(() => gramSchmidt([[1, 0, 0], [1, 0]])).toThrow(/equal length/);
+    expect(() =>
+      gramSchmidt([
+        [1, 0, 0],
+        [1, 0],
+      ]),
+    ).toThrow(/equal length/);
   });
 
   it('empty signal set → dim 0 with empty outputs', () => {

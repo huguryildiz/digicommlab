@@ -26,15 +26,40 @@ export function ScenarioControls({ params, set }: Props) {
         options={SCHEME_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) }))}
         onChange={(v) => set({ scheme: v as AnalogScheme })}
       />
-      <Slider label={t('an.gen.cnr')} min={0} max={40} step={1} value={params.cnrDb} onChange={(v) => set({ cnrDb: v })} />
+      <Slider
+        label={t('an.gen.cnr')}
+        min={0}
+        max={40}
+        step={1}
+        value={params.cnrDb}
+        onChange={(v) => set({ cnrDb: v })}
+      />
       {isAm && (
-        <Slider label={t('an.gen.amIndex')} min={0.1} max={1} step={0.05} value={params.amIndex} onChange={(v) => set({ amIndex: v })} />
+        <Slider
+          label={t('an.gen.amIndex')}
+          min={0.1}
+          max={1}
+          step={0.05}
+          value={params.amIndex}
+          onChange={(v) => set({ amIndex: v })}
+        />
       )}
       {isFm && (
-        <Slider label={t('an.gen.beta')} min={1} max={15} step={1} value={params.beta} onChange={(v) => set({ beta: v })} />
+        <Slider
+          label={t('an.gen.beta')}
+          min={1}
+          max={15}
+          step={1}
+          value={params.beta}
+          onChange={(v) => set({ beta: v })}
+        />
       )}
       {isFm && (
-        <Toggle label={t('an.gen.emphasis')} checked={params.emphasis} onChange={(v) => set({ emphasis: v })} />
+        <Toggle
+          label={t('an.gen.emphasis')}
+          checked={params.emphasis}
+          onChange={(v) => set({ emphasis: v })}
+        />
       )}
     </Panel>
   );
