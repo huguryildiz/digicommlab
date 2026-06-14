@@ -7,6 +7,7 @@ export const channelcoding: Record<string, string> = {
   'cc.tab.shannon': 'Shannon Limit',
   'cc.tab.block': 'Block Codes',
   'cc.tab.conv': 'Convolutional',
+  'cc.tab.cyclic': 'Cyclic / CRC',
   'cc.theory': 'Theory',
 
   // Tab 1 — Channels & Capacity
@@ -79,4 +80,27 @@ export const channelcoding: Record<string, string> = {
   'cc.cv.fail': '✗ decoding failed (errors beyond capability)',
   'cc.cv.tail': 'tail',
   'cc.cv.metric': 'path metric',
+
+  // Tab 5 — Cyclic / CRC
+  'cc.cy.code': 'Generator polynomial',
+  'cc.cy.sel': 'Code / CRC preset',
+  'cc.cy.divides': 'divides pⁿ+1',
+  'cc.cy.notCyclic': '(CRC framing — used for detection)',
+  'cc.cy.message': 'Message bits m',
+  'cc.cy.errors': 'Channel errors (toggle received bits)',
+  'cc.cy.errorsHint': 'Click a received bit to flip it (inject errors).',
+  'cc.cy.encode': 'Systematic encoding  c = pⁿ⁻ᵏ·m + rem',
+  'cc.cy.lfsr': 'LFSR division encoder',
+  'cc.cy.shift': 'Cyclic-shift property',
+  'cc.cy.detect': 'CRC error detection',
+  'cc.cy.step': 'LFSR step',
+  'cc.cy.play': '▶ Play',
+  'cc.cy.pause': '⏸ Pause',
+  'cc.cy.reset': '⏮ Reset',
+  'cc.cy.rem': 'rem (CRC/parity)',
+  'cc.cy.cw': 'codeword c',
+  'cc.cy.syn': 'syndrome s = r mod g',
+  'cc.cy.ok': '✓ error detected (s ≠ 0)',
+  'cc.cy.none': 's = 0 — no error detected',
+  'cc.cy.burst': 'Every error burst ≤ deg g is always detected.',
 };

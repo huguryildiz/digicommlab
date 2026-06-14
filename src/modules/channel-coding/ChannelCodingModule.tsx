@@ -4,15 +4,17 @@ import { ChannelsCapacitySection } from './ChannelsCapacitySection';
 import { ShannonLimitSection } from './ShannonLimitSection';
 import { BlockCodesSection } from './BlockCodesSection';
 import { ConvCodesSection } from './ConvCodesSection';
+import { CyclicCodesSection } from './CyclicCodesSection';
 import './channel-coding.css';
 
-type Tab = 'channels' | 'shannon' | 'block' | 'conv';
+type Tab = 'channels' | 'shannon' | 'block' | 'conv' | 'cyclic';
 
 const TABS: { id: Tab; key: string }[] = [
   { id: 'channels', key: 'cc.tab.channels' },
   { id: 'shannon', key: 'cc.tab.shannon' },
   { id: 'block', key: 'cc.tab.block' },
   { id: 'conv', key: 'cc.tab.conv' },
+  { id: 'cyclic', key: 'cc.tab.cyclic' },
 ];
 
 export function ChannelCodingModule() {
@@ -39,6 +41,7 @@ export function ChannelCodingModule() {
       {tab === 'shannon' && <ShannonLimitSection />}
       {tab === 'block' && <BlockCodesSection />}
       {tab === 'conv' && <ConvCodesSection />}
+      {tab === 'cyclic' && <CyclicCodesSection />}
     </div>
   );
 }
