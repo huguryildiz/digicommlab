@@ -114,3 +114,29 @@ describe('FDM', () => {
   });
 });
 
+import { qamModulate, qamDemod } from '@/lib/dsp/am-impl';
+
+describe('quadrature-carrier multiplexing (QAM)', () => {
+  const FS3 = 200_000;
+  const t3 = Array.from({ length: 4096 }, (_, i) => i / FS3);
+  const fc = 20_000;
+  const W = 3000;
+  const m1 = [{ freq: 1000, amp: 1 }];
+  const m2 = [{ freq: 2000, amp: 1 }];
+  function energyAt(sig: number[], f: number): number {
+    const c = sig.reduce((s, v, i) => s + v * Math.cos(2 * Math.PI * f * t3[i]), 0);
+    return Math.abs(c) / sig.length;
+  }
+  it('with no phase error each channel recovers its own message (no crosstalk)', () => {
+    const u = qamModulate(m1, m2, fc, 1, t3);
+    const { m1Hat, m2Hat } = qamDemod(u, fc, t3, FS3, W, 0);
+    expect(energyAt(m1Hat, 1000)).toBeGreaterThan(energyAt(m1Hat, 2000) * 4);
+    expect(energyAt(m2Hat, 2000)).toBeGreaterThan(energyAt(m2Hat, 1000) * 4);
+  });
+  it('a 90° phase error swaps the channels (full crosstalk)', () => {
+    const u = qamModulate(m1, m2, fc, 1, t3);
+    const { m1Hat } = qamDemod(u, fc, t3, FS3, W, Math.PI / 2);
+    expect(energyAt(m1Hat, 2000)).toBeGreaterThan(energyAt(m1Hat, 1000) * 2);
+  });
+});
+

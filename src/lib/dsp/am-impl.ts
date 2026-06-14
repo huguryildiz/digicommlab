@@ -152,3 +152,35 @@ export function fdmSeparate(
   return bandpassFilterFFT(mixed, fs, 0, W).map((v) => 2 * v);
 }
 
+/**
+ * Quadrature-carrier multiplexing / QAM (Proakis §3.4.2, Eq 3.4.1):
+ * u(t) = A_c m₁(t) cos(2πf_c t) + A_c m₂(t) sin(2πf_c t).
+ */
+export function qamModulate(m1: Tone[], m2: Tone[], fc: number, Ac: number, t: number[]): number[] {
+  return t.map(
+    (tt) =>
+      Ac * msgNorm(m1, tt) * Math.cos(2 * Math.PI * fc * tt) +
+      Ac * msgNorm(m2, tt) * Math.sin(2 * Math.PI * fc * tt),
+  );
+}
+
+/**
+ * QAM coherent demodulation (Proakis §3.4.2): multiply by cos/sin references
+ * (with optional receiver phase error Δφ) and lowpass-filter to baseband. With
+ * Δφ ≠ 0 the in-phase and quadrature channels leak into each other (crosstalk).
+ */
+export function qamDemod(
+  u: number[],
+  fc: number,
+  t: number[],
+  fs: number,
+  W: number,
+  phaseError: number,
+): { m1Hat: number[]; m2Hat: number[] } {
+  const iMix = u.map((v, i) => v * Math.cos(2 * Math.PI * fc * t[i] + phaseError));
+  const qMix = u.map((v, i) => v * Math.sin(2 * Math.PI * fc * t[i] + phaseError));
+  const m1Hat = bandpassFilterFFT(iMix, fs, 0, W).map((v) => 2 * v);
+  const m2Hat = bandpassFilterFFT(qMix, fs, 0, W).map((v) => 2 * v);
+  return { m1Hat, m2Hat };
+}
+
