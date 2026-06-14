@@ -3,6 +3,12 @@ import { evalSignal } from '@/lib/dsp/signals';
 import type { AmMode } from '@/lib/dsp/analog';
 import { amSignal, amEnvelope, amEfficiency, pllRecoverPhase, vsbFilter } from '@/lib/dsp/analog';
 import { spectrum } from '@/lib/dsp/fft';
+import {
+  powerLawModulator,
+  switchingModulator,
+  balancedModulator,
+  ringModulator,
+} from '@/lib/dsp/am-impl';
 
 /**
  * AM modulation view parameters.
@@ -308,5 +314,113 @@ export function buildAnalogSuperView(p: AnalogSuperParams): AnalogSuperView {
     imageFreq,
     rfLines: [p.stationFreq, imageFreq],
     ifLine: p.ifFreq,
+  };
+}
+
+export type ModulatorKind = 'power-law' | 'switching' | 'balanced' | 'ring';
+
+export interface ModulatorParams {
+  modulator: ModulatorKind;
+  messageFreq: number; // Hz
+  carrierFreq: number; // Hz
+  carrierAmp: number; // V
+}
+
+export interface ModulatorView {
+  time: number[];
+  node: number[]; // intermediate "dirty" node signal (pre-BPF)
+  output: number[]; // BPF / summed output (the desired AM signal)
+  dirtyFreq: number[];
+  dirtyMag: number[]; // spectrum before the bandpass filter (shows unwanted terms)
+  cleanFreq: number[];
+  cleanMag: number[]; // spectrum after the bandpass filter (desired AM)
+  producesDsb: boolean; // balanced/ring → DSB-SC; power-law/switching → conventional
+}
+
+/** Keep only the positive-frequency bins of a two-sided spectrum within [lo, hi]. */
+function bandSlice(freq: number[], mag: number[], lo: number, hi: number): { f: number[]; m: number[] } {
+  const f: number[] = [];
+  const m: number[] = [];
+  for (let i = 0; i < freq.length; i++) {
+    if (freq[i] >= lo && freq[i] <= hi) {
+      f.push(freq[i]);
+      m.push(mag[i]);
+    }
+  }
+  return { f, m };
+}
+
+/**
+ * Build the modulator view: the intermediate (pre-BPF) node signal and the
+ * recovered output, plus their FFT spectra so the "unwanted terms → BPF → clean
+ * AM" story is explicit. Proakis §3.3.
+ */
+export function buildModulatorView(p: ModulatorParams): ModulatorView {
+  const fm = p.messageFreq;
+  const fc = p.carrierFreq;
+  const fs = 8 * fc;
+  const N = 8192;
+  const t = Array.from({ length: N }, (_, i) => i / fs);
+  const msg = [{ freq: fm, amp: 1 }];
+
+  let node: number[];
+  let output: number[];
+  let producesDsb: boolean;
+  switch (p.modulator) {
+    case 'power-law': {
+      const r = powerLawModulator(msg, fc, p.carrierAmp, 1, 0.3, t);
+      node = r.vo;
+      output = r.uBpf;
+      producesDsb = false;
+      break;
+    }
+    case 'switching': {
+      const r = switchingModulator(msg, fc, p.carrierAmp, t, 15);
+      node = r.vo;
+      output = r.uBpf;
+      producesDsb = false;
+      break;
+    }
+    case 'balanced': {
+      const r = balancedModulator(msg, fc, p.carrierAmp, t);
+      node = r.upper; // show one branch as the "node" signal
+      output = r.uOut;
+      producesDsb = true;
+      break;
+    }
+    case 'ring': {
+      const r = ringModulator(msg, fc, t, 15);
+      node = r.vo;
+      output = r.uBpf;
+      producesDsb = true;
+      break;
+    }
+  }
+
+  const lo = 0; // lo=0 drops the negative-frequency half of the two-sided spectrum
+  const hi = fc + 6 * fm;
+  const win = hann(N);
+  const dirtySpec = spectrum(
+    node.map((v, i) => v * win[i]),
+    fs,
+  );
+  const cleanSpec = spectrum(
+    output.map((v, i) => v * win[i]),
+    fs,
+  );
+  const dirty = bandSlice(dirtySpec.freq, dirtySpec.mag, lo, hi);
+  const clean = bandSlice(cleanSpec.freq, cleanSpec.mag, lo, hi);
+
+  // Show a few message/carrier periods of the time-domain node + output.
+  const showN = Math.min(N, Math.ceil(fs * Math.max(3 / fm, 10 / fc)));
+  return {
+    time: t.slice(0, showN),
+    node: node.slice(0, showN),
+    output: output.slice(0, showN),
+    dirtyFreq: dirty.f,
+    dirtyMag: dirty.m,
+    cleanFreq: clean.f,
+    cleanMag: clean.m,
+    producesDsb,
   };
 }
