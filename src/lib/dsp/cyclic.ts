@@ -55,3 +55,49 @@ export function polyToString(a: number[]): string {
   }
   return terms.length ? terms.join('+') : '0';
 }
+
+/** True iff g(p) divides p^n + 1 (the cyclic-code condition). Thm 9.6.1. */
+export function dividesPn1(g: number[], n: number): boolean {
+  const pn1 = new Array<number>(n + 1).fill(0);
+  pn1[0] = 1;
+  pn1[n] = 1;
+  return polyDeg(polyMod(pn1, g)) < 0;
+}
+
+/** CRC / parity remainder rem = (msg · p^{deg g}) mod g, length deg g. §9.6 (systematic). */
+export function crcRemainder(msg: number[], g: number[]): number[] {
+  const dg = polyDeg(g);
+  const shifted = new Array<number>(msg.length + dg).fill(0);
+  for (let i = 0; i < msg.length; i++) shifted[i + dg] = msg[i] & 1;
+  const rem = polyMod(shifted, g);
+  const out = new Array<number>(dg).fill(0);
+  for (let i = 0; i < dg; i++) out[i] = rem[i] ?? 0;
+  return out;
+}
+
+/** Systematic codeword [rem (low) | msg (high)], length msg.length + deg g. §9.6. */
+export function encodeCyclic(msg: number[], g: number[]): number[] {
+  const dg = polyDeg(g);
+  const rem = crcRemainder(msg, g);
+  const cw = new Array<number>(msg.length + dg).fill(0);
+  for (let i = 0; i < dg; i++) cw[i] = rem[i];
+  for (let i = 0; i < msg.length; i++) cw[i + dg] = msg[i] & 1;
+  return cw;
+}
+
+/** Syndrome s = received mod g; all-zero ⇒ no detected error. §9.6.1. */
+export function syndrome(received: number[], g: number[]): number[] {
+  const dg = polyDeg(g);
+  const rem = polyMod(received, g);
+  const out = new Array<number>(dg).fill(0);
+  for (let i = 0; i < dg; i++) out[i] = rem[i] ?? 0;
+  return out;
+}
+
+/** Cyclic shift of the n-bit codeword (≡ ×p mod p^n+1): rotate LSB-first array right by 1. */
+export function cyclicShiftRight(cw: number[]): number[] {
+  const n = cw.length;
+  const out = new Array<number>(n);
+  for (let i = 0; i < n; i++) out[i] = cw[(i - 1 + n) % n];
+  return out;
+}
