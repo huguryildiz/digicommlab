@@ -41,6 +41,13 @@
   align-items: start;
 }
 
+/* Stack the time-domain + spectrum canvases on narrow / mobile-portrait viewports. */
+@media (max-width: 900px) {
+  .analog__am-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
 .analog__panel-half {
   display: flex;
   flex-direction: column;
@@ -138,4 +145,27 @@
   font-size: 13px;
   margin-top: 8px;
   font-family: var(--mono);
+}
+
+/* 4-tab shell */
+.analog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+}
+
+.analog__tabbar {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.analog__hint {
+  color: var(--text-dim);
+  font-size: 0.9em;
+  margin-bottom: var(--space-2, 8px);
+}
+
+/* §3.3 modulator view: keep schematics compact. */
+.analog__plots .schematic {
+  max-height: 120px;
 }

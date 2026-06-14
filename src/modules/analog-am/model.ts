@@ -1,7 +1,18 @@
 import { linspace } from '@/lib/dsp/math';
 import { evalSignal } from '@/lib/dsp/signals';
 import type { AmMode } from '@/lib/dsp/analog';
-import { amSignal, amEnvelope, amEfficiency, pllRecoverPhase } from '@/lib/dsp/analog';
+import { amSignal, amEnvelope, amEfficiency, pllRecoverPhase, vsbFilter } from '@/lib/dsp/analog';
+import { spectrum } from '@/lib/dsp/fft';
+import {
+  powerLawModulator,
+  switchingModulator,
+  balancedModulator,
+  ringModulator,
+  fdmCompose,
+  fdmSeparate,
+  qamModulate,
+  qamDemod,
+} from '@/lib/dsp/am-impl';
 
 /**
  * AM modulation view parameters.
@@ -91,6 +102,52 @@ export interface AnalogSuperView {
   ifLine: number; // where everything lands after mixing (f_IF)
 }
 
+/** Hann window of length N — tapers the FFT buffer to suppress spectral leakage. */
+function hann(N: number): number[] {
+  const w = new Array<number>(N);
+  for (let n = 0; n < N; n++) w[n] = 0.5 - 0.5 * Math.cos((2 * Math.PI * n) / (N - 1));
+  return w;
+}
+
+/**
+ * FFT magnitude spectrum |U(f)| of the AM signal around the carrier.
+ * The spectrum is computed from a windowed time buffer via `spectrum()` rather
+ * than hardcoded analytic lines. VSB is generated as DSB-SC and then shaped by
+ * the real vestigial filter (Proakis §3.2.4).
+ */
+export function buildAmSpectrum(p: AnalogAmParams): { specFreq: number[]; specMag: number[] } {
+  const fm = p.messageFreq;
+  const fc = p.carrierFreq;
+  const fs = 8 * fc; // oversample so carrier + sidebands sit well below Nyquist
+  const N = 8192; // power of two for the radix-2 FFT
+  const msg = [{ freq: fm, amp: 1 }];
+  // VSB is DSB-SC filtered; generate the DSB buffer, then shape the spectrum.
+  const genMode: AmMode = p.mode === 'vsb' ? 'dsb' : p.mode;
+  const win = hann(N);
+  const x = new Array<number>(N);
+  for (let n = 0; n < N; n++) {
+    x[n] = amSignal(genMode, msg, fc, p.carrierAmp, p.modIndex, n / fs) * win[n];
+  }
+  const sp = spectrum(x, fs);
+  // Keep only the positive-frequency display band around the carrier.
+  const lo = Math.max(0, fc - 4 * fm);
+  const hi = fc + 4 * fm;
+  const specFreq: number[] = [];
+  let specMag: number[] = [];
+  for (let i = 0; i < sp.freq.length; i++) {
+    if (sp.freq[i] >= lo && sp.freq[i] <= hi) {
+      specFreq.push(sp.freq[i]);
+      specMag.push(sp.mag[i]);
+    }
+  }
+  if (p.mode === 'vsb') {
+    // vestige half-width = 2·fm so the lower sideband at f_c-fm lands mid-ramp
+    // (H = 0.25), leaving a visible vestige rather than being fully removed.
+    specMag = vsbFilter(specMag, specFreq, fc, 2 * fm);
+  }
+  return { specFreq, specMag };
+}
+
 /**
  * Build AM modulation view: time-domain waveforms + spectrum.
  */
@@ -115,39 +172,7 @@ export function buildAnalogAmView(p: AnalogAmParams, tStart = 0): AnalogAmView {
   const envelope =
     p.mode === 'conventional' ? time.map((t) => amEnvelope(msg, Ac, a, tStart + t)) : undefined;
 
-  // Spectrum: compute FFT and extract positive frequencies
-  // For simplicity, use analytic spectrum for single-tone message
-  const specFreq: number[] = [];
-  const specMag: number[] = [];
-
-  // Analytical spectrum for AM modes:
-  switch (p.mode) {
-    case 'dsb':
-      // Sidebands only at fc±fm
-      specFreq.push(fc - fm, fc, fc + fm);
-      specMag.push(0.5, 0, 0.5); // Ac/2 at each sideband
-      break;
-    case 'conventional':
-      // Carrier at fc + sidebands at fc±fm
-      specFreq.push(fc - fm, fc, fc + fm);
-      specMag.push(a * 0.5, 1, a * 0.5); // Carrier normalized to 1, sidebands to a/2
-      break;
-    case 'ssb-usb':
-      // Upper sideband only at fc+fm
-      specFreq.push(fc + fm);
-      specMag.push(0.5);
-      break;
-    case 'ssb-lsb':
-      // Lower sideband only at fc-fm
-      specFreq.push(fc - fm);
-      specMag.push(0.5);
-      break;
-    case 'vsb':
-      // Partial sidebands (vestige)
-      specFreq.push(fc - fm, fc, fc + fm);
-      specMag.push(0.4, 0.8, 0.5);
-      break;
-  }
+  const { specFreq, specMag } = buildAmSpectrum(p);
 
   const isOvermodulated = a > 1;
 
@@ -293,5 +318,209 @@ export function buildAnalogSuperView(p: AnalogSuperParams): AnalogSuperView {
     imageFreq,
     rfLines: [p.stationFreq, imageFreq],
     ifLine: p.ifFreq,
+  };
+}
+
+export type ModulatorKind = 'power-law' | 'switching' | 'balanced' | 'ring';
+
+export interface ModulatorParams {
+  modulator: ModulatorKind;
+  messageFreq: number; // Hz
+  carrierFreq: number; // Hz
+  carrierAmp: number; // V
+}
+
+export interface ModulatorView {
+  time: number[];
+  node: number[]; // intermediate "dirty" node signal (pre-BPF)
+  output: number[]; // BPF / summed output (the desired AM signal)
+  dirtyFreq: number[];
+  dirtyMag: number[]; // spectrum before the bandpass filter (shows unwanted terms)
+  cleanFreq: number[];
+  cleanMag: number[]; // spectrum after the bandpass filter (desired AM)
+  producesDsb: boolean; // balanced/ring → DSB-SC; power-law/switching → conventional
+}
+
+/** Keep only the positive-frequency bins of a two-sided spectrum within [lo, hi]. */
+function bandSlice(freq: number[], mag: number[], lo: number, hi: number): { f: number[]; m: number[] } {
+  const f: number[] = [];
+  const m: number[] = [];
+  for (let i = 0; i < freq.length; i++) {
+    if (freq[i] >= lo && freq[i] <= hi) {
+      f.push(freq[i]);
+      m.push(mag[i]);
+    }
+  }
+  return { f, m };
+}
+
+/**
+ * Build the modulator view: the intermediate (pre-BPF) node signal and the
+ * recovered output, plus their FFT spectra so the "unwanted terms → BPF → clean
+ * AM" story is explicit. Proakis §3.3.
+ */
+export function buildModulatorView(p: ModulatorParams): ModulatorView {
+  const fm = p.messageFreq;
+  const fc = p.carrierFreq;
+  const fs = 8 * fc;
+  const N = 8192;
+  const t = Array.from({ length: N }, (_, i) => i / fs);
+  const msg = [{ freq: fm, amp: 1 }];
+
+  let node: number[];
+  let output: number[];
+  let producesDsb: boolean;
+  switch (p.modulator) {
+    case 'power-law': {
+      const r = powerLawModulator(msg, fc, p.carrierAmp, 1, 0.3, t);
+      node = r.vo;
+      output = r.uBpf;
+      producesDsb = false;
+      break;
+    }
+    case 'switching': {
+      const r = switchingModulator(msg, fc, p.carrierAmp, t, 15);
+      node = r.vo;
+      output = r.uBpf;
+      producesDsb = false;
+      break;
+    }
+    case 'balanced': {
+      const r = balancedModulator(msg, fc, p.carrierAmp, t);
+      node = r.upper; // show one branch as the "node" signal
+      output = r.uOut;
+      producesDsb = true;
+      break;
+    }
+    case 'ring': {
+      const r = ringModulator(msg, fc, t, 15);
+      node = r.vo;
+      output = r.uBpf;
+      producesDsb = true;
+      break;
+    }
+  }
+
+  const lo = 0; // lo=0 drops the negative-frequency half of the two-sided spectrum
+  const hi = fc + 6 * fm;
+  const win = hann(N);
+  const dirtySpec = spectrum(
+    node.map((v, i) => v * win[i]),
+    fs,
+  );
+  const cleanSpec = spectrum(
+    output.map((v, i) => v * win[i]),
+    fs,
+  );
+  const dirty = bandSlice(dirtySpec.freq, dirtySpec.mag, lo, hi);
+  const clean = bandSlice(cleanSpec.freq, cleanSpec.mag, lo, hi);
+
+  // Show a few message/carrier periods of the time-domain node + output.
+  const showN = Math.min(N, Math.ceil(fs * Math.max(3 / fm, 10 / fc)));
+  return {
+    time: t.slice(0, showN),
+    node: node.slice(0, showN),
+    output: output.slice(0, showN),
+    dirtyFreq: dirty.f,
+    dirtyMag: dirty.m,
+    cleanFreq: clean.f,
+    cleanMag: clean.m,
+    producesDsb,
+  };
+}
+
+export interface FdmParams {
+  messageFreqs: number[]; // one tone per channel (Hz)
+  spacing: number; // carrier separation (Hz)
+  bandwidth: number; // per-channel baseband bandwidth W (Hz)
+  selected: number; // channel index to recover at the receiver
+}
+export interface FdmView {
+  time: number[];
+  recovered: number[];
+  specFreq: number[];
+  specMag: number[];
+  carriers: number[];
+  overlap: boolean; // spacing < 2·bandwidth → adjacent-band interference
+}
+
+export interface QamParams {
+  m1Freq: number;
+  m2Freq: number;
+  carrierFreq: number;
+  phaseErrorDeg: number;
+}
+export interface QamView {
+  time: number[];
+  m1: number[];
+  m2: number[];
+  m1Hat: number[];
+  m2Hat: number[];
+  crosstalkDb: number;
+}
+
+/**
+ * Build the FDM multiplexer view: composite spectrum + one recovered channel.
+ * Each message is a single tone DSB-SC-modulated onto its own carrier; the
+ * channels are spaced by `spacing` Hz starting from fc0 = 20 kHz (Proakis §3.4.1).
+ * overlap = true when spacing < 2·bandwidth, indicating adjacent-band interference.
+ */
+export function buildFdmView(p: FdmParams): FdmView {
+  const K = p.messageFreqs.length;
+  const fc0 = 20000;
+  const carriers = Array.from({ length: K }, (_, k) => fc0 + k * p.spacing);
+  const fcMax = carriers[K - 1];
+  const fs = 8 * (fcMax + p.bandwidth);
+  const N = 8192;
+  const t = Array.from({ length: N }, (_, i) => i / fs);
+  const messages = p.messageFreqs.map((f) => [{ freq: f, amp: 1 }]);
+  const { composite } = fdmCompose(messages, carriers, t);
+  const sel = Math.min(p.selected, K - 1);
+  const recovered = fdmSeparate(composite, fs, carriers[sel], p.bandwidth, t);
+  const win = hann(N);
+  const sp = spectrum(
+    composite.map((v, i) => v * win[i]),
+    fs,
+  );
+  const { f, m } = bandSlice(sp.freq, sp.mag, 0, fcMax + 4 * p.bandwidth);
+  const showN = Math.min(N, Math.ceil(fs * 0.003));
+  return {
+    time: t.slice(0, showN),
+    recovered: recovered.slice(0, showN),
+    specFreq: f,
+    specMag: m,
+    carriers,
+    overlap: p.spacing < 2 * p.bandwidth,
+  };
+}
+
+/**
+ * Build the QAM view: modulated signal, recovered channels, and crosstalk.
+ * A phase error at the receiver couples the I and Q channels (Proakis §3.4.2).
+ * crosstalkDb = 20 log10(leak/own) measured at the message tone frequencies.
+ */
+export function buildQamView(p: QamParams): QamView {
+  const fc = p.carrierFreq;
+  const fs = 8 * fc;
+  const N = 8192;
+  const t = Array.from({ length: N }, (_, i) => i / fs);
+  const W = Math.max(p.m1Freq, p.m2Freq) * 1.5;
+  const m1 = [{ freq: p.m1Freq, amp: 1 }];
+  const m2 = [{ freq: p.m2Freq, amp: 1 }];
+  const u = qamModulate(m1, m2, fc, 1, t);
+  const { m1Hat, m2Hat } = qamDemod(u, fc, t, fs, W, (p.phaseErrorDeg * Math.PI) / 180);
+  const corr = (sig: number[], f: number) =>
+    Math.abs(sig.reduce((s, v, i) => s + v * Math.cos(2 * Math.PI * f * t[i]), 0)) / sig.length;
+  const own = corr(m1Hat, p.m1Freq);
+  const leak = corr(m1Hat, p.m2Freq);
+  const crosstalkDb = 20 * Math.log10((leak + 1e-9) / (own + 1e-9));
+  const showN = Math.min(N, Math.ceil(fs * Math.max(3 / p.m1Freq, 10 / fc)));
+  return {
+    time: t.slice(0, showN),
+    m1: t.slice(0, showN).map((tt) => Math.cos(2 * Math.PI * p.m1Freq * tt)),
+    m2: t.slice(0, showN).map((tt) => Math.cos(2 * Math.PI * p.m2Freq * tt)),
+    m1Hat: m1Hat.slice(0, showN),
+    m2Hat: m2Hat.slice(0, showN),
+    crosstalkDb,
   };
 }

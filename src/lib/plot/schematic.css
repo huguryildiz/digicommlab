@@ -1,0 +1,35 @@
+/* SVG circuit-schematic primitives — colors from tokens only. */
+.schematic {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.schematic__wire {
+  stroke: var(--text-dim);
+  stroke-width: 1.5;
+  fill: none;
+}
+.schematic__symbol {
+  stroke: var(--text);
+  stroke-width: 1.5;
+  fill: none;
+}
+.schematic__fill {
+  fill: var(--surface-2);
+  stroke: var(--border);
+}
+.schematic__node {
+  fill: var(--text-dim);
+  stroke: none;
+}
+.schematic__label {
+  fill: var(--text);
+  font-family: var(--mono);
+  font-size: 9px;
+  stroke: none;
+}
+.schematic__active {
+  stroke: var(--accent);
+  fill: var(--accent);
+  filter: drop-shadow(0 0 4px rgba(57, 255, 133, 0.5));
+}
