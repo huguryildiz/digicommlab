@@ -10,10 +10,15 @@ import {
   weightSpectrum,
   isCatastrophic,
   viterbiDecode,
+  viterbiDecodeSoft,
+  bpskMap,
+  hardSlice,
+  awgnSoftReceive,
   convBerHardBound,
   convBerSoftBound,
 } from '@/lib/dsp/convcodes';
 import { uncodedBerBpsk } from '@/lib/dsp/blockcodes';
+import { makeRng } from '@/lib/dsp/random';
 
 describe('convolutional encoder FSM', () => {
   it('BOOK_CODE is the (2,1,3) g1=[1,0,1], g2=[1,1,1] code', () => {
@@ -98,5 +103,43 @@ describe('coding-gain BER bounds', () => {
     expect(convBerHardBound(code, 8)).toBeLessThan(convBerHardBound(code, 2));
     expect(convBerSoftBound(code, 8)).toBeGreaterThan(0);
     expect(convBerHardBound(code, 2)).toBeLessThan(1);
+  });
+});
+
+describe('soft-decision Viterbi', () => {
+  it('bpskMap maps 0→+1, 1→−1; hardSlice slices on sign', () => {
+    expect([0, 1].map(bpskMap)).toEqual([1, -1]);
+    expect(hardSlice([0.8, -0.3, -2, 1.5])).toEqual([0, 1, 1, 0]);
+  });
+  it('decodes the clean BPSK mapping of a codeword exactly (metric ~ 0)', () => {
+    const input = [1, 0, 1, 1];
+    const cw = encodeConv(input, BOOK_CODE);
+    const r = viterbiDecodeSoft(cw.map(bpskMap), BOOK_CODE);
+    expect(r.decoded).toEqual(input);
+    expect(r.finalMetric).toBeLessThan(1e-9);
+  });
+});
+
+describe('AWGN soft receive + soft advantage', () => {
+  const code = BOOK_CODE;
+  it('high Eb/N0 slices back to the codeword', () => {
+    const cw = encodeConv([1, 0, 1, 1], code);
+    const soft = awgnSoftReceive(cw, 12, makeRng(1));
+    expect(hardSlice(soft)).toEqual(cw);
+  });
+  it('soft-decision recovers more often than hard at low Eb/N0', () => {
+    const input = [1, 0, 1, 1, 0, 1];
+    const cw = encodeConv(input, code);
+    const eq = (a: number[], b: number[]) => a.length === b.length && a.every((x, i) => x === b[i]);
+    let softWins = 0;
+    let hardWins = 0;
+    const N = 400;
+    for (let seed = 1; seed <= N; seed++) {
+      const soft = awgnSoftReceive(cw, 2, makeRng(seed));
+      if (eq(viterbiDecodeSoft(soft, code).decoded, input)) softWins++;
+      if (eq(viterbiDecode(hardSlice(soft), code).decoded, input)) hardWins++;
+    }
+    expect(hardWins).toBeGreaterThan(0);
+    expect(softWins).toBeGreaterThan(hardWins);
   });
 });

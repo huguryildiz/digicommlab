@@ -3,6 +3,7 @@
 // State = the L-1 memory bits as an integer; register[i] = (state >> (L-1-i)) & 1 for i>=1,
 // register[0] = input. Output b_j = XOR_i g_j[i]*register[i].  Sums are mod 2.
 import { qfunc } from './math';
+import { gaussian } from './awgn';
 
 export interface ConvCode {
   L: number; // constraint length
@@ -199,17 +200,24 @@ export interface ViterbiResult {
   finalMetric: number;
 }
 
-/** Hard-decision Viterbi (Hamming metric). Assumes the encoder was flushed to state 0. §9.7.2. */
-export function viterbiDecode(received: number[], code: ConvCode): ViterbiResult {
+/**
+ * Shared add-compare-select trellis decoder. `recvAt(t)` returns the n received values for
+ * branch t; `branchCost(branchOut, recv)` is the per-branch metric. §9.7.2.
+ */
+function acsDecode(
+  m: number,
+  code: ConvCode,
+  recvAt: (t: number) => number[],
+  branchCost: (out: number[], recv: number[]) => number,
+): ViterbiResult {
   const { nStates, L } = code;
-  const m = received.length / 2; // branches
   let metric = new Array<number>(nStates).fill(Infinity);
   metric[0] = 0;
   const steps: ViterbiStep[] = [];
   const survivorsByT: (number | null)[][] = [];
 
   for (let t = 0; t < m; t++) {
-    const recv = [received[2 * t], received[2 * t + 1]];
+    const recv = recvAt(t);
     const next = new Array<number>(nStates).fill(Infinity);
     const survivor = new Array<number | null>(nStates).fill(null);
     const branchMetric: number[][] = Array.from({ length: nStates }, () => [0, 0]);
@@ -217,7 +225,7 @@ export function viterbiDecode(received: number[], code: ConvCode): ViterbiResult
       if (metric[s] === Infinity) continue;
       for (let input = 0; input < 2; input++) {
         const ns = nextState(s, input, L);
-        const bw = hammingBits(branchOutputs(s, input, code), recv);
+        const bw = branchCost(branchOutputs(s, input, code), recv);
         branchMetric[s][input] = bw;
         const cand = metric[s] + bw;
         if (cand < next[ns]) {
@@ -244,6 +252,58 @@ export function viterbiDecode(received: number[], code: ConvCode): ViterbiResult
   }
   const decoded = decodedFull.slice(0, m - (L - 1)); // drop L-1 tail bits
   return { steps, mlPath, decoded, finalMetric: metric[0] };
+}
+
+/** Hard-decision Viterbi (Hamming metric). Assumes the encoder was flushed to state 0. §9.7.2. */
+export function viterbiDecode(received: number[], code: ConvCode): ViterbiResult {
+  const m = received.length / 2; // branches
+  return acsDecode(
+    m,
+    code,
+    (t) => [received[2 * t], received[2 * t + 1]],
+    (out, recv) => hammingBits(out, recv),
+  );
+}
+
+/** BPSK map: bit 0 → +1, bit 1 → −1. §9.7.2. */
+export function bpskMap(bit: number): number {
+  return bit ? -1 : 1;
+}
+
+/** Hard decision on soft values: negative → 1, else 0. §9.7.2. */
+export function hardSlice(soft: number[]): number[] {
+  return soft.map((v) => (v < 0 ? 1 : 0));
+}
+
+/**
+ * Soft-decision Viterbi (squared-Euclidean metric, Eq. 9.7.8): branch cost =
+ * Σ_k (soft_k − bpskMap(out_k))². Returns the same ViterbiResult shape (real-valued metrics).
+ */
+export function viterbiDecodeSoft(soft: number[], code: ConvCode): ViterbiResult {
+  const m = soft.length / 2;
+  return acsDecode(
+    m,
+    code,
+    (t) => [soft[2 * t], soft[2 * t + 1]],
+    (out, recv) => {
+      let d = 0;
+      for (let k = 0; k < out.length; k++) {
+        const diff = recv[k] - bpskMap(out[k]);
+        d += diff * diff;
+      }
+      return d;
+    },
+  );
+}
+
+/**
+ * Map a codeword to BPSK ±1 and add AWGN at the given Eb/N0. Coded-bit SNR γc = Rc·Eb/N0,
+ * noise σ = 1/√(2γc) (Es normalized to 1). `rng` yields uniform [0,1) (e.g. makeRng(seed)).
+ */
+export function awgnSoftReceive(codeword: number[], ebN0Db: number, rng: () => number): number[] {
+  const gammaC = RATE * 10 ** (ebN0Db / 10);
+  const sigma = 1 / Math.sqrt(2 * gammaC);
+  return codeword.map((b) => bpskMap(b) + sigma * gaussian(rng));
 }
 
 /** C(n,k) via a numerically gentle product. */
