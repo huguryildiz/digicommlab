@@ -10,6 +10,7 @@ export const channelcoding: Record<string, string> = {
   'cc.tab.cyclic': 'Cyclic / CRC',
   'cc.tab.gfbch': 'GF(2ᵐ) & BCH',
   'cc.tab.rs': 'Reed-Solomon',
+  'cc.tab.compare': 'Codes vs Shannon',
   'cc.theory': 'Theory',
 
   // Tab 1 — Channels & Capacity
@@ -149,4 +150,16 @@ export const channelcoding: Record<string, string> = {
   'cc.rs.detected': '✓ error detected (syndrome ≠ 0)',
   'cc.rs.undetected': 'syndrome 0 — no error',
   'cc.rs.mds': 'MDS: D_min = N − K + 1 (Singleton bound)',
+  // Codes vs Shannon tab
+  'cc.cmp.chart': 'BER vs Eb/N₀ — coding gain',
+  'cc.cmp.target': 'Target BER',
+  'cc.cmp.table': 'Coding gain at target BER',
+  'cc.cmp.code': 'Code',
+  'cc.cmp.rate': 'Rc',
+  'cc.cmp.req': 'Eb/N₀ @ target',
+  'cc.cmp.gain': 'gain vs uncoded',
+  'cc.cmp.gap': 'gap to Shannon',
+  'cc.cmp.shannon': 'Shannon limit −1.59 dB',
+  'cc.cmp.note':
+    'Analytic union bounds. Coding trades rate (bandwidth) for power efficiency, approaching capacity (§9.4.2).',
 };
