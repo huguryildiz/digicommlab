@@ -114,7 +114,7 @@ export interface FilterView {
 }
 
 export function buildFilter(
-  filterType: 'lpf' | 'hpf' | 'bpf' | 'rc',
+  filterType: 'lpf' | 'hpf' | 'bpf' | 'bsf' | 'rc',
   fc: number,
   fc2?: number,
   signalFreq: number = 50,
@@ -236,4 +236,24 @@ export function buildAnalytic(
     qComponent: result.q,
     envelope: result.env,
   };
+}
+
+/** Tab 4: baseband (centered at 0) vs bandpass (centered at ±fc) spectra. */
+export interface BasebandBandpassView {
+  freqs: number[];
+  baseband: number[];
+  bandpass: number[];
+  W: number;
+  fc: number;
+  fs: number;
+}
+
+export function buildBasebandBandpass(W: number, fc: number, fs = 1000): BasebandBandpassView {
+  const freqs = linspace(-fs / 2, fs / 2, 512);
+  // Triangular baseband spectrum over [-W, W]; bandpass is it shifted to ±fc.
+  const tri = (f: number, center: number, half: number) =>
+    Math.max(0, 1 - Math.abs(f - center) / half);
+  const baseband = freqs.map((f) => tri(f, 0, W));
+  const bandpass = freqs.map((f) => tri(f, fc, W / 2) + tri(f, -fc, W / 2));
+  return { freqs, baseband, bandpass, W, fc, fs };
 }

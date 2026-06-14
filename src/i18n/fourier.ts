@@ -97,4 +97,12 @@ export const fourier: Record<string, string> = {
   'fourier.readout.powerN': 'Power in N harmonics',
   'fourier.preset.gibbs': 'Show Gibbs overshoot',
   'fourier.hint.gibbs': 'More harmonics sharpen the edges but the overshoot near jumps stays ~9% (Gibbs).',
+
+  // Tab 4 — Filters & Bandpass
+  'fourier.filter.type.bsf': 'Band-stop (BSF)',
+  'fourier.panel.baseband': 'Baseband vs Bandpass',
+  'fourier.bb.mode': 'Bandpass (off = baseband)',
+  'fourier.hint.filter': 'The output spectrum is the input times |H(f)|; outside the passband it is suppressed.',
+  'fourier.hint.baseband': 'Baseband sits at f=0 over [−W, W]; bandpass is the same shape shifted to ±f_c.',
+  'fourier.hint.iq': 'I (green) and Q (blue) are slow baseband signals; the envelope is √(I²+Q²).',
 };
