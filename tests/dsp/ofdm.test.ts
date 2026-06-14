@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { Complex } from '@/lib/dsp/fft';
-import { ofdmModulate, ofdmDemodulate, cabs, addCyclicPrefix, removeCyclicPrefix } from '@/lib/dsp/ofdm';
+import { ofdmModulate, ofdmDemodulate, cabs, addCyclicPrefix, removeCyclicPrefix, convolveChannel, channelFreqResponse } from '@/lib/dsp/ofdm';
 
 function expectComplexClose(a: Complex[], b: Complex[], digits = 9): void {
   expect(a.length).toBe(b.length);
@@ -48,5 +48,31 @@ describe('addCyclicPrefix / removeCyclicPrefix', () => {
   it('cp = 0 is a no-op', () => {
     const time: Complex[] = [{ re: 5, im: -1 }];
     expect(addCyclicPrefix(time, 0)).toEqual(time);
+  });
+});
+
+describe('convolveChannel', () => {
+  it('is the linear convolution of two complex sequences', () => {
+    const a: Complex[] = [{ re: 1, im: 0 }, { re: 1, im: 0 }];
+    const h: Complex[] = [{ re: 1, im: 0 }, { re: 1, im: 0 }];
+    const y = convolveChannel(a, h);
+    expect(y).toHaveLength(3);
+    expect(y.map((z) => z.re)).toEqual([1, 2, 1]);
+  });
+  it('a unit-impulse channel passes the signal through unchanged', () => {
+    const a: Complex[] = [{ re: 2, im: 1 }, { re: -1, im: 3 }];
+    const h: Complex[] = [{ re: 1, im: 0 }];
+    const y = convolveChannel(a, h);
+    expect(y.map((z) => z.re)).toEqual([2, -1]);
+    expect(y.map((z) => z.im)).toEqual([1, 3]);
+  });
+});
+
+describe('channelFreqResponse', () => {
+  it('a unit-impulse channel has a flat |H| = 1 over all subcarriers', () => {
+    const h: Complex[] = [{ re: 1, im: 0 }];
+    const H = channelFreqResponse(h, 8);
+    expect(H).toHaveLength(8);
+    for (const v of H) expect(cabs(v)).toBeCloseTo(1, 12);
   });
 });

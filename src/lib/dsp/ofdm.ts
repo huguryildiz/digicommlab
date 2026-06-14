@@ -11,6 +11,11 @@ export function cabs(z: Complex): number {
   return Math.hypot(z.re, z.im);
 }
 
+/** Complex multiply a·b. */
+function cmul(a: Complex, b: Complex): Complex {
+  return { re: a.re * b.re - a.im * b.im, im: a.re * b.im + a.im * b.re };
+}
+
 /**
  * OFDM modulator: map N frequency-domain subcarrier symbols to N time-domain
  * samples via the inverse FFT. Proakis Ch. 10 (OFDM).
@@ -44,4 +49,33 @@ export function addCyclicPrefix(time: Complex[], cpLen: number): Complex[] {
  */
 export function removeCyclicPrefix(rx: Complex[], cpLen: number, n: number): Complex[] {
   return rx.slice(cpLen, cpLen + n);
+}
+
+/**
+ * Linear convolution y[n] = Σ_k a[k]·h[n−k] of two complex sequences. Models a
+ * tapped-delay-line multipath channel applied to the time-domain OFDM signal.
+ * Output length is a.length + h.length − 1. Proakis Ch. 10.
+ */
+export function convolveChannel(a: Complex[], h: Complex[]): Complex[] {
+  const out: Complex[] = Array.from({ length: a.length + h.length - 1 }, () => ({ re: 0, im: 0 }));
+  for (let k = 0; k < a.length; k++) {
+    for (let m = 0; m < h.length; m++) {
+      const p = cmul(a[k], h[m]);
+      out[k + m].re += p.re;
+      out[k + m].im += p.im;
+    }
+  }
+  return out;
+}
+
+/**
+ * Per-subcarrier channel frequency response H[k] = FFT of the channel taps
+ * zero-padded to N. With a cyclic prefix ≥ L−1, each subcarrier sees a flat
+ * complex gain H[k], so equalization is one tap per subcarrier. Proakis Ch. 10.
+ */
+export function channelFreqResponse(h: Complex[], n: number): Complex[] {
+  const padded: Complex[] = Array.from({ length: n }, (_, i) =>
+    i < h.length ? { re: h[i].re, im: h[i].im } : { re: 0, im: 0 },
+  );
+  return fft(padded);
 }
