@@ -34,4 +34,17 @@ export const wireless: Record<string, string> = {
   'wl.ber.threshold': 'Outage threshold γ_th (dB)',
   'wl.ber.curve.title': 'BER vs E_b/N₀ — AWGN, Rayleigh, MRC',
   'wl.ber.outage.title': 'Outage probability vs average SNR (shadowing)',
+
+  // Spread-spectrum (DS-SS) section
+  'wl.tab.spread': 'Spread Spectrum (DS-SS)',
+  'wl.ss.title': 'Direct-sequence spread spectrum',
+  'wl.ss.registerLength': 'PN register length n (N = 2ⁿ−1)',
+  'wl.ss.ebN0': 'E_b/N₀ (dB)',
+  'wl.ss.jsr': 'Jammer-to-signal ratio (dB)',
+  'wl.ss.jammerOffset': 'Jammer frequency (× chip rate)',
+  'wl.ss.autocorr.title': 'PN autocorrelation (peak N, off-peak −1)',
+  'wl.ss.spectrum.title': 'Spectrum before vs after despreading',
+  'wl.ss.ber.title': 'BER vs jammer power — spread vs unspread',
+  'wl.ss.readout.gp': 'Processing gain G_p',
+  'wl.ss.readout.N': 'Chips per bit N',
 };
