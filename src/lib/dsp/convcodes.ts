@@ -177,3 +177,71 @@ export function isCatastrophic(code: ConvCode): boolean {
   const isMonomial = (g & (g - 1)) === 0; // single bit set => D^a
   return !isMonomial;
 }
+
+function hammingBits(a: number[], b: number[]): number {
+  let d = 0;
+  for (let i = 0; i < a.length; i++) d += (a[i] ^ b[i]) & 1;
+  return d;
+}
+
+export interface ViterbiStep {
+  t: number; // branch index
+  recv: number[]; // n received bits this branch
+  branchMetric: number[][]; // [fromState][input] = Hamming(branchOut, recv)
+  metric: number[]; // accumulated path metric per state AFTER this branch (Infinity = unreachable)
+  survivor: (number | null)[]; // predecessor state on the surviving path into each state
+}
+
+export interface ViterbiResult {
+  steps: ViterbiStep[];
+  mlPath: number[]; // state sequence (length steps+1), starts and ends at state 0
+  decoded: number[]; // recovered info bits (tail removed)
+  finalMetric: number;
+}
+
+/** Hard-decision Viterbi (Hamming metric). Assumes the encoder was flushed to state 0. §9.7.2. */
+export function viterbiDecode(received: number[], code: ConvCode): ViterbiResult {
+  const { nStates, L } = code;
+  const m = received.length / 2; // branches
+  let metric = new Array<number>(nStates).fill(Infinity);
+  metric[0] = 0;
+  const steps: ViterbiStep[] = [];
+  const survivorsByT: (number | null)[][] = [];
+
+  for (let t = 0; t < m; t++) {
+    const recv = [received[2 * t], received[2 * t + 1]];
+    const next = new Array<number>(nStates).fill(Infinity);
+    const survivor = new Array<number | null>(nStates).fill(null);
+    const branchMetric: number[][] = Array.from({ length: nStates }, () => [0, 0]);
+    for (let s = 0; s < nStates; s++) {
+      if (metric[s] === Infinity) continue;
+      for (let input = 0; input < 2; input++) {
+        const ns = nextState(s, input, L);
+        const bw = hammingBits(branchOutputs(s, input, code), recv);
+        branchMetric[s][input] = bw;
+        const cand = metric[s] + bw;
+        if (cand < next[ns]) {
+          next[ns] = cand;
+          survivor[ns] = s;
+        }
+      }
+    }
+    steps.push({ t, recv, branchMetric, metric: next.slice(), survivor: survivor.slice() });
+    survivorsByT.push(survivor);
+    metric = next;
+  }
+
+  // Traceback from state 0 (flushed). input = top memory bit of the next state.
+  const mlPath = new Array<number>(m + 1);
+  mlPath[m] = 0;
+  const decodedFull: number[] = [];
+  let s = 0;
+  for (let t = m - 1; t >= 0; t--) {
+    const prev = survivorsByT[t][s] ?? 0;
+    mlPath[t] = prev;
+    decodedFull[t] = (s >> (L - 2)) & 1; // the input that produced state s
+    s = prev;
+  }
+  const decoded = decodedFull.slice(0, m - (L - 1)); // drop L-1 tail bits
+  return { steps, mlPath, decoded, finalMetric: metric[0] };
+}

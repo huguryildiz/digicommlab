@@ -9,6 +9,7 @@ import {
   freeDistance,
   weightSpectrum,
   isCatastrophic,
+  viterbiDecode,
 } from '@/lib/dsp/convcodes';
 
 describe('convolutional encoder FSM', () => {
@@ -53,5 +54,31 @@ describe('free distance, weight spectrum, catastrophic test', () => {
     const bad = makeConvCode(3, [1, 1, 0], [0, 1, 1]); // gcd = 1+D (not a monomial)
     expect(isCatastrophic(bad)).toBe(true);
     expect(isCatastrophic(BOOK_CODE)).toBe(false);
+  });
+});
+
+describe('Viterbi decoding', () => {
+  const input = [1, 0, 1, 1];
+  const code = BOOK_CODE;
+  const codeword = encodeConv(input, code); // 12 bits, ends at state 0
+
+  it('decodes an error-free word back to the input, metric 0', () => {
+    const r = viterbiDecode(codeword, code);
+    expect(r.decoded).toEqual(input);
+    expect(r.finalMetric).toBe(0);
+    expect(r.mlPath[0]).toBe(0);
+    expect(r.mlPath[r.mlPath.length - 1]).toBe(0);
+  });
+  it('corrects a single channel error (within d_free capability)', () => {
+    const recv = codeword.slice();
+    recv[3] ^= 1;
+    const r = viterbiDecode(recv, code);
+    expect(r.decoded).toEqual(input);
+    expect(r.finalMetric).toBe(1);
+  });
+  it('exposes one snapshot per branch with per-state metrics', () => {
+    const r = viterbiDecode(codeword, code);
+    expect(r.steps.length).toBe(codeword.length / 2);
+    expect(r.steps[0].metric.length).toBe(code.nStates);
   });
 });
