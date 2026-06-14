@@ -34,5 +34,4 @@ export const wireless: Record<string, string> = {
   'wl.ber.threshold': 'Outage threshold γ_th (dB)',
   'wl.ber.curve.title': 'BER vs E_b/N₀ — AWGN, Rayleigh, MRC',
   'wl.ber.outage.title': 'Outage probability vs average SNR (shadowing)',
-  'wl.ber.readout.rayleighPenalty': 'Rayleigh penalty @ 1e-3',
 };
