@@ -48,6 +48,24 @@ export const analogam: Record<string, string> = {
   'analog.mod.observe.ring': 'The diode ring multiplies m(t) by a ±1 square-wave carrier; the bandpass filter extracts the DSB-SC signal.',
   'analog.demod.group': 'Demodulator',
 
+  // §3.4 Signal Multiplexing
+  'analog.mux.kind': 'Multiplexing',
+  'analog.mux.kind.fdm': 'FDM',
+  'analog.mux.kind.qam': 'Quadrature (QAM)',
+  'analog.mux.fdm.spacing': 'Carrier spacing',
+  'analog.mux.fdm.bandwidth': 'Channel bandwidth W',
+  'analog.mux.fdm.channel': 'Recover channel',
+  'analog.mux.fdm.composite': 'Composite FDM spectrum',
+  'analog.mux.fdm.recovered': 'Recovered channel',
+  'analog.mux.fdm.overlap': 'Channels overlap — spacing < 2W (interference)',
+  'analog.mux.fdm.ok': 'Channels separated (spacing ≥ 2W)',
+  'analog.mux.qam.phase': 'RX phase error Δφ',
+  'analog.mux.qam.crosstalk': 'Crosstalk',
+  'analog.mux.qam.m1': 'Channel 1 (cos): m₁ vs recovered',
+  'analog.mux.qam.m2': 'Channel 2 (sin): m₂ vs recovered',
+  'analog.mux.observe.fdm': 'Each message rides a different carrier. Shrink the spacing below 2W and the bands overlap — the recovered channel picks up its neighbours.',
+  'analog.mux.observe.qam': 'Two messages share one carrier on cos and sin. A receiver phase error Δφ leaks one channel into the other (crosstalk).',
+
   // AM Modulator panel
   'analog.am.title': 'AM Modulator',
   'analog.am.mode': 'Modulation mode',
