@@ -98,6 +98,25 @@ export const fourier: Record<string, string> = {
   'fourier.preset.gibbs': 'Show Gibbs overshoot',
   'fourier.hint.gibbs': 'More harmonics sharpen the edges but the overshoot near jumps stays ~9% (Gibbs).',
 
+  // Tab 3 — Fourier Transform & Spectra
+  'fourier.panel.properties': 'FT Properties',
+  'fourier.prop.which': 'Property',
+  'fourier.prop.shift': 'Time shift',
+  'fourier.prop.modulate': 'Frequency shift',
+  'fourier.prop.scale': 'Time scaling',
+  'fourier.prop.amp': 'Amplitude scaling',
+  'fourier.prop.amount': 'Amount',
+  'fourier.prop.showAll': 'Show all properties',
+  'fourier.preset.leakage': 'Show spectral leakage',
+  'fourier.readout.bw': 'Bandwidth',
+  'fourier.readout.eTime': 'Energy (time)',
+  'fourier.readout.eFreq': 'Energy (freq)',
+  'fourier.hint.leakage': 'A rectangular window on an off-bin tone smears energy into neighboring bins (leakage).',
+  'fourier.hint.prop.shift': 'Shifting in time leaves |X(f)| unchanged — only the phase ramps.',
+  'fourier.hint.prop.modulate': 'Multiplying by a carrier copies the spectrum up to ±f₀.',
+  'fourier.hint.prop.scale': 'Compressing in time stretches the spectrum: narrower pulse ⇒ wider bandwidth.',
+  'fourier.hint.prop.amp': 'Scaling amplitude scales the spectrum by the same factor.',
+
   // Tab 4 — Filters & Bandpass
   'fourier.filter.type.bsf': 'Band-stop (BSF)',
   'fourier.panel.baseband': 'Baseband vs Bandpass',
