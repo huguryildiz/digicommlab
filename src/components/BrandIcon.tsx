@@ -16,12 +16,26 @@ export function BrandIcon({ size = 26 }: { size?: number }) {
       className="brand-icon"
     >
       <defs>
-        <linearGradient id="brand-wave" x1="9" y1="24" x2="39" y2="24" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="brand-wave"
+          x1="9"
+          y1="24"
+          x2="39"
+          y2="24"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0" stopColor="var(--accent)" />
           <stop offset="0.55" stopColor="var(--accent-blue)" />
           <stop offset="1" stopColor="var(--accent-2)" />
         </linearGradient>
-        <linearGradient id="brand-border" x1="2" y1="2" x2="46" y2="46" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="brand-border"
+          x1="2"
+          y1="2"
+          x2="46"
+          y2="46"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0" stopColor="var(--accent)" stopOpacity="0.75" />
           <stop offset="0.5" stopColor="var(--accent-blue)" stopOpacity="0.5" />
           <stop offset="1" stopColor="var(--accent-2)" stopOpacity="0.75" />

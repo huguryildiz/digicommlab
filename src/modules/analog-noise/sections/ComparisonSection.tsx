@@ -20,10 +20,7 @@ const COLORS: Record<AnalogScheme, string> = {
 export function ComparisonSection({ params, d }: Props) {
   const x = Array.from(d.cnrSweep);
   const schemes: AnalogScheme[] = ['dsb', 'ssb', 'am', 'fm'];
-  const yMax = Math.max(
-    1,
-    ...schemes.flatMap((s) => Array.from(d.curves[s])),
-  );
+  const yMax = Math.max(1, ...schemes.flatMap((s) => Array.from(d.curves[s])));
   const yMin = Math.min(0, ...schemes.flatMap((s) => Array.from(d.curves[s])));
 
   return (
@@ -39,7 +36,14 @@ export function ComparisonSection({ params, d }: Props) {
           };
           drawAxes(ctx, ax, [x[0], x[x.length - 1]]);
           for (const s of schemes) {
-            drawLine(ctx, ax, x, Array.from(d.curves[s]), COLORS[s], s === params.scheme ? 2.4 : 1.2);
+            drawLine(
+              ctx,
+              ax,
+              x,
+              Array.from(d.curves[s]),
+              COLORS[s],
+              s === params.scheme ? 2.4 : 1.2,
+            );
           }
           // operating point marker for the current scheme
           const px = ax.x(params.cnrDb);

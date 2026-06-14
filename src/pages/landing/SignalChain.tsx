@@ -7,7 +7,12 @@ export function SignalChain() {
     <div className="flow">
       <span className="flow__label">{t('landing.flow.label')}</span>
       <div className="flow__track">
-        <svg className="flow__svg" viewBox="0 0 1000 44" preserveAspectRatio="none" aria-hidden="true">
+        <svg
+          className="flow__svg"
+          viewBox="0 0 1000 44"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
           <defs>
             <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="var(--color-x)" />

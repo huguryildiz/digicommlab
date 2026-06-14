@@ -15,17 +15,26 @@ describe('Home (landing)', () => {
   it('renders the hero headline and the primary CTA → /start', () => {
     renderHome();
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/survive the channel/i);
-    expect(screen.getByRole('link', { name: /Browse the modules/i })).toHaveAttribute('href', '/start');
+    expect(screen.getByRole('link', { name: /Browse the modules/i })).toHaveAttribute(
+      'href',
+      '/start',
+    );
   });
 
   it('links the three live modules to their routes', () => {
     renderHome();
-    expect(screen.getByRole('link', { name: /Sampling & Quantization/i })).toHaveAttribute('href', '/sampling');
+    expect(screen.getByRole('link', { name: /Sampling & Quantization/i })).toHaveAttribute(
+      'href',
+      '/sampling',
+    );
     expect(screen.getByRole('link', { name: /Information Theory/i })).toHaveAttribute(
       'href',
       '/information-theory',
     );
-    expect(screen.getByRole('link', { name: /Modulation & Detection/i })).toHaveAttribute('href', '/modulation');
+    expect(screen.getByRole('link', { name: /Modulation & Detection/i })).toHaveAttribute(
+      'href',
+      '/modulation',
+    );
   });
 
   it('renders coming-soon modules as non-interactive (not links)', () => {

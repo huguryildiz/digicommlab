@@ -58,5 +58,16 @@ export function deriveAll(p: ProcessParams): Derived {
   const psdTheory = theoreticalPsd(p, freqs);
   const filterMag = filterMagSq(p, freqs);
 
-  return { ensemble, mean, lags: lagsArr, rEnsemble, rTime, rTheory, freqs, psdEstimate, psdTheory, filterMag };
+  return {
+    ensemble,
+    mean,
+    lags: lagsArr,
+    rEnsemble,
+    rTime,
+    rTheory,
+    freqs,
+    psdEstimate,
+    psdTheory,
+    filterMag,
+  };
 }

@@ -5,7 +5,13 @@
  */
 
 import { linspace } from '@/lib/dsp/math';
-import { seriesCoeffs, seriesPartialSum, transferMag, ftPair, lowpassEquivalent } from '@/lib/dsp/fourier';
+import {
+  seriesCoeffs,
+  seriesPartialSum,
+  transferMag,
+  ftPair,
+  lowpassEquivalent,
+} from '@/lib/dsp/fourier';
 import { spectrum } from '@/lib/dsp/fft';
 import { evalSignal, periodicWave, type Tone, type Periodic } from '@/lib/dsp/signals';
 import { window as windowFunc, type WindowType } from '@/lib/dsp/window';
@@ -127,7 +133,10 @@ export function buildFilter(
   // Displayed input scrolls with tStart; spectrum from a fixed buffer (stationary).
   const timeSigInput = time.map((t) => sigAt(tStart + t));
 
-  const spec = spectrum(time.map((t) => sigAt(t)), fs);
+  const spec = spectrum(
+    time.map((t) => sigAt(t)),
+    fs,
+  );
   const inputMag = spec.mag;
   const outputMag = spec.mag.map((m, i) => {
     const f = spec.freq[i];
@@ -177,7 +186,7 @@ export function buildPairs(
   const dt = n > 1 ? t[1] - t[0] : 1;
   const shiftIdx = Math.round(timeShift / dt);
   const timeShifted = x.map((_, i) => {
-    const j = ((i - shiftIdx) % n + n) % n;
+    const j = (((i - shiftIdx) % n) + n) % n;
     return x[j] * ampScale;
   });
 

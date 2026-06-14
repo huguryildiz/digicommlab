@@ -65,7 +65,11 @@ function power(x: Float64Array): number {
 }
 
 /** Return reference + white Gaussian noise scaled so the SNR equals snrDb. */
-export function addNoiseAtSnr(reference: Float64Array, snrDb: number, rng: () => number): Float64Array {
+export function addNoiseAtSnr(
+  reference: Float64Array,
+  snrDb: number,
+  rng: () => number,
+): Float64Array {
   const sigP = power(reference) || 1e-12;
   const noiseP = sigP / 10 ** (snrDb / 10);
   const sigma = Math.sqrt(noiseP);

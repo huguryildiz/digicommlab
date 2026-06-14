@@ -24,9 +24,7 @@ export function Segmented<T extends string>({
           type="button"
           role="tab"
           aria-selected={o.value === value}
-          className={
-            o.value === value ? 'segmented__btn segmented__btn--active' : 'segmented__btn'
-          }
+          className={o.value === value ? 'segmented__btn segmented__btn--active' : 'segmented__btn'}
           onClick={() => onChange(o.value)}
         >
           {o.label}

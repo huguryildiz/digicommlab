@@ -7,7 +7,14 @@ import {
   nyquistOffCenterSamples,
   type PulseKind,
 } from '@/lib/dsp/pulse';
-import { matchedFilter, matchedFilterOutput, correlate, pulseEnergy, peakSnr, convolve } from '@/lib/dsp/matchedfilter';
+import {
+  matchedFilter,
+  matchedFilterOutput,
+  correlate,
+  pulseEnergy,
+  peakSnr,
+  convolve,
+} from '@/lib/dsp/matchedfilter';
 import { sigmaFromN0, gaussian } from '@/lib/dsp/awgn';
 import { makeRng } from '@/lib/sim/sources';
 import { eyeTraces, eyeMetrics, type EyeTrace } from '@/lib/dsp/eye';

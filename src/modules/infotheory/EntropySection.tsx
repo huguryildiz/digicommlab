@@ -56,7 +56,10 @@ export function EntropySection() {
           <Readout label={t('it.entropy.H')} value={H.toFixed(4)} unit="bits" />
           <Readout label={t('it.entropy.max')} value={max.toFixed(4)} unit="bits" />
           <Readout label={t('it.entropy.eta')} value={max > 0 ? (H / max).toFixed(3) : '—'} />
-          <Readout label={t('it.entropy.sum')} value={probs.reduce((s, p) => s + p, 0).toFixed(2)} />
+          <Readout
+            label={t('it.entropy.sum')}
+            value={probs.reduce((s, p) => s + p, 0).toFixed(2)}
+          />
         </div>
 
         <Panel title={t('it.entropy.bars')}>
@@ -67,7 +70,10 @@ export function EntropySection() {
             draw={(ctx, w, h) => {
               const n = norm.length;
               const yMax = 1;
-              const ax = { x: linScale([0, n], [30, w - 10]), y: linScale([0, yMax], [h - 20, 10]) };
+              const ax = {
+                x: linScale([0, n], [30, w - 10]),
+                y: linScale([0, yMax], [h - 20, 10]),
+              };
               drawAxes(ctx, ax, [0, n]);
               for (let i = 0; i < n; i++) {
                 const x0 = ax.x(i + 0.15);
@@ -75,7 +81,16 @@ export function EntropySection() {
                 ctx.fillStyle = CHART.blue;
                 ctx.fillRect(x0, ax.y(norm[i]), x1 - x0, ax.y(0) - ax.y(norm[i]));
                 drawText(ctx, ax, i + 0.5, -0.04, `s${i}`, CHART.dim, -6, 12);
-                drawText(ctx, ax, i + 0.5, norm[i], `I=${selfInfo(norm[i]).toFixed(1)}`, CHART.text, -14, -6);
+                drawText(
+                  ctx,
+                  ax,
+                  i + 0.5,
+                  norm[i],
+                  `I=${selfInfo(norm[i]).toFixed(1)}`,
+                  CHART.text,
+                  -14,
+                  -6,
+                );
               }
             }}
           />
@@ -87,7 +102,10 @@ export function EntropySection() {
             ariaLabel="Binary entropy function H(p)"
             deps={[norm]}
             draw={(ctx, w, h) => {
-              const ax = { x: linScale([0, 1], [30, w - 10]), y: linScale([0, 1.05], [h - 20, 10]) };
+              const ax = {
+                x: linScale([0, 1], [30, w - 10]),
+                y: linScale([0, 1.05], [h - 20, 10]),
+              };
               drawAxes(ctx, ax, [0, 1]);
               const xs: number[] = [];
               const ys: number[] = [];

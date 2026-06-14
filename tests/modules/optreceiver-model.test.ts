@@ -136,8 +136,20 @@ describe('buildOptRxView (2-D PSK/QAM)', () => {
   });
 
   it('16-QAM: kind 2d, 16 points; Monte-Carlo Pe drops with Eb/N0', () => {
-    const lo = buildOptRxView({ signalSetId: 'qam16', ebN0Db: 4, symbolIndex: 0, sps: 64, cycles: 4 });
-    const hi = buildOptRxView({ signalSetId: 'qam16', ebN0Db: 16, symbolIndex: 0, sps: 64, cycles: 4 });
+    const lo = buildOptRxView({
+      signalSetId: 'qam16',
+      ebN0Db: 4,
+      symbolIndex: 0,
+      sps: 64,
+      cycles: 4,
+    });
+    const hi = buildOptRxView({
+      signalSetId: 'qam16',
+      ebN0Db: 16,
+      symbolIndex: 0,
+      sps: 64,
+      cycles: 4,
+    });
     expect(lo.M).toBe(16);
     expect(lo.kind).toBe('2d');
     const peLo = monteCarloPe(lo, 4000, makeRng(2)).errors;
@@ -148,7 +160,13 @@ describe('buildOptRxView (2-D PSK/QAM)', () => {
 
 describe('buildOptRxView (orthogonal FSK)', () => {
   it('4-FSK: kind orthogonal, dim 4, 4 orthonormal tone basis', () => {
-    const v = buildOptRxView({ signalSetId: 'fsk4', ebN0Db: 8, symbolIndex: 0, sps: 64, cycles: 2 });
+    const v = buildOptRxView({
+      signalSetId: 'fsk4',
+      ebN0Db: 8,
+      symbolIndex: 0,
+      sps: 64,
+      cycles: 2,
+    });
     expect(v.kind).toBe('orthogonal');
     expect(v.dim).toBe(4);
     expect(v.M).toBe(4);
@@ -159,7 +177,13 @@ describe('buildOptRxView (orthogonal FSK)', () => {
   });
 
   it('4-FSK reception: M-component statistic, decision = argmax at high SNR', () => {
-    const v = buildOptRxView({ signalSetId: 'fsk4', ebN0Db: 40, symbolIndex: 3, sps: 64, cycles: 2 });
+    const v = buildOptRxView({
+      signalSetId: 'fsk4',
+      ebN0Db: 40,
+      symbolIndex: 3,
+      sps: 64,
+      cycles: 2,
+    });
     const rx = simulateReception(v, 3, makeRng(11));
     expect(rx.statistic).toHaveLength(4);
     let argmax = 0;
@@ -169,8 +193,20 @@ describe('buildOptRxView (orthogonal FSK)', () => {
   });
 
   it('BFSK: kind orthogonal, dim 2; Monte-Carlo Pe drops with Eb/N0', () => {
-    const lo = buildOptRxView({ signalSetId: 'bfsk', ebN0Db: 2, symbolIndex: 0, sps: 64, cycles: 2 });
-    const hi = buildOptRxView({ signalSetId: 'bfsk', ebN0Db: 12, symbolIndex: 0, sps: 64, cycles: 2 });
+    const lo = buildOptRxView({
+      signalSetId: 'bfsk',
+      ebN0Db: 2,
+      symbolIndex: 0,
+      sps: 64,
+      cycles: 2,
+    });
+    const hi = buildOptRxView({
+      signalSetId: 'bfsk',
+      ebN0Db: 12,
+      symbolIndex: 0,
+      sps: 64,
+      cycles: 2,
+    });
     expect(lo.dim).toBe(2);
     const peLo = monteCarloPe(lo, 5000, makeRng(4)).errors;
     const peHi = monteCarloPe(hi, 5000, makeRng(4)).errors;

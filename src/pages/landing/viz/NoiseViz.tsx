@@ -26,9 +26,30 @@ let lastFrame = -1;
 function ensureLanes(): Lane[] {
   if (!lanes) {
     lanes = [
-      { buf: makeNoiseTrace(VISIBLE + 2, gaussian), color: VIZ.green, alpha: 0.95, width: 1.8, glow: 6, scale: 0.1 },
-      { buf: makeNoiseTrace(VISIBLE + 2, gaussian), color: VIZ.blue, alpha: 0.5, width: 1.2, glow: 0, scale: 0.13 },
-      { buf: makeNoiseTrace(VISIBLE + 2, gaussian), color: VIZ.orange, alpha: 0.38, width: 1.2, glow: 0, scale: 0.16 },
+      {
+        buf: makeNoiseTrace(VISIBLE + 2, gaussian),
+        color: VIZ.green,
+        alpha: 0.95,
+        width: 1.8,
+        glow: 6,
+        scale: 0.1,
+      },
+      {
+        buf: makeNoiseTrace(VISIBLE + 2, gaussian),
+        color: VIZ.blue,
+        alpha: 0.5,
+        width: 1.2,
+        glow: 0,
+        scale: 0.13,
+      },
+      {
+        buf: makeNoiseTrace(VISIBLE + 2, gaussian),
+        color: VIZ.orange,
+        alpha: 0.38,
+        width: 1.2,
+        glow: 0,
+        scale: 0.16,
+      },
     ];
   }
   return lanes;

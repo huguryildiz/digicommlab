@@ -13,7 +13,13 @@ interface Props {
 
 export function ThresholdEmphasisSection({ params, d }: Props) {
   const x = Array.from(d.cnrSweep);
-  const sp = { amIndex: params.amIndex, beta: params.beta, messagePower: MESSAGE_POWER, emphasis: false, W: params.W };
+  const sp = {
+    amIndex: params.amIndex,
+    beta: params.beta,
+    messagePower: MESSAGE_POWER,
+    emphasis: false,
+    W: params.W,
+  };
   const spE = { ...sp, emphasis: true };
   // FM output SNR with and without emphasis. Below the threshold FM collapses, so we clamp the
   // curve to cnr-10 to make the knee visible; above the threshold we use the theoretical SNR.

@@ -26,11 +26,27 @@ describe('GF(2) primitives', () => {
   });
   it('encode computes c = xG mod 2', () => {
     // G = [[1,0,1],[0,1,1]] → x=[1,1] → c = [1,1,0]
-    expect(encode([1, 1], [[1, 0, 1], [0, 1, 1]])).toEqual([1, 1, 0]);
+    expect(
+      encode(
+        [1, 1],
+        [
+          [1, 0, 1],
+          [0, 1, 1],
+        ],
+      ),
+    ).toEqual([1, 1, 0]);
   });
   it('syndrome computes s = rHᵀ mod 2', () => {
     // H = [[1,1,0],[1,0,1]] → r=[1,1,0] → s=[0,1]
-    expect(syndrome([1, 1, 0], [[1, 1, 0], [1, 0, 1]])).toEqual([0, 1]);
+    expect(
+      syndrome(
+        [1, 1, 0],
+        [
+          [1, 1, 0],
+          [1, 0, 1],
+        ],
+      ),
+    ).toEqual([0, 1]);
   });
 });
 

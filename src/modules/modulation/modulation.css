@@ -54,9 +54,15 @@
   vertical-align: middle;
 }
 
-.modulation__legend .lg-theory::before { background: #4aa3ff; }
-.modulation__legend .lg-sim::before { background: #ffb454; }
-.modulation__legend .lg-live::before { background: #46c93a; }
+.modulation__legend .lg-theory::before {
+  background: #4aa3ff;
+}
+.modulation__legend .lg-sim::before {
+  background: #ffb454;
+}
+.modulation__legend .lg-live::before {
+  background: #46c93a;
+}
 
 .modulation__message {
   display: grid;

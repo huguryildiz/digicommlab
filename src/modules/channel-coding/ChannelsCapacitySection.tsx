@@ -76,25 +76,59 @@ export function ChannelsCapacitySection() {
             onChange={setKind}
           />
           {kind === 'bsc' && (
-            <Slider label={t('cc.ch.eps')} value={eps} min={0} max={0.5} step={0.01} onChange={setEps} />
+            <Slider
+              label={t('cc.ch.eps')}
+              value={eps}
+              min={0}
+              max={0.5}
+              step={0.01}
+              onChange={setEps}
+            />
           )}
           {kind === 'bec' && (
-            <Slider label={t('cc.ch.perase')} value={pErase} min={0} max={1} step={0.01} onChange={setPErase} />
+            <Slider
+              label={t('cc.ch.perase')}
+              value={pErase}
+              min={0}
+              max={1}
+              step={0.01}
+              onChange={setPErase}
+            />
           )}
           {kind === 'awgn' && (
             <>
-              <Slider label={t('cc.ch.ebn0')} value={ebN0Db} min={-2} max={12} step={0.5} unit="dB" onChange={setEbN0Db} />
+              <Slider
+                label={t('cc.ch.ebn0')}
+                value={ebN0Db}
+                min={-2}
+                max={12}
+                step={0.5}
+                unit="dB"
+                onChange={setEbN0Db}
+              />
               <Readout label={t('cc.ch.epsInduced')} value={epsEff.toFixed(4)} />
             </>
           )}
-          <Slider label={t('cc.ch.px0')} value={px0} min={0} max={1} step={0.01} onChange={setPx0} />
+          <Slider
+            label={t('cc.ch.px0')}
+            value={px0}
+            min={0}
+            max={1}
+            step={0.01}
+            onChange={setPx0}
+          />
         </Panel>
         <Panel title={t('cc.ch.readouts')}>
           <div className="cc-readouts">
             <Readout label="H(Y)" value={HY.toFixed(3)} unit="bits" />
             <Readout label="H(Y|X)" value={HYgivenX.toFixed(3)} unit="bits" />
             <Readout label="I(X;Y)" value={I.toFixed(3)} unit="bits" />
-            <Readout label={t('cc.ch.capacity')} value={capacity.toFixed(3)} unit="bits" tone="ok" />
+            <Readout
+              label={t('cc.ch.capacity')}
+              value={capacity.toFixed(3)}
+              unit="bits"
+              tone="ok"
+            />
           </div>
         </Panel>
       </aside>
@@ -114,7 +148,10 @@ export function ChannelsCapacitySection() {
             ariaLabel="Mutual information versus input distribution"
             deps={[kind, epsEff, pErase, px0]}
             draw={(ctx, w, h) => {
-              const ax = { x: linScale([0, 1], [34, w - 10]), y: linScale([0, 1.05], [h - 22, 10]) };
+              const ax = {
+                x: linScale([0, 1], [34, w - 10]),
+                y: linScale([0, 1.05], [h - 22, 10]),
+              };
               drawAxes(ctx, ax, [0, 1]);
               drawLine(ctx, ax, xs, ys, CHART.blue, 2);
               drawScatter(ctx, ax, [xs[argmax]], [ys[argmax]], CHART.green, 4);
@@ -212,7 +249,12 @@ function drawNode(
 }
 
 /** Plot soft (BI-AWGN), hard (BSC) and unconstrained-Gaussian capacity vs Eb/N0 (dB). */
-function drawSoftHard(ctx: CanvasRenderingContext2D, w: number, h: number, ebN0DbCur: number): void {
+function drawSoftHard(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  ebN0DbCur: number,
+): void {
   const ax = { x: linScale([-2, 12], [34, w - 10]), y: linScale([0, 1.05], [h - 22, 10]) };
   drawAxes(ctx, ax, [-2, 12]);
   const xs: number[] = [];

@@ -13,7 +13,10 @@ interface Props {
 export function EnsembleSection({ params, d }: Props) {
   const N = params.N;
   const ts = Array.from({ length: N }, (_, n) => n / params.fs);
-  const yMax = Math.max(1e-6, ...d.ensemble.slice(0, 30).flatMap((x) => Array.from(x).map(Math.abs)));
+  const yMax = Math.max(
+    1e-6,
+    ...d.ensemble.slice(0, 30).flatMap((x) => Array.from(x).map(Math.abs)),
+  );
 
   const meanAvg = d.mean.reduce((s, v) => s + v, 0) / d.mean.length;
 

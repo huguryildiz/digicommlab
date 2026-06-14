@@ -67,7 +67,12 @@
 .hero__title-em {
   font-style: italic;
   font-weight: 600;
-  background: linear-gradient(110deg, var(--accent) 0%, var(--accent-blue) 55%, var(--accent-2) 100%);
+  background: linear-gradient(
+    110deg,
+    var(--accent) 0%,
+    var(--accent-blue) 55%,
+    var(--accent-2) 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -97,7 +102,10 @@
   align-items: center;
   gap: 0.55rem;
   border: 1px solid transparent;
-  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition),
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    border-color var(--transition),
     color var(--transition);
 }
 .btn--primary {
@@ -161,7 +169,9 @@
   background: linear-gradient(180deg, rgba(8, 12, 30, 0.9), var(--scope-bg));
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 0 60px rgba(57, 255, 133, 0.04);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.5),
+    inset 0 0 60px rgba(57, 255, 133, 0.04);
 }
 .viz-canvas {
   display: block;
@@ -330,7 +340,10 @@
   text-decoration: none;
   opacity: 0;
   animation: tile-fade 0.6s ease forwards;
-  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+  transition:
+    transform var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition);
 }
 .tile::before {
   content: '';

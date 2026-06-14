@@ -15,7 +15,8 @@ export function PsdSection({ d, params }: Props) {
   const est = Array.from(d.psdEstimate);
   const estMax = Math.max(1e-6, ...est);
   const estNorm = est.map((v) => v / estMax);
-  const showTheory = params.kind === 'white-gaussian' || params.kind === 'colored' || params.kind === 'binary-nrz';
+  const showTheory =
+    params.kind === 'white-gaussian' || params.kind === 'colored' || params.kind === 'binary-nrz';
   const theory = Array.from(d.psdTheory);
   const thMax = Math.max(1e-6, ...theory);
   const thNorm = theory.map((v) => v / thMax);

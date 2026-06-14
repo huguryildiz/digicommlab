@@ -28,7 +28,14 @@ export function EyeEqualizationSection() {
             ]}
             onChange={(v) => setM(Number(v) as 2 | 4)}
           />
-          <Slider label={t('baseband.eye.channel')} value={c1} min={0} max={0.9} step={0.05} onChange={setC1} />
+          <Slider
+            label={t('baseband.eye.channel')}
+            value={c1}
+            min={0}
+            max={0.9}
+            step={0.05}
+            onChange={setC1}
+          />
           <Select
             label={t('baseband.eye.equalizer')}
             value={equalizer}
@@ -40,16 +47,33 @@ export function EyeEqualizationSection() {
             onChange={(v) => setEqualizer(v as EqualizerKind)}
           />
           {equalizer !== 'off' && (
-            <Slider label={t('baseband.eye.taps')} value={nTaps} min={3} max={12} step={1} onChange={setNTaps} />
+            <Slider
+              label={t('baseband.eye.taps')}
+              value={nTaps}
+              min={3}
+              max={12}
+              step={1}
+              onChange={setNTaps}
+            />
           )}
           {equalizer === 'mmse' && (
-            <Slider label={t('baseband.rx.n0')} value={noiseVar} min={0} max={0.5} step={0.01} onChange={setNoiseVar} />
+            <Slider
+              label={t('baseband.rx.n0')}
+              value={noiseVar}
+              min={0}
+              max={0.5}
+              step={0.01}
+              onChange={setNoiseVar}
+            />
           )}
         </Panel>
       </aside>
       <div className="bb-content">
         <div className="bb-readouts">
-          <Readout label={t('baseband.readout.eyeHeight')} value={view.eyeHeightBefore.toFixed(2)} />
+          <Readout
+            label={t('baseband.readout.eyeHeight')}
+            value={view.eyeHeightBefore.toFixed(2)}
+          />
           <Readout
             label={`${t('baseband.readout.eyeHeight')} (eq)`}
             value={view.eyeHeightAfter.toFixed(2)}
@@ -58,11 +82,19 @@ export function EyeEqualizationSection() {
           <Readout label={t('baseband.readout.residualIsi')} value={view.residualIsi.toFixed(4)} />
         </div>
         <Panel title={t('baseband.panel.eye')}>
-          <EyePanel traces={view.tracesBefore} sps={view.sps} label="Eye diagram before equalization" />
+          <EyePanel
+            traces={view.tracesBefore}
+            sps={view.sps}
+            label="Eye diagram before equalization"
+          />
         </Panel>
         {equalizer !== 'off' && (
           <Panel title={t('baseband.panel.eyeAfter')}>
-            <EyePanel traces={view.tracesAfter} sps={view.sps} label="Eye diagram after equalization" />
+            <EyePanel
+              traces={view.tracesAfter}
+              sps={view.sps}
+              label="Eye diagram after equalization"
+            />
           </Panel>
         )}
         <Panel title={t('baseband.panel.eqTaps')}>
@@ -72,8 +104,12 @@ export function EyeEqualizationSection() {
           <CombinedPanel view={view} />
         </Panel>
         <TheoryBox title={t('baseband.theory.eye')}>
-          <p><Formula tex="y_m=x_0 a_m+\sum_{n\neq m} a_n x_{m-n}+\nu_m\quad(\text{ISI})" block /></p>
-          <p><Formula tex="W_{ZF}(z)=\frac{1}{H(z)}\qquad W_{MMSE}=\arg\min_w E|w*r-a|^2" block /></p>
+          <p>
+            <Formula tex="y_m=x_0 a_m+\sum_{n\neq m} a_n x_{m-n}+\nu_m\quad(\text{ISI})" block />
+          </p>
+          <p>
+            <Formula tex="W_{ZF}(z)=\frac{1}{H(z)}\qquad W_{MMSE}=\arg\min_w E|w*r-a|^2" block />
+          </p>
         </TheoryBox>
       </div>
     </div>

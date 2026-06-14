@@ -99,11 +99,7 @@ export function ricianPdf(r: number, sigma: number, K: number): number {
   if (r < 0) return 0;
   const s = Math.sqrt(2 * K) * sigma;
   const s2 = sigma * sigma;
-  return (
-    (r / s2) *
-    Math.exp(-(r * r + s * s) / (2 * s2)) *
-    besselI0((r * s) / s2)
-  );
+  return (r / s2) * Math.exp(-(r * r + s * s) / (2 * s2)) * besselI0((r * s) / s2);
 }
 
 export interface EnvelopeParams {

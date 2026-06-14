@@ -30,7 +30,7 @@ const draw: DrawFn = (ctx, t, w, h) => {
     ctx.beginPath();
     for (let x = 0; x <= w; x += 2) {
       const frac = x / w;
-      const harmonic = ((4 / Math.PI) / n) * Math.sin(2 * Math.PI * n * frac);
+      const harmonic = (4 / Math.PI / n) * Math.sin(2 * Math.PI * n * frac);
       const y = mid - harmonic * amp;
       if (x === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
@@ -51,7 +51,7 @@ const draw: DrawFn = (ctx, t, w, h) => {
     const frac = x / w;
     let y = 0;
     for (let n = 1; n < activeHarmonics; n += 2) {
-      y += ((4 / Math.PI) / n) * Math.sin(2 * Math.PI * n * frac);
+      y += (4 / Math.PI / n) * Math.sin(2 * Math.PI * n * frac);
     }
     const py = mid - y * amp;
     if (x === 0) ctx.moveTo(x, py);

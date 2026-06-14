@@ -84,12 +84,7 @@ describe('colored & nrz generators', () => {
   });
 });
 
-import {
-  ensembleMean,
-  ensembleAutocorr,
-  timeAutocorr,
-  periodogram,
-} from '@/lib/dsp/random';
+import { ensembleMean, ensembleAutocorr, timeAutocorr, periodogram } from '@/lib/dsp/random';
 
 describe('estimators', () => {
   it('ensembleMean of zero-mean white ~ 0 across the record', () => {

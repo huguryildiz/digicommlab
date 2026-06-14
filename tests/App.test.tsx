@@ -16,7 +16,13 @@ describe('App shell', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: /Modules/i }));
     const menu = screen.getByRole('menu');
-    expect(within(menu).getByRole('link', { name: /Fourier & Spectrum/i })).toHaveAttribute('href', '#/fourier');
-    expect(within(menu).getByRole('link', { name: /Analog Noise & SNR/i })).toHaveAttribute('href', '#/analog-noise');
+    expect(within(menu).getByRole('link', { name: /Fourier & Spectrum/i })).toHaveAttribute(
+      'href',
+      '#/fourier',
+    );
+    expect(within(menu).getByRole('link', { name: /Analog Noise & SNR/i })).toHaveAttribute(
+      'href',
+      '#/analog-noise',
+    );
   });
 });

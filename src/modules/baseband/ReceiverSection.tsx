@@ -17,9 +17,25 @@ export function ReceiverSection() {
     <div className="bb-section">
       <aside className="bb-controls">
         <Panel title={t('baseband.tab.receiver')}>
-          <Slider label={t('baseband.pulse.alpha')} value={alpha} min={0} max={1} step={0.05} onChange={setAlpha} />
+          <Slider
+            label={t('baseband.pulse.alpha')}
+            value={alpha}
+            min={0}
+            max={1}
+            step={0.05}
+            onChange={setAlpha}
+          />
           <Toggle label={t('baseband.rx.noise')} checked={noise} onChange={setNoise} />
-          {noise && <Slider label={t('baseband.rx.n0')} value={n0} min={0.01} max={1} step={0.01} onChange={setN0} />}
+          {noise && (
+            <Slider
+              label={t('baseband.rx.n0')}
+              value={n0}
+              min={0.01}
+              max={1}
+              step={0.01}
+              onChange={setN0}
+            />
+          )}
         </Panel>
       </aside>
       <div className="bb-content">
@@ -38,9 +54,21 @@ export function ReceiverSection() {
           <RrcSplitPanel view={view} />
         </Panel>
         <TheoryBox title={t('baseband.theory.receiver')}>
-          <p><Formula tex="h(t)=p(T-t)\qquad y(T)=\int r(t)\,p(t)\,dt=\textstyle\sum_n r_n p_n" block /></p>
-          <p><Formula tex="\left(\tfrac{S}{N}\right)_{\max}=\frac{2E}{N_0}" /></p>
-          <p><Formula tex="\sqrt{X_{rc}(f)}\cdot\sqrt{X_{rc}(f)}=X_{rc}(f)\ \Rightarrow\ \text{matched \& zero-ISI}" block /></p>
+          <p>
+            <Formula
+              tex="h(t)=p(T-t)\qquad y(T)=\int r(t)\,p(t)\,dt=\textstyle\sum_n r_n p_n"
+              block
+            />
+          </p>
+          <p>
+            <Formula tex="\left(\tfrac{S}{N}\right)_{\max}=\frac{2E}{N_0}" />
+          </p>
+          <p>
+            <Formula
+              tex="\sqrt{X_{rc}(f)}\cdot\sqrt{X_{rc}(f)}=X_{rc}(f)\ \Rightarrow\ \text{matched \& zero-ISI}"
+              block
+            />
+          </p>
         </TheoryBox>
       </div>
     </div>

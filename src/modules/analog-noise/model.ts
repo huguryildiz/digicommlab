@@ -39,7 +39,13 @@ const SCHEMES: AnalogScheme[] = ['dsb', 'ssb', 'am', 'fm'];
 export const MESSAGE_POWER = 0.5; // normalized single-tone message power (½ for unit-amplitude sine)
 
 function snrParams(p: ScenarioParams): SnrParams {
-  return { amIndex: p.amIndex, beta: p.beta, messagePower: MESSAGE_POWER, emphasis: p.emphasis, W: p.W };
+  return {
+    amIndex: p.amIndex,
+    beta: p.beta,
+    messagePower: MESSAGE_POWER,
+    emphasis: p.emphasis,
+    W: p.W,
+  };
 }
 
 export interface Derived {
