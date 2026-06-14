@@ -9,6 +9,24 @@ export const analogam: Record<string, string> = {
   'analog.animation': 'Animation',
   'analog.panel.select': 'Panel',
 
+  // Tab bar (4-tab restructure; 'mux' lands in Plan 3)
+  'analog.tab.schemes': 'AM Schemes',
+  'analog.tab.modimpl': 'Modulators & Demodulators',
+  'analog.tab.mux': 'Signal Multiplexing',
+  'analog.tab.radio': 'AM Radio Broadcasting',
+
+  // AM Schemes — scheme selector + sideband toggle
+  'analog.am.scheme': 'AM scheme',
+  'analog.am.scheme.dsb': 'DSB-SC',
+  'analog.am.scheme.conventional': 'Conventional',
+  'analog.am.scheme.ssb': 'SSB',
+  'analog.am.scheme.vsb': 'VSB',
+  'analog.am.ssbSide': 'Sideband',
+  'analog.am.ssbSide.usb': 'Upper (USB)',
+  'analog.am.ssbSide.lsb': 'Lower (LSB)',
+  'analog.am.vestige': 'Vestige width',
+  'analog.am.observe': 'Watch how the spectrum and envelope change as you switch schemes and raise the modulation index a.',
+
   // AM Modulator panel
   'analog.am.title': 'AM Modulator',
   'analog.am.mode': 'Modulation mode',
