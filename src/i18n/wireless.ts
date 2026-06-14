@@ -114,4 +114,17 @@ export const wireless: Record<string, string> = {
   'wl.rake.snr.title': 'Per-finger SNR',
   'wl.rake.readout.fingers': 'Resolvable fingers L',
   'wl.rake.readout.chip': 'Chip duration',
+
+  // MIMO section
+  'wl.tab.mimo': 'MIMO',
+  'wl.mimo.title': 'MIMO antennas',
+  'wl.mimo.nt': 'Transmit antennas N_t',
+  'wl.mimo.nr': 'Receive antennas N_r',
+  'wl.mimo.trials': 'Monte-Carlo trials',
+  'wl.mimo.seed': 'Seed',
+  'wl.mimo.ber.title': 'BER vs E_b/N₀ — Alamouti diversity',
+  'wl.mimo.cap.title': 'Ergodic capacity vs SNR',
+  'wl.mimo.readout.divSiso': 'SISO diversity order',
+  'wl.mimo.readout.divAlamouti': 'Alamouti 2×N_r order',
+  'wl.mimo.readout.capAt': 'Capacity (N_t×N_r) @ 10 dB',
 };
