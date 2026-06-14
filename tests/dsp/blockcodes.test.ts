@@ -11,6 +11,9 @@ import {
   makeHamming,
   syndromeTable,
   decode,
+  uncodedBerBpsk,
+  codedBerHard,
+  codedBerSoftRef,
 } from '@/lib/dsp/blockcodes';
 
 describe('GF(2) primitives', () => {
@@ -112,5 +115,21 @@ describe('syndrome decoding', () => {
     expect(dec.syndrome.every((b) => b === 0)).toBe(true);
     expect(dec.errorPos).toBe(-1);
     expect(dec.message).toEqual(x);
+  });
+});
+
+describe('coding-gain BER', () => {
+  const ham = CODES[0]; // (7,4) Hamming
+  it('uncoded BPSK is Q(√(2·Eb/N0)) and decreasing', () => {
+    expect(uncodedBerBpsk(10)).toBeLessThan(uncodedBerBpsk(4));
+    expect(uncodedBerBpsk(0)).toBeGreaterThan(0);
+    expect(uncodedBerBpsk(0)).toBeLessThan(0.5);
+  });
+  it('coded beats uncoded at high Eb/N0 but loses at low Eb/N0 (rate-penalty crossover)', () => {
+    expect(codedBerHard(ham, 10)).toBeLessThan(uncodedBerBpsk(10));
+    expect(codedBerHard(ham, 0)).toBeGreaterThan(uncodedBerBpsk(0));
+  });
+  it('soft reference beats hard-decision at high Eb/N0', () => {
+    expect(codedBerSoftRef(ham, 10)).toBeLessThan(codedBerHard(ham, 10));
   });
 });

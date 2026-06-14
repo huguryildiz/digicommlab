@@ -178,3 +178,41 @@ export function decode(r: number[], code: LinearCode, table: Map<string, number>
   if (errorPos >= 0) corrected[errorPos] ^= 1;
   return { syndrome: s, errorPos, corrected, message: corrected.slice(0, code.k) };
 }
+
+/** C(n,k) via a numerically gentle product. */
+function binom(n: number, k: number): number {
+  if (k < 0 || k > n) return 0;
+  let r = 1;
+  for (let i = 0; i < k; i++) r = (r * (n - i)) / (i + 1);
+  return r;
+}
+
+/** Uncoded BPSK BER P_b = Q(√(2·Eb/N0)). Ch. 7. */
+export function uncodedBerBpsk(ebN0Db: number): number {
+  return qfunc(Math.sqrt(2 * 10 ** (ebN0Db / 10)));
+}
+
+/**
+ * Hard-decision coded BER, bounded-distance decoding. The code rate R_c=k/n lowers the
+ * per-coded-bit energy, so the BSC crossover is p=Q(√(2·R_c·Eb/N0)); residual bit error
+ * ≈ (1/n)·Σ_{i=t+1}^{n} i·C(n,i)·p^i·(1−p)^{n−i}. §9.5.1.
+ */
+export function codedBerHard(code: LinearCode, ebN0Db: number): number {
+  const Rc = code.k / code.n;
+  const p = qfunc(Math.sqrt(2 * Rc * 10 ** (ebN0Db / 10)));
+  const t = errorCorrectionT(code.dmin);
+  const n = code.n;
+  let pb = 0;
+  for (let i = t + 1; i <= n; i++) pb += (i / n) * binom(n, i) * p ** i * (1 - p) ** (n - i);
+  return pb;
+}
+
+/**
+ * Soft-decision union-bound reference (leading term): A_dmin·Q(√(2·R_c·d_min·Eb/N0)),
+ * with A_dmin = number of minimum-weight codewords. §9.5.1 (union bound, Ch. 7).
+ */
+export function codedBerSoftRef(code: LinearCode, ebN0Db: number): number {
+  const Rc = code.k / code.n;
+  const aDmin = allCodewords(code.G).filter((c) => weight(c) === code.dmin).length;
+  return aDmin * qfunc(Math.sqrt(2 * Rc * code.dmin * 10 ** (ebN0Db / 10)));
+}
