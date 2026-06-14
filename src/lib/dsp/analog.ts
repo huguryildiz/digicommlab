@@ -110,6 +110,35 @@ export function vsbFilterMag(f: number, fc: number, vestige: number): number {
 }
 
 /**
+ * Real vestigial-sideband filter applied to a magnitude spectrum.
+ * Proakis §3.2.4, Example 3.2.7 / Fig 3.21: the VSB filter has unity gain in the
+ * passband, a linear vestige ramp across [f_c - vestige, f_c + vestige] with
+ * H(f_c) = 1/2, and complementary symmetry H(f_c+δ) + H(f_c-δ) = 1, so the
+ * vestige of the lower sideband exactly compensates the rolled-off upper edge.
+ *
+ * @param mag      magnitude values to filter
+ * @param freq     frequency (Hz) for each magnitude bin (same length as `mag`)
+ * @param fc       carrier frequency (Hz)
+ * @param vestige  half-width (Hz) of the vestige transition band
+ * @returns        filtered magnitudes, |H(f)|·mag
+ */
+export function vsbFilter(
+  mag: number[],
+  freq: number[],
+  fc: number,
+  vestige: number,
+): number[] {
+  return mag.map((m, i) => {
+    const d = freq[i] - fc; // offset from carrier
+    let h: number;
+    if (d <= -vestige) h = 0;
+    else if (d >= vestige) h = 1;
+    else h = 0.5 + d / (2 * vestige); // linear ramp: H(fc)=0.5, complementary
+    return m * h;
+  });
+}
+
+/**
  * Angle-modulated signal. Proakis §3.3.1
  * FM: Ac·cos(2π fc t + 2π kf ∫m dτ)
  * PM: Ac·cos(2π fc t + kp·m(t))
