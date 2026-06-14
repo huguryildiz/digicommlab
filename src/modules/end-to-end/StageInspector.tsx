@@ -14,9 +14,10 @@ export function StageInspector({ stage, r }: { stage: Stage; r: LinkResult }) {
     const m = Math.max(1, ...dim0.map(Math.abs), ...dim1.map(Math.abs), ...ideal0.map(Math.abs), ...ideal1.map(Math.abs));
     return (
       <Canvas
+        key="constellation"
         height={260}
         ariaLabel={t('e2e.inspector.mod')}
-        deps={[r, stage]}
+        deps={[r]}
         draw={(ctx, w, h) => {
           const ax = { x: linScale([-m, m], [8, w - 8]), y: linScale([-m, m], [h - 8, 8]) };
           drawAxes(ctx, ax, [-m, m]);
@@ -32,6 +33,7 @@ export function StageInspector({ stage, r }: { stage: Stage; r: LinkResult }) {
     const eye = r.channelTrace.eye;
     return (
       <Canvas
+        key="channel"
         height={260}
         ariaLabel={t('e2e.inspector.channel')}
         deps={[r]}
@@ -52,6 +54,7 @@ export function StageInspector({ stage, r }: { stage: Stage; r: LinkResult }) {
   // source / sink: sampled original + quantized levels
   return (
     <Canvas
+      key="signal"
       height={260}
       ariaLabel={t('e2e.inspector.source')}
       deps={[r]}
