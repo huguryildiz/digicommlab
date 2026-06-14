@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildSeriesSynth } from '@/modules/fourier/model';
-import { buildAnalogAmView } from '@/modules/analog/model';
+import { buildAnalogAmView } from '@/modules/analog-am/model';
 
 // The animation clock feeds `tStart` into the time-domain builders. The display
 // axis stays fixed (local [0, T]) while samples are taken tStart ahead, so the

@@ -2,13 +2,12 @@ import { useMemo, useState } from 'react';
 import { Panel, Formula, TheoryBox, Readout } from '@/components';
 import { Canvas } from '@/lib/plot/Canvas';
 import { linScale, logScale, drawAxes, drawLine, drawStems, drawVLine, shadeRegion } from '@/lib/plot/draw';
-import { CHART } from '@/lib/plot/colors';
+import { CHART, alpha } from '@/lib/plot/colors';
 import { t } from '@/i18n';
 import { DEFAULT_RAKE_PARAMS, deriveRake, type RakeParams } from '../rake-model';
 import { RakeControls } from '../rake-panels';
 
 const BER_FLOOR = 1e-6;
-const BAR_FILL = 'rgba(57, 255, 133, 0.4)'; // CHART.green, translucent (finger SNR bars)
 
 export function RakeSection() {
   const [params, setParams] = useState<RakeParams>(DEFAULT_RAKE_PARAMS);
@@ -92,7 +91,7 @@ export function RakeSection() {
             };
             drawAxes(ctx, ax, [0, n]);
             d.fingerSnrsDb.forEach((s, i) => {
-              shadeRegion(ctx, ax, i + 0.15, i + 0.85, yMin, s, BAR_FILL);
+              shadeRegion(ctx, ax, i + 0.15, i + 0.85, yMin, s, alpha(CHART.green, 0.4));
             });
           }}
         />

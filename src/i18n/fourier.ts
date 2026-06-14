@@ -1,10 +1,10 @@
 /**
- * i18n strings for Fourier & Spectrum module.
+ * i18n strings for Signals & Spectra module.
  * Will be merged into the dictionary during integration.
  */
 export const fourier: Record<string, string> = {
-  'nav.fourier': 'Fourier & Spectrum',
-  'landing.mod.fourier.title': 'Fourier & Spectrum',
+  'nav.fourier': 'Signals & Spectra',
+  'landing.mod.fourier.title': 'Signals & Spectra',
   'landing.mod.fourier.desc':
     'Analyze signals in the frequency domain. Fourier series, DFT, filters, and analytical signals.',
 
@@ -75,7 +75,7 @@ export const fourier: Record<string, string> = {
   'fourier.readout.env': 'Envelope mean',
 
   // Theory box
-  'fourier.theory.title': 'Theory — Fourier & Spectrum',
+  'fourier.theory.title': 'Theory — Signals & Spectra',
   'fourier.theory.series': 'Fourier Series',
   'fourier.theory.formula.series': 'x(t) = Σ cₙ e^(j2πnf₀t)',
   'fourier.theory.dft': 'Discrete Fourier Transform',

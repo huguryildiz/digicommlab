@@ -1,5 +1,5 @@
 import { useCanvasTicker, type DrawFn } from '../useCanvasTicker';
-import { VIZ } from './palette';
+import { VIZ, alpha } from './palette';
 
 /** Sampling: continuous sine + sample-and-hold staircase + sample points. */
 const draw: DrawFn = (ctx, t, w, h) => {
@@ -11,7 +11,7 @@ const draw: DrawFn = (ctx, t, w, h) => {
   const n = 11;
 
   // sample & hold staircase
-  ctx.strokeStyle = 'rgba(255, 140, 66, 0.85)';
+  ctx.strokeStyle = alpha(VIZ.orange, 0.85);
   ctx.lineWidth = 1.8;
   ctx.beginPath();
   for (let i = 0; i <= n; i += 1) {

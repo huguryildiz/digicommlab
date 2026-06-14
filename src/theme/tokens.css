@@ -50,9 +50,13 @@
   --glass-blur: 18px;
   --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* ── Typography — premium SaaS trio (lab-journal tone) ── */
-  --font: 'Newsreader', Georgia, 'Times New Roman', serif; /* body/UI — editorial serif */
-  --font-head: 'Newsreader', Georgia, 'Times New Roman', serif; /* heading — editorial serif */
+  /* ── Elevation — resting card shadow + card/overlay lift (themed) ── */
+  --shadow-card: none; /* dark cards separate via border; light theme adds a soft shadow */
+  --shadow-lift: 0 18px 40px rgba(0, 0, 0, 0.45);
+
+  /* ── Typography — editorial serif headings + technical sans UI + mono numerics ── */
+  --font: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; /* body/UI — clean technical sans */
+  --font-head: 'Newsreader', Georgia, 'Times New Roman', serif; /* heading/brand — editorial serif */
   --mono: 'IBM Plex Mono', 'SF Mono', Menlo, Consolas, monospace; /* numeric/formula/code/reading */
 
   /* ── Instrument screen — oscilloscope/viz canvas background (dark in both themes) ── */
@@ -60,34 +64,52 @@
 }
 
 /* =====================================================================
- * Light theme — readable light tones (token names preserved)
+ * Light theme — calm "paper lab" tones (token names preserved)
+ *
+ * Design intent: a clean, bright daylight surface that keeps the instrument
+ * aesthetic. Three deliberate choices fix the prior issues:
+ *   1. Borders are soft + near-neutral (was heavy saturated blue at α 0.5–0.78,
+ *      which outlined every panel and made the UI feel busy/harsh).
+ *   2. Page is bright white; white cards separate via a soft shadow (--shadow-card).
+ *   3. Canvases are a soft LIGHT-BLUE screen (--canvas-bg) with deepened traces
+ *      (theme-aware palettes in lib/plot/colors.ts + viz/palette.ts), instead of
+ *      the dark/black screen that looked harsh on a light page.
  * ===================================================================== */
 :root[data-theme='light'] {
-  --bg: #eef1f8;
-  --bg-panel: rgba(255, 255, 255, 0.92);
-  --surface: rgba(255, 255, 255, 0.92);
-  --surface-2: rgba(255, 255, 255, 0.98);
-  --canvas-bg: #ffffff;
+  /* Bright white page + solid white panels (cards lift via --shadow-card) */
+  --bg: #f7f9fc;
+  --bg-panel: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f4f6fb;
+  --canvas-bg: #eaf2fd; /* soft light-blue instrument screen */
+  --scope-bg: #eaf2fd; /* hero scope + brand icon screen (light-blue in light mode) */
   --select-option-bg: #ffffff;
 
-  --text: #0d1226;
-  --text-dim: #3a4060;
-  --text-faint: #6b7494;
+  /* Deep ink text (not pure black → softer on a light surface) */
+  --text: #161b2e;
+  --text-dim: #4d5470;
+  --text-faint: #868ca6;
 
-  --border: rgba(40, 70, 170, 0.5);
-  --border-strong: rgba(20, 50, 160, 0.78);
-  --slider-track: rgba(40, 70, 170, 0.22);
+  /* Soft, low-contrast borders — the primary eye-strain fix */
+  --border: rgba(24, 34, 68, 0.12);
+  --border-strong: rgba(44, 72, 180, 0.3); /* gentle accent edge on hover/active */
+  --slider-track: rgba(24, 34, 68, 0.14);
 
-  --accent: #0e6e2e; /* forest green */
-  --accent-2: #a8430a; /* dark brick */
-  --accent-blue: #2a3a9a; /* indigo */
+  /* Neon accents, deepened just enough to stay legible on white chrome */
+  --accent: #0a6428; /* forest green (primary) */
+  --accent-2: #c2410c; /* burnt orange (secondary) */
+  --accent-blue: #3a4fd0; /* indigo-blue */
 
-  --color-x: #0e6e2e;
-  --color-h: #a8430a;
-  --color-y: #2a3a9a;
-  --color-marker: #b01e6a;
+  --color-x: #0a6428;
+  --color-h: #c2410c;
+  --color-y: #3a4fd0;
+  --color-marker: #d11d6b; /* magenta — readable on light cells and dark canvas */
 
-  --ok: #0e6e2e;
-  --err: #b01e6a;
-  --warn: #a8430a;
+  --ok: #0a6428;
+  --err: #cc2b2b;
+  --warn: #c2410c;
+
+  /* Soft elevation — resting card shadow + hover lift (white cards on a white page) */
+  --shadow-card: 0 2px 10px rgba(30, 45, 90, 0.07), 0 1px 2px rgba(30, 45, 90, 0.05);
+  --shadow-lift: 0 16px 40px rgba(28, 40, 86, 0.16);
 }

@@ -1,16 +1,7 @@
 import { linspace } from '@/lib/dsp/math';
 import { evalSignal } from '@/lib/dsp/signals';
-import type { AmMode, AngleMode } from '@/lib/dsp/analog';
-import {
-  amSignal,
-  amEnvelope,
-  amEfficiency,
-  angleSignal,
-  instantFreq,
-  besselJ,
-  carsonBandwidth,
-  pllRecoverPhase,
-} from '@/lib/dsp/analog';
+import type { AmMode } from '@/lib/dsp/analog';
+import { amSignal, amEnvelope, amEfficiency, pllRecoverPhase } from '@/lib/dsp/analog';
 
 /**
  * AM modulation view parameters.
@@ -24,17 +15,6 @@ export interface AnalogAmParams {
 }
 
 /**
- * FM/PM modulation view parameters.
- */
-export interface AnalogFmParams {
-  mode: AngleMode;
-  messageFreq: number; // Hz
-  carrierFreq: number; // Hz
-  carrierAmp: number; // V
-  modIndex: number; // β (FM) or kp (PM)
-}
-
-/**
  * Power & efficiency view parameters.
  */
 export interface AnalogPowerParams {
@@ -45,9 +25,8 @@ export interface AnalogPowerParams {
  * Demodulation view parameters.
  */
 export interface AnalogDemodParams {
-  method: 'envelope' | 'coherent' | 'pll' | 'fmdiscrim';
+  method: 'envelope' | 'coherent' | 'pll';
   amParams?: AnalogAmParams;
-  fmParams?: AnalogFmParams;
 }
 
 /**
@@ -73,21 +52,6 @@ export interface AnalogAmView {
   specMag: number[]; // magnitude spectrum (normalized)
   // Status
   isOvermodulated: boolean; // a > 1
-}
-
-/**
- * Result from FM modulation view computation.
- */
-export interface AnalogFmView {
-  time: number[];
-  message: number[];
-  modulated: number[]; // constant-envelope FM/PM signal
-  instantFreq: number[]; // f_i(t)
-  // Bessel spectrum (discrete sidebands)
-  sidebandFreqs: number[]; // carrier ± n·fm
-  sidebandMags: number[]; // |Jn(β)|
-  // Carson bandwidth marker
-  carsonBw: number; // B = 2(β+1)fm
 }
 
 /**
@@ -200,53 +164,6 @@ export function buildAnalogAmView(p: AnalogAmParams, tStart = 0): AnalogAmView {
 }
 
 /**
- * Build FM modulation view: constant-envelope waveform + Bessel spectrum.
- */
-export function buildAnalogFmView(p: AnalogFmParams, tStart = 0): AnalogFmView {
-  const msg = [{ freq: p.messageFreq, amp: 1 }];
-  const fm = p.messageFreq;
-  const fc = p.carrierFreq;
-  const Ac = p.carrierAmp;
-  const beta = p.modIndex;
-
-  // Sample over ~5 message periods
-  const duration = 5 / fm;
-  const fs = Math.max(20 * fc, 50 * fm);
-  const N = Math.ceil(fs * duration);
-  // Local (fixed) display axis; sampling tStart ahead scrolls the wave.
-  const time = linspace(0, duration, N);
-
-  const message = time.map((t) => evalSignal(msg, tStart + t));
-  const modulated = time.map((t) => angleSignal(p.mode, msg, fc, Ac, beta, tStart + t));
-  const instFreq = time.map((t) => (p.mode === 'fm' ? instantFreq(msg, fc, beta, tStart + t) : fc));
-
-  // Bessel spectrum: sidebands at fc±n·fm with amplitude |Jn(β)|
-  const sidebandFreqs: number[] = [];
-  const sidebandMags: number[] = [];
-  const maxN = Math.ceil(beta + 2);
-  for (let n = -maxN; n <= maxN; n++) {
-    const freq = fc + n * fm;
-    if (freq > 0) {
-      const mag = Math.abs(besselJ(Math.abs(n), beta));
-      sidebandFreqs.push(freq);
-      sidebandMags.push(mag);
-    }
-  }
-
-  const carsonBw = carsonBandwidth(beta, fm);
-
-  return {
-    time,
-    message,
-    modulated,
-    instantFreq: instFreq,
-    sidebandFreqs,
-    sidebandMags,
-    carsonBw,
-  };
-}
-
-/**
  * Build power & efficiency view.
  */
 export function buildAnalogPowerView(p: AnalogPowerParams): AnalogPowerView {
@@ -302,17 +219,9 @@ export function buildAnalogDemodView(p: AnalogDemodParams, tStart = 0): AnalogDe
     carrierAmp: 1,
     modIndex: 0.5,
   };
-  const fp = p.fmParams ?? {
-    mode: 'fm' as AngleMode,
-    messageFreq: 1000,
-    carrierFreq: 20000,
-    carrierAmp: 1,
-    modIndex: 5,
-  };
 
-  const isFm = p.method === 'fmdiscrim';
-  const fm = isFm ? fp.messageFreq : ap.messageFreq;
-  const fc = isFm ? fp.carrierFreq : ap.carrierFreq;
+  const fm = ap.messageFreq;
+  const fc = ap.carrierFreq;
   const duration = 3 / fm;
   const fs = Math.max(20 * fc, 100 * fm);
   const N = Math.ceil(fs * duration);
@@ -363,13 +272,6 @@ export function buildAnalogDemodView(p: AnalogDemodParams, tStart = 0): AnalogDe
           (carrierEst as number[])[n],
       );
       recovered = movingAverage(prod, win).map((v) => 2 * v);
-      break;
-    }
-    case 'fmdiscrim':
-    default: {
-      // Proakis §3.3.3: discriminator output ∝ f_i(t) − f_c ∝ m(t).
-      const fi = time.map((tt) => instantFreq(msg, fp.carrierFreq, fp.modIndex, tStart + tt));
-      recovered = fi.map((f) => (f - fp.carrierFreq) / fp.modIndex);
       break;
     }
   }

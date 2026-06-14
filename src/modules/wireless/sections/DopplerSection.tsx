@@ -2,12 +2,11 @@ import { useMemo, useState } from 'react';
 import { Panel, Formula, TheoryBox, Readout } from '@/components';
 import { Canvas } from '@/lib/plot/Canvas';
 import { linScale, drawAxes, drawLine, drawVLine, shadeRegion } from '@/lib/plot/draw';
-import { CHART } from '@/lib/plot/colors';
+import { CHART, alpha } from '@/lib/plot/colors';
 import { t } from '@/i18n';
 import { DEFAULT_DOPPLER_PARAMS, deriveDoppler, type DopplerParams } from '../doppler-model';
 import { DopplerControls } from '../doppler-panels';
 
-const FADE_FILL = 'rgba(255, 91, 107, 0.22)'; // CHART.red, translucent (below-threshold fade intervals)
 
 export function DopplerSection() {
   const [params, setParams] = useState<DopplerParams>(DEFAULT_DOPPLER_PARAMS);
@@ -61,7 +60,7 @@ export function DopplerSection() {
             // Shade below-threshold fade intervals.
             for (let i = 1; i < d.envDb.length; i++) {
               if (d.envDb[i] < d.thresholdDb) {
-                shadeRegion(ctx, ax, d.envTimeMs[i - 1], d.envTimeMs[i], yMin, d.thresholdDb, FADE_FILL);
+                shadeRegion(ctx, ax, d.envTimeMs[i - 1], d.envTimeMs[i], yMin, d.thresholdDb, alpha(CHART.red, 0.22));
               }
             }
             // Dashed threshold line ρ across the whole time axis.

@@ -1,5 +1,5 @@
 /**
- * Fourier & Spectrum module — interactive analysis tools.
+ * Signals & Spectra module — interactive analysis tools.
  * Proakis & Salehi §2.1–§2.5.
  */
 
@@ -32,7 +32,7 @@ import {
 import './fourier.css';
 
 /**
- * Fourier & Spectrum module: five interactive panels for signal analysis.
+ * Signals & Spectra module: five interactive panels for signal analysis.
  * - Panel 1: Fourier series synthesis with Gibbs overshoot
  * - Panel 2: DFT/FFT spectrum analyzer with windowing
  * - Panel 3: LTI filter frequency response

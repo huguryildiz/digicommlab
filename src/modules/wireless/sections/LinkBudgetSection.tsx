@@ -2,12 +2,11 @@ import { useMemo, useState } from 'react';
 import { Panel, Formula, TheoryBox, Readout } from '@/components';
 import { Canvas } from '@/lib/plot/Canvas';
 import { linScale, drawAxes, drawLine, shadeRegion, drawVLine } from '@/lib/plot/draw';
-import { CHART } from '@/lib/plot/colors';
+import { CHART, alpha } from '@/lib/plot/colors';
 import { t } from '@/i18n';
 import { DEFAULT_LINK_BUDGET_PARAMS, deriveLinkBudget, type LinkBudgetParams } from '../linkbudget-model';
 import { LinkBudgetControls } from '../linkbudget-panels';
 
-const BAR_FILL = 'rgba(123, 140, 255, 0.45)'; // CHART.blue, translucent (waterfall bars)
 
 export function LinkBudgetSection() {
   const [params, setParams] = useState<LinkBudgetParams>(DEFAULT_LINK_BUDGET_PARAMS);
@@ -34,7 +33,7 @@ export function LinkBudgetSection() {
             drawAxes(ctx, ax, [0, d.waterfall.length]);
             // Bars from the axis floor up to each cumulative level.
             d.waterfall.forEach((s, i) => {
-              shadeRegion(ctx, ax, i + 0.15, i + 0.85, yMin, s.cumDbm, BAR_FILL);
+              shadeRegion(ctx, ax, i + 0.15, i + 0.85, yMin, s.cumDbm, alpha(CHART.blue, 0.45));
             });
             // Sensitivity threshold (required Rx power, no fade) across the chart.
             drawLine(ctx, ax, [0, d.waterfall.length], [d.sensitivityDbm, d.sensitivityDbm], CHART.red, 1.4, true);
@@ -68,7 +67,7 @@ export function LinkBudgetSection() {
             };
             drawAxes(ctx, ax, [d.distKm[0], xMax]);
             // Fade-margin band above the bare sensitivity threshold.
-            shadeRegion(ctx, ax, d.distKm[0], xMax, d.sensitivityDbm, d.sensitivityDbm + d.fadeMarginDb, BAR_FILL);
+            shadeRegion(ctx, ax, d.distKm[0], xMax, d.sensitivityDbm, d.sensitivityDbm + d.fadeMarginDb, alpha(CHART.blue, 0.45));
             drawLine(ctx, ax, [d.distKm[0], xMax], [d.sensitivityDbm, d.sensitivityDbm], CHART.red, 1.2, true);
             drawLine(ctx, ax, d.distKm, ys, CHART.green, 2);
             if (d.maxRangeKm > d.distKm[0] && d.maxRangeKm < xMax) {

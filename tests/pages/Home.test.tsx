@@ -23,7 +23,7 @@ describe('Home (landing)', () => {
 
   it('links the live modules to their routes', () => {
     renderHome();
-    expect(screen.getByRole('link', { name: /Sampling & Quantization/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Analog-to-Digital Conversion/i })).toHaveAttribute(
       'href',
       '/sampling',
     );
@@ -31,11 +31,11 @@ describe('Home (landing)', () => {
       'href',
       '/information-theory',
     );
-    expect(screen.getByRole('link', { name: /Modulation & Detection/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Digital Modulation & Detection/i })).toHaveAttribute(
       'href',
       '/modulation',
     );
-    expect(screen.getByRole('link', { name: /Baseband & Eye/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Baseband Transmission & ISI/i })).toHaveAttribute(
       'href',
       '/baseband',
     );

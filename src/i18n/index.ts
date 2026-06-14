@@ -1,6 +1,7 @@
 import { en } from './en';
 import { fourier } from './fourier';
-import { analog } from './analog';
+import { analogam } from './analogam';
+import { analogfm } from './analogfm';
 import { randomprocess } from './randomprocess';
 import { analognoise } from './analognoise';
 import { channelcoding } from './channelcoding';
@@ -12,7 +13,8 @@ import { endtoend } from './endtoend';
 const dict: Record<string, string> = {
   ...en,
   ...fourier,
-  ...analog,
+  ...analogam,
+  ...analogfm,
   ...randomprocess,
   ...analognoise,
   ...channelcoding,

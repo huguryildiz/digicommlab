@@ -10,9 +10,14 @@ export type VizKind =
   | 'entropy'
   | 'linkpulse'
   | 'fourier'
-  | 'amfm'
+  | 'am'
+  | 'fm'
   | 'fading'
-  | 'noise';
+  | 'noise'
+  | 'noisysignal'
+  | 'eye'
+  | 'channelcoding'
+  | 'chain';
 
 export interface LandingModule {
   id: string;
@@ -42,77 +47,66 @@ export const LANDING_MODULES: LandingModule[] = [
     compact: true,
   },
   {
-    id: 'analog',
+    id: 'analog-am',
     num: '02',
-    titleKey: 'landing.mod.analog.title',
-    descKey: 'landing.mod.analog.desc',
+    titleKey: 'landing.mod.analog-am.title',
+    descKey: 'landing.mod.analog-am.desc',
     chapter: 'CH 3',
     route: '/analog',
     status: 'live',
-    viz: 'amfm',
+    viz: 'am',
+    compact: true,
+  },
+  {
+    id: 'analog-fm',
+    num: '03',
+    titleKey: 'landing.mod.analog-fm.title',
+    descKey: 'landing.mod.analog-fm.desc',
+    chapter: 'CH 4',
+    route: '/analog-fm',
+    status: 'live',
+    viz: 'fm',
     compact: true,
   },
   {
     id: 'random-process',
-    num: '03',
+    num: '04',
     titleKey: 'rp.title',
     descKey: 'rp.subtitle',
-    chapter: 'CH 4',
+    chapter: 'CH 5',
     route: '/random-process',
     status: 'live',
     viz: 'noise',
     compact: true,
   },
   {
+    id: 'analog-noise',
+    num: '05',
+    titleKey: 'an.title',
+    descKey: 'an.subtitle',
+    chapter: 'CH 6',
+    route: '/analog-noise',
+    status: 'live',
+    viz: 'noisysignal',
+    compact: true,
+  },
+  {
     id: 'sampling',
-    num: '04',
+    num: '06',
     titleKey: 'landing.mod.sampling.title',
     descKey: 'landing.mod.sampling.desc',
-    chapter: 'CH 4·6',
+    chapter: 'CH 7',
     route: '/sampling',
     status: 'live',
     viz: 'sampling',
     compact: true,
   },
   {
-    id: 'deltamod',
-    num: '05',
-    titleKey: 'landing.mod.deltamod.title',
-    descKey: 'landing.mod.deltamod.desc',
-    chapter: 'CH 6',
-    route: '/delta-modulation',
-    status: 'live',
-    viz: 'sampling',
-    compact: true,
-  },
-  {
-    id: 'analog-noise',
-    num: '06',
-    titleKey: 'an.title',
-    descKey: 'an.subtitle',
-    chapter: 'CH 5',
-    route: '/analog-noise',
-    status: 'live',
-    viz: 'amfm',
-    compact: true,
-  },
-  {
-    id: 'infotheory',
-    num: '07',
-    titleKey: 'landing.mod.infotheory.title',
-    descKey: 'landing.mod.infotheory.desc',
-    chapter: 'CH 6',
-    route: '/information-theory',
-    status: 'live',
-    viz: 'entropy',
-    compact: true,
-  },
-  {
     id: 'modulation',
-    num: '08',
+    num: '07',
     titleKey: 'landing.mod.modulation.title',
     descKey: 'landing.mod.modulation.desc',
-    chapter: 'CH 7',
+    chapter: 'CH 8',
     route: '/modulation',
     status: 'live',
     viz: 'constellation',
@@ -121,13 +115,24 @@ export const LANDING_MODULES: LandingModule[] = [
   },
   {
     id: 'baseband',
-    num: '09',
+    num: '08',
     titleKey: 'landing.mod.baseband.title',
     descKey: 'landing.mod.baseband.desc',
-    chapter: 'CH 8',
+    chapter: 'CH 10',
     route: '/baseband',
     status: 'live',
-    viz: 'linkpulse',
+    viz: 'eye',
+    compact: true,
+  },
+  {
+    id: 'infotheory',
+    num: '09',
+    titleKey: 'landing.mod.infotheory.title',
+    descKey: 'landing.mod.infotheory.desc',
+    chapter: 'CH 12',
+    route: '/information-theory',
+    status: 'live',
+    viz: 'entropy',
     compact: true,
   },
   {
@@ -135,10 +140,10 @@ export const LANDING_MODULES: LandingModule[] = [
     num: '10',
     titleKey: 'cc.title',
     descKey: 'cc.subtitle',
-    chapter: 'CH 9',
+    chapter: 'CH 13',
     route: '/channel-coding',
     status: 'live',
-    viz: 'entropy',
+    viz: 'channelcoding',
     compact: true,
   },
   {
@@ -146,10 +151,11 @@ export const LANDING_MODULES: LandingModule[] = [
     num: '11',
     titleKey: 'wl.title',
     descKey: 'wl.subtitle',
-    chapter: 'CH 10',
+    chapter: 'CH 14·15',
     route: '/wireless',
     status: 'live',
     viz: 'fading',
+    compact: true,
   },
   {
     id: 'end-to-end',
@@ -159,7 +165,8 @@ export const LANDING_MODULES: LandingModule[] = [
     chapter: 'All',
     route: '/end-to-end',
     status: 'live',
-    viz: 'linkpulse',
+    viz: 'chain',
+    compact: true,
   },
 ];
 

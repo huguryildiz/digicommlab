@@ -6,8 +6,14 @@ import { SamplingViz } from './viz/SamplingViz';
 import { EntropyViz } from './viz/EntropyViz';
 import { LinkPulseViz } from './viz/LinkPulseViz';
 import { FourierViz } from './viz/FourierViz';
-import { AmFmViz } from './viz/AmFmViz';
+import { AmViz } from './viz/AmViz';
+import { FmViz } from './viz/FmViz';
 import { NoiseViz } from './viz/NoiseViz';
+import { NoisySignalViz } from './viz/NoisySignalViz';
+import { EyeDiagramViz } from './viz/EyeDiagramViz';
+import { ChannelCodingViz } from './viz/ChannelCodingViz';
+import { FadingViz } from './viz/FadingViz';
+import { ChainViz } from './viz/ChainViz';
 
 function Viz({ kind }: { kind: VizKind }) {
   switch (kind) {
@@ -21,10 +27,22 @@ function Viz({ kind }: { kind: VizKind }) {
       return <LinkPulseViz />;
     case 'fourier':
       return <FourierViz />;
-    case 'amfm':
-      return <AmFmViz />;
+    case 'am':
+      return <AmViz />;
+    case 'fm':
+      return <FmViz />;
     case 'noise':
       return <NoiseViz />;
+    case 'noisysignal':
+      return <NoisySignalViz />;
+    case 'eye':
+      return <EyeDiagramViz />;
+    case 'channelcoding':
+      return <ChannelCodingViz />;
+    case 'fading':
+      return <FadingViz />;
+    case 'chain':
+      return <ChainViz />;
     default:
       return null;
   }

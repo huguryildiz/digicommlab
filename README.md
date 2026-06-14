@@ -1,6 +1,10 @@
 <!-- markdownlint-disable MD033 -->
 <!-- Inline HTML is intentional: centered hero header and badge row. -->
 
+<p align="center">
+  <img src="public/icon.svg" alt="CommSysLab logo" width="120" height="120">
+</p>
+
 <h1 align="center">CommSysLab</h1>
 
 <p align="center">
@@ -49,14 +53,14 @@ All twelve modules are live and follow book-chapter order.
 
 | # | Module | What it covers |
 |---|--------|----------------|
-| 01 | **Fourier & Spectrum** | Series synthesis, FFT, windowing, LTI filter response, transform pairs, analytic signals |
-| 02 | **Analog Modulation** | DSB-SC, AM, SSB, FM, PM — modulation, demodulation, power/efficiency, superheterodyne |
-| 03 | **Random Processes** | Ensembles, autocorrelation, ergodicity, PSD, LTI filtering of random processes |
-| 04 | **Analog Noise & SNR** | Output SNR, demodulation gain, FM threshold, pre/de-emphasis for DSB-SC / AM / FM |
-| 05 | **Sampling & Quantization** | Nyquist theorem, aliasing, PCM coding, scalar quantization, SQNR, audio playback |
-| 06 | **Delta Modulation** | Staircase reconstruction, slope overload, granular noise, adaptive bit rates, audio |
-| 07 | **Modulation & Detection** | M-ary constellations (PSK/QAM/ASK/FSK), AWGN, ML/MAP decision regions, SER curves, optimum receiver |
-| 08 | **Baseband & Eye Diagram** | Raised-cosine pulse shaping, matched filtering, ISI, eye diagrams, ZF/MMSE equalization |
+| 01 | **Signals & Spectra** | Series synthesis, FFT, windowing, LTI filter response, transform pairs, analytic signals |
+| 02 | **Amplitude Modulation (AM)** | DSB-SC, conventional AM, SSB & VSB, power/efficiency, envelope/coherent detection, superheterodyne receiver |
+| 03 | **Angle Modulation (FM/PM)** | FM & PM waveforms, instantaneous frequency, Bessel sidebands, Carson bandwidth, discriminator detection |
+| 04 | **Random Processes** | Ensembles, autocorrelation, ergodicity, PSD, LTI filtering of random processes |
+| 05 | **Noise in Analog Systems** | Output SNR, demodulation gain, FM threshold, pre/de-emphasis for DSB-SC / AM / FM |
+| 06 | **Analog-to-Digital Conversion** | Nyquist theorem, aliasing, PCM coding, scalar quantization, SQNR, delta modulation, audio playback |
+| 07 | **Digital Modulation & Detection** | M-ary constellations (PSK/QAM/ASK/FSK), AWGN, ML/MAP decision regions, SER curves, optimum receiver |
+| 08 | **Baseband Transmission & ISI** | Raised-cosine pulse shaping, matched filtering, ISI, eye diagrams, ZF/MMSE equalization |
 | 09 | **Information Theory** | Entropy, Kraft inequality, Huffman coding, Lempel-Ziv compression, source-coding efficiency |
 | 10 | **Channel Capacity & Coding** | Mutual information, capacity, block/conv/cyclic/BCH/Reed-Solomon/concatenated codes, Viterbi |
 | 11 | **Wireless Communications** | Rayleigh/Rician fading, Doppler, BER, DS-SS, FHSS, CDMA, OFDM, RAKE, MIMO, CPM, link budget |
@@ -165,15 +169,16 @@ React Router v6 with hash routing — no server rewrites needed.
 ```text
 /                      Landing page
 /start                 Module launcher
-/fourier               Fourier & Spectrum
-/analog                Analog Modulation
+/fourier               Signals & Spectra
+/analog                Amplitude Modulation (AM)
+/analog-fm             Angle Modulation (FM/PM)
 /random-process        Random Processes
-/analog-noise          Analog Noise & SNR
-/sampling              Sampling & Quantization
-/delta-modulation      Delta Modulation
+/analog-noise          Noise in Analog Systems
+/sampling              Analog-to-Digital Conversion (Sampling, Quantization & Delta Mod.)
+/delta-modulation      → redirects to /sampling
+/modulation            Digital Modulation & Detection
 /information-theory    Information Theory
-/modulation            Modulation & Detection
-/baseband              Baseband & Eye Diagram
+/baseband              Baseband Transmission & ISI
 /channel-coding        Channel Capacity & Coding
 /wireless              Wireless Communications
 /end-to-end            End-to-End Link

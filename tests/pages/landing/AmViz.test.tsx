@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { AmFmViz } from '@/pages/landing/viz/AmFmViz';
+import { AmViz } from '@/pages/landing/viz/AmViz';
+import { FmViz } from '@/pages/landing/viz/FmViz';
 import { VIZ } from '@/pages/landing/viz/palette';
 
 type Point = { x: number; y: number };
@@ -21,8 +22,10 @@ function installCanvasMock() {
     lineWidth: 0,
     shadowColor: '',
     shadowBlur: 0,
+    globalAlpha: 1,
     clearRect: vi.fn(),
     setTransform: vi.fn(),
+    setLineDash: vi.fn(),
     beginPath: vi.fn(() => {
       activePoints = [];
     }),
@@ -70,16 +73,36 @@ afterEach(() => {
   window.ResizeObserver = originalResizeObserver;
 });
 
-describe('AmFmViz', () => {
+describe('AmViz', () => {
   it('draws a true AM carrier inside separate upper and lower envelope rails', () => {
     const { strokes } = installCanvasMock();
 
-    render(<AmFmViz />);
+    render(<AmViz />);
 
     const midline = 90;
     const envelopeStrokes = strokes.filter((stroke) => stroke.style === VIZ.orange);
 
     expect(envelopeStrokes).toHaveLength(2);
+    expect(envelopeStrokes[0].points.every((point) => point.y < midline)).toBe(true);
+    expect(envelopeStrokes[1].points.every((point) => point.y > midline)).toBe(true);
+  });
+});
+
+describe('FmViz', () => {
+  it('draws flat (constant-envelope) rails — FM amplitude does not bulge', () => {
+    const { strokes } = installCanvasMock();
+
+    render(<FmViz />);
+
+    const midline = 90;
+    const envelopeStrokes = strokes.filter((stroke) => stroke.style === VIZ.orange);
+
+    expect(envelopeStrokes).toHaveLength(2);
+    // Constant envelope: every point on each rail shares the same y (flat line).
+    for (const rail of envelopeStrokes) {
+      const firstY = rail.points[0].y;
+      expect(rail.points.every((point) => point.y === firstY)).toBe(true);
+    }
     expect(envelopeStrokes[0].points.every((point) => point.y < midline)).toBe(true);
     expect(envelopeStrokes[1].points.every((point) => point.y > midline)).toBe(true);
   });

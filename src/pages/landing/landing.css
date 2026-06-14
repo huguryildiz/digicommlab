@@ -8,7 +8,7 @@
   position: relative;
   max-width: 1280px;
   margin: 0 auto;
-  padding-bottom: var(--space-5);
+  padding-bottom: 0;
 }
 /* atmosphere: fine dot-grid texture (token color) */
 .landing::before {
@@ -129,35 +129,6 @@
   transform: translateY(-2px);
 }
 
-.hero__stats {
-  display: flex;
-  gap: var(--space-4);
-  margin: var(--space-4) 0 0;
-}
-.stat {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-}
-.stat__n {
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: var(--text);
-  letter-spacing: -0.02em;
-  margin: 0;
-}
-.stat__u {
-  color: var(--accent);
-  font-size: 1rem;
-}
-.stat__l {
-  font-size: 0.72rem;
-  color: var(--text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin-top: 0.15rem;
-}
 
 /* oscilloscope panel */
 .hero__scope {
@@ -170,7 +141,7 @@
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.5),
+    var(--shadow-lift),
     inset 0 0 60px rgba(57, 255, 133, 0.04);
 }
 .viz-canvas {
@@ -197,9 +168,20 @@
   top: 0.85rem;
   left: 1rem;
   color: var(--accent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.hud__live {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+}
+/* live PCM bit feed under the LIVE indicator */
+.hud__bits {
+  color: var(--text-faint);
+  letter-spacing: 0.2em;
+  font-size: 0.92em;
 }
 .hud--tr {
   top: 0.85rem;
@@ -218,6 +200,11 @@
   right: 1rem;
   color: var(--accent-2);
 }
+/* neon-orange emphasis (e.g. live SNR), label + value both accented */
+.hud--accent,
+.hud--accent b {
+  color: var(--accent-2);
+}
 .hud__rec {
   width: 8px;
   height: 8px;
@@ -227,66 +214,6 @@
   animation: hud-blink 1.4s infinite;
 }
 
-/* ───────────────────────── signal-chain strip ───────────────────────── */
-.flow {
-  margin: var(--space-4) var(--space-2) 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg-panel);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  padding: var(--space-3) var(--space-4);
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-.flow__label {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  white-space: nowrap;
-}
-.flow__track {
-  position: relative;
-  flex: 1;
-  height: 44px;
-}
-.flow__svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.flow__packet {
-  position: absolute;
-  top: 16px;
-  left: 2%;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--color-x);
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 10px currentColor;
-  animation: flow-pkt 6s linear infinite;
-}
-.flow__stops {
-  position: absolute;
-  inset: 0;
-}
-.flow__stop {
-  position: absolute;
-  top: 26px;
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  color: var(--text-dim);
-  white-space: nowrap;
-  transform: translateX(-50%);
-}
-.flow__stop--chan {
-  color: var(--text-faint);
-}
 
 /* ───────────────────────── section head ───────────────────────── */
 .lab {
@@ -307,10 +234,20 @@
 }
 .lab__title {
   font-family: var(--font-head);
-  font-weight: 700;
-  font-size: 1.7rem;
+  font-optical-sizing: auto;
+  font-variation-settings: 'opsz' 48;
+  font-weight: 600;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
   letter-spacing: -0.01em;
-  margin: 0;
+  margin: 0 0 var(--space-4);
+  color: var(--text);
+}
+.lab__title-em {
+  font-style: italic;
+  background: linear-gradient(110deg, var(--accent) 0%, var(--accent-blue) 55%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .lab__rule {
   flex: 1;
@@ -338,6 +275,7 @@
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   text-decoration: none;
+  box-shadow: var(--shadow-card);
   opacity: 0;
   animation: tile-fade 0.6s ease forwards;
   transition:
@@ -367,7 +305,7 @@
 .tile:hover {
   transform: translateY(-4px);
   border-color: var(--border-strong);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-lift);
 }
 .tile:hover::before {
   transform: scaleX(1);
@@ -401,7 +339,7 @@
   position: relative;
   z-index: 2;
   display: flex;
-  flex: 1;
+  flex: 0 0 auto;
   min-height: 0;
   flex-direction: column;
 }
@@ -453,7 +391,7 @@
   z-index: 2;
 }
 .tile__open {
-  margin-top: auto;
+  margin-top: 0.5rem;
   font-family: var(--mono);
   font-weight: 500;
   font-size: 0.8rem;
@@ -474,29 +412,36 @@
   position: absolute;
   pointer-events: none;
 }
+
+/* Full-bleed viz: flow below the text block so there's a single, consistent
+ * gap under "Open module" on every card (the absolute height-% approach made
+ * taller viz creep up into the text). The viz takes the remaining vertical
+ * space (flex: 1) and bleeds to the left/right/bottom edges via negative
+ * margins that cancel the tile padding (var(--space-4) sides, var(--space-3) bottom). */
+.tile__viz--sampling,
+.tile__viz--entropy,
+.tile__viz--fourier,
+.tile__viz--am,
+.tile__viz--fm,
+.tile__viz--noise,
+.tile__viz--noisysignal,
+.tile__viz--eye,
+.tile__viz--channelcoding,
+.tile__viz--fading,
+.tile__viz--chain {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: var(--space-3) calc(-1 * var(--space-4)) calc(-1 * var(--space-3));
+  opacity: 0.92;
+}
+
 .tile__viz--constellation {
   right: 0;
   bottom: 0;
   width: 60%;
   height: 74%;
   opacity: 0.95;
-}
-.tile__viz--sampling,
-.tile__viz--entropy {
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 52%;
-  opacity: 0.92;
-}
-.tile__viz--fourier,
-.tile__viz--amfm,
-.tile__viz--noise {
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 56%;
-  opacity: 0.92;
 }
 .tile__viz--linkpulse {
   right: 1.1rem;
@@ -554,9 +499,6 @@
 .tile--compact .tile__desc {
   display: none;
 }
-.tile--compact .tile__open {
-  margin-top: 0.45rem;
-}
 
 /* coming-soon tiles */
 .tile--soon {
@@ -581,8 +523,8 @@
 
 /* ───────────────────────── footer ───────────────────────── */
 .landing__footer {
-  margin-top: var(--space-5);
-  padding: var(--space-4) var(--space-2) var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-2);
   border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -600,6 +542,14 @@
 .landing__footer-meta {
   display: flex;
   gap: var(--space-3);
+}
+.landing__book {
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.landing__book:hover {
+  color: var(--accent-blue);
 }
 .landing__dev {
   color: var(--accent);
@@ -665,34 +615,6 @@
     opacity: 0.25;
   }
 }
-@keyframes flow-pkt {
-  0% {
-    left: 2%;
-    background: var(--color-x);
-  }
-  35% {
-    background: var(--color-x);
-  }
-  37% {
-    background: var(--color-y);
-  }
-  55% {
-    background: var(--color-y);
-  }
-  57% {
-    background: var(--color-marker);
-  }
-  66% {
-    background: var(--color-marker);
-  }
-  68% {
-    background: var(--color-h);
-  }
-  100% {
-    left: 96%;
-    background: var(--color-h);
-  }
-}
 
 /* ───────────────────────── responsive ───────────────────────── */
 @media (max-width: 900px) {
@@ -755,4 +677,21 @@
   font-family: var(--font);
   color: var(--text-dim);
   margin: 0;
+}
+
+/* ───────────────────────── light theme overrides ─────────────────────────
+ * Clean bright page: drop the blue dot-grid texture, and give the instrument
+ * screens (hero scope + constellation tile) the same soft light-blue as the
+ * other canvases instead of a dark screen. */
+:root[data-theme='light'] .landing::before {
+  display: none;
+}
+:root[data-theme='light'] .hero__scope {
+  background: linear-gradient(180deg, #f3f8fe, var(--scope-bg));
+  box-shadow:
+    var(--shadow-lift),
+    inset 0 0 60px rgba(40, 70, 130, 0.05);
+}
+:root[data-theme='light'] .tile--feature .tile__viz--constellation {
+  background: #eef4fe;
 }

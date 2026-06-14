@@ -5,8 +5,10 @@ const landingCss = readFileSync('src/pages/landing/landing.css', 'utf8');
 
 describe('landing module tile CSS', () => {
   it('places the random-process noise animation below the open-module link', () => {
-    const compactVizRule = /\.tile__viz--fourier,\s*\.tile__viz--amfm,\s*\.tile__viz--noise\s*\{[^}]*bottom:\s*0;[^}]*height:\s*56%;/s;
+    // The noise viz belongs to the full-bleed group that flows BELOW the tile text
+    // block: `flex: 1 1 auto` pushes it under "Open module →", bleeding to the edges.
+    const fullBleedNoiseRule = /\.tile__viz--noise,[\s\S]*?\{[\s\S]*?flex:\s*1 1 auto;/;
 
-    expect(landingCss).toMatch(compactVizRule);
+    expect(landingCss).toMatch(fullBleedNoiseRule);
   });
 });

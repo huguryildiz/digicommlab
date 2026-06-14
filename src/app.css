@@ -21,7 +21,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-family: var(--font);
+  font-family: var(--font-head); /* editorial serif wordmark (keeps brand character) */
   font-weight: 700;
   letter-spacing: -0.01em;
   margin-right: var(--space-2);
@@ -56,6 +56,32 @@
   box-shadow: 0 0 12px rgba(57, 255, 133, 0.18);
 }
 
+/* theme toggle — square icon button with a large, clear sun/moon emoji */
+.app__theme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+}
+.app__theme:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 12px rgba(57, 255, 133, 0.18);
+}
+.app__theme-emoji {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+.app__theme:hover .app__theme-emoji {
+  transform: scale(1.12);
+  transition: transform var(--transition);
+}
+
 /* module menu overlay */
 .app__menu-backdrop {
   position: fixed;
@@ -75,7 +101,7 @@
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lift);
   padding: var(--space-2);
 }
 .app__spacer {

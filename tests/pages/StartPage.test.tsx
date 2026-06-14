@@ -11,7 +11,7 @@ describe('StartPage (launcher)', () => {
       </MemoryRouter>,
     );
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Choose a module/i);
-    expect(screen.getByRole('link', { name: /Sampling & Quantization/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Analog-to-Digital Conversion/i })).toHaveAttribute(
       'href',
       '/sampling',
     );

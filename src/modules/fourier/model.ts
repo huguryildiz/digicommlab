@@ -1,5 +1,5 @@
 /**
- * Fourier & Spectrum module — data model for each panel.
+ * Signals & Spectra module — data model for each panel.
  * Pure functions that compute display data from parameters.
  * Proakis & Salehi §2.1–§2.5.
  */

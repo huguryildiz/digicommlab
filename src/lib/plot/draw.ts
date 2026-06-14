@@ -30,10 +30,17 @@ interface PlotFrame {
 
 const plotFrames = new WeakMap<CanvasRenderingContext2D, PlotFrame>();
 
-const DEFAULT_AXIS = 'rgba(154,167,180,0.55)';
-const DEFAULT_GRID = 'rgba(122,130,166,0.16)';
-const DEFAULT_TICK = 'rgba(154,167,180,0.78)';
-const DEFAULT_LABEL = 'rgba(226,230,240,0.84)';
+// Plot chrome is theme-aware: light traces/labels on a dark screen (dark mode),
+// dark traces/labels on a light-blue screen (light mode). Resolved live from
+// the document's `data-theme` so plots follow the theme toggle.
+const isLightTheme = (): boolean =>
+  typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'light';
+const pickColor = (dark: string, light: string): string => (isLightTheme() ? light : dark);
+
+const DEFAULT_AXIS = (): string => pickColor('rgba(154,167,180,0.55)', 'rgba(40,70,130,0.42)');
+const DEFAULT_GRID = (): string => pickColor('rgba(122,130,166,0.16)', 'rgba(40,70,130,0.12)');
+const DEFAULT_TICK = (): string => pickColor('rgba(154,167,180,0.78)', 'rgba(54,64,96,0.72)');
+const DEFAULT_LABEL = (): string => pickColor('rgba(226,230,240,0.84)', 'rgba(22,32,63,0.9)');
 
 const SUBSCRIPT: Record<string, string> = {
   '0': '₀',
@@ -239,7 +246,7 @@ function drawAxisLabel(
   rotated = false,
 ): void {
   ctx.save();
-  ctx.fillStyle = DEFAULT_TICK;
+  ctx.fillStyle = DEFAULT_TICK();
   ctx.font = '12px var(--mono)';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -260,7 +267,7 @@ function drawTickLabels(
   xTicks: number[],
   yTicks: number[],
 ): void {
-  ctx.fillStyle = DEFAULT_TICK;
+  ctx.fillStyle = DEFAULT_TICK();
   ctx.font = '10px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
   ctx.textBaseline = 'bottom';
   ctx.textAlign = 'center';
@@ -283,7 +290,7 @@ export function drawAxes(
   ctx: CanvasRenderingContext2D,
   ax: Axes,
   domainX: [number, number],
-  colorOrOptions: string | DrawAxesOptions = DEFAULT_AXIS,
+  colorOrOptions: string | DrawAxesOptions = DEFAULT_AXIS(),
 ): void {
   const options: DrawAxesOptions =
     typeof colorOrOptions === 'string' ? { color: colorOrOptions } : colorOrOptions;
@@ -301,7 +308,7 @@ export function drawAxes(
   const labels = options.tickLabels ?? Boolean(options.xLabel || options.yLabel);
 
   if (bounds && grid) {
-    ctx.strokeStyle = options.gridColor ?? DEFAULT_GRID;
+    ctx.strokeStyle = options.gridColor ?? DEFAULT_GRID();
     ctx.lineWidth = 1;
     ctx.setLineDash([]);
     for (const x of xTicks) {
@@ -322,7 +329,7 @@ export function drawAxes(
     }
   }
 
-  ctx.strokeStyle = options.color ?? DEFAULT_AXIS;
+  ctx.strokeStyle = options.color ?? DEFAULT_AXIS();
   ctx.lineWidth = 1;
   const y0 = yDomain && includes(yDomain, 0) ? ax.y(0) : bounds?.bottom ?? ax.y(0);
   ctx.beginPath();
@@ -339,7 +346,7 @@ export function drawAxes(
   ctx.stroke();
 
   if (ticks) {
-    ctx.strokeStyle = options.tickColor ?? DEFAULT_TICK;
+    ctx.strokeStyle = options.tickColor ?? DEFAULT_TICK();
     ctx.lineWidth = 1;
     const tickSize = 4;
     for (const x of xTicks) {
@@ -361,7 +368,7 @@ export function drawAxes(
   }
 
   if (labels) {
-    ctx.fillStyle = options.labelColor ?? DEFAULT_TICK;
+    ctx.fillStyle = options.labelColor ?? DEFAULT_TICK();
     drawTickLabels(ctx, ax, bounds, xTicks, yTicks);
   }
 
@@ -400,7 +407,7 @@ function recordPlotPoints(
 /** Draw a crosshair and coordinate badge for an interactive data cursor. */
 export function drawPointCursor(ctx: CanvasRenderingContext2D, point: PlotPoint): void {
   const bounds = point.bounds;
-  const color = 'rgba(255,140,66,0.9)';
+  const color = pickColor('rgba(255,140,66,0.9)', 'rgba(194,65,12,0.95)');
   ctx.save();
   ctx.strokeStyle = color;
   ctx.lineWidth = 1;
@@ -439,11 +446,11 @@ export function drawPointCursor(ctx: CanvasRenderingContext2D, point: PlotPoint)
   if (bx + bw > maxRight) bx = point.px - bw - 10;
   if (bx < minLeft) bx = minLeft + 2;
   if (by < minTop) by = point.py + 10;
-  ctx.fillStyle = 'rgba(10,10,22,0.9)';
+  ctx.fillStyle = pickColor('rgba(10,10,22,0.9)', 'rgba(255,255,255,0.94)');
   ctx.fillRect(bx, by, bw, bh);
-  ctx.strokeStyle = 'rgba(255,140,66,0.45)';
+  ctx.strokeStyle = pickColor('rgba(255,140,66,0.45)', 'rgba(194,65,12,0.5)');
   ctx.strokeRect(bx, by, bw, bh);
-  ctx.fillStyle = DEFAULT_LABEL;
+  ctx.fillStyle = DEFAULT_LABEL();
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   ctx.fillText(label, bx + pad, by + bh / 2);

@@ -1,4 +1,4 @@
-// Analog noise & SNR (Proakis & Salehi Ch 5). Pure, framework-free.
+// Noise in analog systems (Proakis & Salehi Ch 6). Pure, framework-free.
 // Verify exact FM/threshold/emphasis constants against refs/Book.pdf §5.3 (PDF ~256-260).
 import { amEfficiency } from './analog';
 import { gaussian } from './awgn';

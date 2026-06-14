@@ -1,3 +1,9 @@
+/* Analog-to-Digital Conversion module: tab bar above the active sub-module. */
+.adc__tabwrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
 .sampling__panels {
   display: grid;
   grid-template-columns: 1fr 1fr;

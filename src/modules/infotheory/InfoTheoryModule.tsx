@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Segmented } from '@/components';
 import { t } from '@/i18n';
 import { EntropySection } from './EntropySection';
 import { PrefixKraftSection } from './PrefixKraftSection';
@@ -8,29 +9,23 @@ import './infotheory.css';
 
 type Tab = 'entropy' | 'prefix' | 'huffman' | 'lz';
 
-const TABS: { id: Tab; key: string }[] = [
-  { id: 'entropy', key: 'it.tab.entropy' },
-  { id: 'prefix', key: 'it.tab.prefix' },
-  { id: 'huffman', key: 'it.tab.huffman' },
-  { id: 'lz', key: 'it.tab.lz' },
+const TABS: { value: Tab; label: string }[] = [
+  { value: 'entropy', label: t('it.tab.entropy') },
+  { value: 'prefix', label: t('it.tab.prefix') },
+  { value: 'huffman', label: t('it.tab.huffman') },
+  { value: 'lz', label: t('it.tab.lz') },
 ];
 
 export function InfoTheoryModule() {
   const [tab, setTab] = useState<Tab>('entropy');
   return (
     <div className="it-module">
-      <nav className="it-tabs">
-        {TABS.map((tb) => (
-          <button
-            key={tb.id}
-            type="button"
-            className={tab === tb.id ? 'it-tab it-tab--active' : 'it-tab'}
-            onClick={() => setTab(tb.id)}
-          >
-            {t(tb.key)}
-          </button>
-        ))}
-      </nav>
+      <Segmented<Tab>
+        ariaLabel={t('it.tab.aria')}
+        value={tab}
+        options={TABS}
+        onChange={setTab}
+      />
       {tab === 'entropy' && <EntropySection />}
       {tab === 'prefix' && <PrefixKraftSection />}
       {tab === 'huffman' && <HuffmanSection />}

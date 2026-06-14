@@ -1,5 +1,5 @@
 /**
- * Landing page ambient visualization for Fourier & Spectrum module.
+ * Landing page ambient visualization for Signals & Spectra module.
  * Animated harmonic accumulation: square wave building from sine components.
  * Proakis § 2.1.
  */

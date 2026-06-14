@@ -22,14 +22,14 @@ describe('LANDING_MODULES', () => {
   it('orders module ids by book chapter (fourier → end-to-end)', () => {
     expect(LANDING_MODULES.map((m) => m.id)).toEqual([
       'fourier',
-      'analog',
+      'analog-am',
+      'analog-fm',
       'random-process',
-      'sampling',
-      'deltamod',
       'analog-noise',
-      'infotheory',
+      'sampling',
       'modulation',
       'baseband',
+      'infotheory',
       'channel-coding',
       'wireless',
       'end-to-end',

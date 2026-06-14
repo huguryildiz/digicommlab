@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Segmented } from '@/components';
 import { t } from '@/i18n';
 import { ChannelsCapacitySection } from './ChannelsCapacitySection';
 import { ShannonLimitSection } from './ShannonLimitSection';
@@ -13,16 +14,16 @@ import './channel-coding.css';
 
 type Tab = 'channels' | 'shannon' | 'block' | 'conv' | 'cyclic' | 'gfbch' | 'rs' | 'compare' | 'concat';
 
-const TABS: { id: Tab; key: string }[] = [
-  { id: 'channels', key: 'cc.tab.channels' },
-  { id: 'shannon', key: 'cc.tab.shannon' },
-  { id: 'block', key: 'cc.tab.block' },
-  { id: 'conv', key: 'cc.tab.conv' },
-  { id: 'cyclic', key: 'cc.tab.cyclic' },
-  { id: 'gfbch', key: 'cc.tab.gfbch' },
-  { id: 'rs', key: 'cc.tab.rs' },
-  { id: 'compare', key: 'cc.tab.compare' },
-  { id: 'concat', key: 'cc.tab.concat' },
+const TABS: { value: Tab; label: string }[] = [
+  { value: 'channels', label: t('cc.tab.channels') },
+  { value: 'shannon', label: t('cc.tab.shannon') },
+  { value: 'block', label: t('cc.tab.block') },
+  { value: 'conv', label: t('cc.tab.conv') },
+  { value: 'cyclic', label: t('cc.tab.cyclic') },
+  { value: 'gfbch', label: t('cc.tab.gfbch') },
+  { value: 'rs', label: t('cc.tab.rs') },
+  { value: 'compare', label: t('cc.tab.compare') },
+  { value: 'concat', label: t('cc.tab.concat') },
 ];
 
 export function ChannelCodingModule() {
@@ -33,18 +34,12 @@ export function ChannelCodingModule() {
         <h1>{t('cc.title')}</h1>
         <p>{t('cc.subtitle')}</p>
       </header>
-      <nav className="cc-tabs">
-        {TABS.map((tb) => (
-          <button
-            key={tb.id}
-            type="button"
-            className={tab === tb.id ? 'cc-tab cc-tab--active' : 'cc-tab'}
-            onClick={() => setTab(tb.id)}
-          >
-            {t(tb.key)}
-          </button>
-        ))}
-      </nav>
+      <Segmented<Tab>
+        ariaLabel={t('cc.title')}
+        value={tab}
+        options={TABS}
+        onChange={setTab}
+      />
       {tab === 'channels' && <ChannelsCapacitySection />}
       {tab === 'shannon' && <ShannonLimitSection />}
       {tab === 'block' && <BlockCodesSection />}

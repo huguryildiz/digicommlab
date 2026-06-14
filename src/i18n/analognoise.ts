@@ -1,7 +1,7 @@
 export const analognoise: Record<string, string> = {
-  'nav.analogNoise': 'Analog Noise & SNR',
-  'an.title': 'Analog Noise & SNR',
-  'an.subtitle': 'Output SNR, demodulation gain, FM threshold, and pre/de-emphasis — Proakis Ch 5',
+  'nav.analogNoise': 'Noise in Analog Systems',
+  'an.title': 'Noise in Analog Systems',
+  'an.subtitle': 'Output SNR, demodulation gain, FM threshold, and pre/de-emphasis — Proakis Ch 6',
   'an.gen.title': 'Channel scenario',
   'an.gen.scheme': 'Modulation',
   'an.gen.scheme.dsb': 'DSB-SC',

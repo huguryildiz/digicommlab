@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
-import { HashRouter, Link, Route, Routes, useLocation } from 'react-router-dom';
+import { HashRouter, Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { t } from '@/i18n';
 import { BrandIcon } from '@/components/BrandIcon';
 import { ModuleMenu } from '@/components/ModuleMenu';
 import { Home } from '@/pages/Home';
 import { StartPage } from '@/pages/StartPage';
 import { FourierModule } from '@/modules/fourier/FourierModule';
-import { AnalogModule } from '@/modules/analog/AnalogModule';
+import { AnalogAmModule } from '@/modules/analog-am/AnalogAmModule';
+import { AnalogFmModule } from '@/modules/analog-fm/AnalogFmModule';
 import { AnalogNoiseModule } from '@/modules/analog-noise/AnalogNoiseModule';
 import { RandomProcessModule } from '@/modules/random-process/RandomProcessModule';
-import { SamplingModule } from '@/modules/sampling-quantization/SamplingModule';
-import { DeltaModModule } from '@/modules/deltamod/DeltaModModule';
+import { AdcModule } from '@/modules/sampling-quantization/AdcModule';
 import { ModulationModule } from '@/modules/modulation/ModulationModule';
 import { BasebandModule } from '@/modules/baseband/BasebandModule';
 import { InfoTheoryModule } from '@/modules/infotheory/InfoTheoryModule';
@@ -69,9 +69,13 @@ function Shell() {
         <button
           type="button"
           className="app__theme"
+          aria-label={theme === 'dark' ? t('nav.theme.light') : t('nav.theme.dark')}
+          title={theme === 'dark' ? t('nav.theme.light') : t('nav.theme.dark')}
           onClick={() => applyTheme(theme === 'dark' ? 'light' : 'dark')}
         >
-          {theme === 'dark' ? '☀' : '☾'}
+          <span className="app__theme-emoji" role="img" aria-hidden="true">
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </span>
         </button>
       </nav>
 
@@ -88,11 +92,13 @@ function Shell() {
           <Route path="/" element={<Home />} />
           <Route path="/start" element={<StartPage />} />
           <Route path="/fourier" element={<FourierModule />} />
-          <Route path="/analog" element={<AnalogModule />} />
+          <Route path="/analog" element={<AnalogAmModule />} />
+          <Route path="/analog-fm" element={<AnalogFmModule />} />
           <Route path="/analog-noise" element={<AnalogNoiseModule />} />
           <Route path="/random-process" element={<RandomProcessModule />} />
-          <Route path="/sampling" element={<SamplingModule />} />
-          <Route path="/delta-modulation" element={<DeltaModModule />} />
+          <Route path="/sampling" element={<AdcModule />} />
+          {/* Delta Modulation is now a tab inside the Analog-to-Digital Conversion module. */}
+          <Route path="/delta-modulation" element={<Navigate to="/sampling" replace />} />
           <Route path="/modulation" element={<ModulationModule />} />
           <Route path="/information-theory" element={<InfoTheoryModule />} />
           <Route path="/channel-coding" element={<ChannelCodingModule />} />

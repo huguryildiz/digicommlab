@@ -2,6 +2,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
   padding: var(--space-3);
   margin-bottom: var(--space-3);
 }
@@ -84,31 +85,32 @@
   margin: var(--space-2) 0;
 }
 .segmented {
-  display: inline-flex;
-  gap: var(--space-1);
-  padding: var(--space-1);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
 }
 .segmented__btn {
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
   background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
   color: var(--text-dim);
-  font: inherit;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-family: var(--font-head);
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: var(--transition);
+  transition:
+    color var(--transition),
+    border-color var(--transition);
 }
 .segmented__btn:hover {
-  color: var(--text);
+  color: var(--accent);
 }
 .segmented__btn--active {
-  color: var(--text);
-  border-color: var(--accent);
-  background: var(--surface);
-  box-shadow: 0 0 12px rgba(57, 255, 133, 0.18);
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  text-shadow: 0 0 10px rgba(57, 255, 133, 0.35);
 }
 
 /* ── Module launcher menu (shared: /start page + top-bar ≡ overlay) ── */

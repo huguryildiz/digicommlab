@@ -2,13 +2,12 @@ import { useMemo, useState } from 'react';
 import { Panel, Formula, TheoryBox, Readout } from '@/components';
 import { Canvas } from '@/lib/plot/Canvas';
 import { linScale, drawAxes, drawLine, drawScatter, shadeRegion } from '@/lib/plot/draw';
-import { CHART } from '@/lib/plot/colors';
+import { CHART, alpha } from '@/lib/plot/colors';
 import { t } from '@/i18n';
 import { DEFAULT_OFDM_PARAMS, deriveOfdm, type OfdmParams } from '../ofdm-model';
 import { OfdmControls } from '../ofdm-panels';
 
 // Translucent fill for the cyclic-prefix guard interval (CHART.orange at low alpha).
-const CP_FILL = 'rgba(255, 140, 66, 0.18)';
 
 export function OfdmSection() {
   const [params, setParams] = useState<OfdmParams>(DEFAULT_OFDM_PARAMS);
@@ -40,7 +39,7 @@ export function OfdmSection() {
               y: linScale([-yMax, yMax], [h - 16, 12]),
             };
             // Shade the cyclic-prefix guard interval.
-            if (d.cpLength > 0) shadeRegion(ctx, ax, 0, d.cpLength - 1, -yMax, yMax, CP_FILL);
+            if (d.cpLength > 0) shadeRegion(ctx, ax, 0, d.cpLength - 1, -yMax, yMax, alpha(CHART.orange, 0.18));
             drawAxes(ctx, ax, [0, n - 1]);
             drawLine(ctx, ax, d.timeReal.map((_, i) => i), d.timeReal, CHART.blue, 1.6);
           }}

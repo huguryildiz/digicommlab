@@ -1,19 +1,57 @@
 /**
- * CommSysLab chart palette — central colors for canvas drawing.
- * CSS "chrome" comes from tokens (tokens.css); but since canvas `fillStyle`/`strokeStyle`
- * cannot read CSS variables, the signal colors are pinned here — values match
- * tokens.css `--color-*` (dark theme). All modules consume from here.
+ * CommSysLab chart palette — theme-aware colors for canvas drawing.
+ *
+ * Canvas `fillStyle`/`strokeStyle` cannot read CSS variables, so the signal
+ * colors are pinned here. Two palettes are kept: dark (neon traces on a near-
+ * black screen) and light (deepened traces on a soft light-blue screen). Values
+ * mirror tokens.css `--color-*` per theme. The active palette is resolved live
+ * from the document's `data-theme`, so every CHART.* lookup flips when the user
+ * toggles the theme — no per-module changes needed.
  */
-export const CHART = {
-  green: '#39ff85', // --color-x : primary / input / ML / quantization
-  orange: '#ff8c42', // --color-h : sample / simulation / cursor
-  blue: '#7b8cff', // --color-y : analog / theory / constellation point
-  pink: '#ff4f9a', // --color-marker : emphasis
-  red: '#ff5b6b', // --err : error
-  text: '#e2e6f0', // --text : label
-  dim: '#7a82a6', // --text-dim : axis / helper line
-  bgDeep: '#0a0a16', // dark canvas fill (label background)
-} as const;
+type Chart = {
+  green: string; // --color-x : primary / input / ML / quantization
+  orange: string; // --color-h : sample / simulation / cursor
+  blue: string; // --color-y : analog / theory / constellation point
+  pink: string; // --color-marker : emphasis
+  red: string; // --err : error
+  text: string; // --text : label
+  dim: string; // --text-dim : axis / helper line
+  bgDeep: string; // canvas fill (label background)
+};
+
+const DARK: Chart = {
+  green: '#39ff85',
+  orange: '#ff8c42',
+  blue: '#7b8cff',
+  pink: '#ff4f9a',
+  red: '#ff5b6b',
+  text: '#e2e6f0',
+  dim: '#7a82a6',
+  bgDeep: '#0a0a16',
+};
+
+const LIGHT: Chart = {
+  green: '#0a6428',
+  orange: '#c2410c',
+  blue: '#2c43c4',
+  pink: '#c8186a',
+  red: '#cc2b2b',
+  text: '#16203f',
+  dim: '#4d5470',
+  bgDeep: '#f2f7fe', // light label background
+};
+
+function isLight(): boolean {
+  return typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'light';
+}
+
+/** Live theme-aware palette: CHART.green etc. resolve against the current theme on every read. */
+export const CHART: Chart = new Proxy({} as Chart, {
+  get(_target, prop: string | symbol): string {
+    const p = isLight() ? LIGHT : DARK;
+    return p[prop as keyof Chart];
+  },
+});
 
 /** Convert "#rrggbb" color to semi-transparent `rgba(...)` string with alpha. */
 export function alpha(hex: string, a: number): string {

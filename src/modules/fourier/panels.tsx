@@ -1,5 +1,5 @@
 /**
- * Canvas-based plot components for Fourier & Spectrum module.
+ * Canvas-based plot components for Signals & Spectra module.
  * Proakis & Salehi §2.1–§2.5.
  */
 
