@@ -59,3 +59,38 @@ export function sinc(x: number): number {
   const px = Math.PI * x;
   return Math.sin(px) / px;
 }
+
+/**
+ * Bessel function of the first kind, order 0. Abramowitz & Stegun 9.4.1/9.4.3
+ * rational approximations (|error| < 1e-7). Even function, so evaluate at |x|.
+ * Used for the classical Doppler autocorrelation R(τ) = J₀(2π f_m τ).
+ */
+export function besselJ0(x: number): number {
+  const ax = Math.abs(x);
+  if (ax <= 3) {
+    const y = (x / 3) ** 2;
+    return (
+      1 +
+      y *
+        (-2.2499997 +
+          y *
+            (1.2656208 +
+              y * (-0.3163866 + y * (0.0444479 + y * (-0.0039444 + y * 0.00021)))))
+    );
+  }
+  const z = 3 / ax;
+  const f0 =
+    0.79788456 +
+    z *
+      (-0.00000077 +
+        z *
+          (-0.0055274 + z * (-0.00009512 + z * (0.00137237 + z * (-0.00072805 + z * 0.00014476)))));
+  const theta0 =
+    ax -
+    0.78539816 +
+    z *
+      (-0.04166397 +
+        z *
+          (-0.00003954 + z * (0.00262573 + z * (-0.00054125 + z * (-0.00029333 + z * 0.00013558)))));
+  return (f0 / Math.sqrt(ax)) * Math.cos(theta0);
+}
