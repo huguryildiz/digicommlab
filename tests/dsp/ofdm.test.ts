@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { Complex } from '@/lib/dsp/fft';
-import { ofdmModulate, ofdmDemodulate, cabs, addCyclicPrefix, removeCyclicPrefix, convolveChannel, channelFreqResponse, equalizeZf } from '@/lib/dsp/ofdm';
+import { ofdmModulate, ofdmDemodulate, cabs, addCyclicPrefix, removeCyclicPrefix, convolveChannel, channelFreqResponse, equalizeZf, exponentialChannelTaps } from '@/lib/dsp/ofdm';
 import { makeRng } from '@/lib/dsp/random';
 
 function expectComplexClose(a: Complex[], b: Complex[], digits = 9): void {
@@ -112,5 +112,25 @@ describe('OFDM end-to-end (CP ≥ L−1, no noise) recovers symbols exactly', ()
     const H = channelFreqResponse(h, N);
     const Xhat = equalizeZf(Y, H);
     expectComplexClose(Xhat, X, 9);
+  });
+});
+
+describe('exponentialChannelTaps', () => {
+  it('returns `numTaps` complex taps with unit total power', () => {
+    const h = exponentialChannelTaps(4, 1.5, makeRng(3));
+    expect(h).toHaveLength(4);
+    const power = h.reduce((s, z) => s + z.re * z.re + z.im * z.im, 0);
+    expect(power).toBeCloseTo(1, 9);
+  });
+  it('is deterministic for a fixed seed', () => {
+    const a = exponentialChannelTaps(5, 2, makeRng(42));
+    const b = exponentialChannelTaps(5, 2, makeRng(42));
+    expect(a).toEqual(b);
+  });
+  it('decays: the first tap carries more power than the last', () => {
+    const h = exponentialChannelTaps(4, 1, makeRng(9));
+    const p0 = h[0].re * h[0].re + h[0].im * h[0].im;
+    const pLast = h[3].re * h[3].re + h[3].im * h[3].im;
+    expect(p0).toBeGreaterThan(pLast);
   });
 });

@@ -95,3 +95,28 @@ export function channelFreqResponse(h: Complex[], n: number): Complex[] {
 export function equalizeZf(rxSymbols: Complex[], H: Complex[]): Complex[] {
   return rxSymbols.map((y, k) => cdiv(y, H[k]));
 }
+
+/**
+ * Seeded multipath channel: `numTaps` sample-spaced complex taps whose powers
+ * follow an exponential profile p_l = exp(−l/tauSamples) (normalized to unit
+ * total power), each with a fixed amplitude √p_l and a random phase. A frozen
+ * snapshot of a frequency-selective Rayleigh channel. Proakis Ch. 10 / §10.1.1.
+ */
+export function exponentialChannelTaps(
+  numTaps: number,
+  tauSamples: number,
+  rng: () => number,
+): Complex[] {
+  const powers: number[] = [];
+  let total = 0;
+  for (let l = 0; l < numTaps; l++) {
+    const p = Math.exp(-l / tauSamples);
+    powers.push(p);
+    total += p;
+  }
+  return powers.map((p) => {
+    const amp = Math.sqrt(p / total);
+    const theta = 2 * Math.PI * rng();
+    return { re: amp * Math.cos(theta), im: amp * Math.sin(theta) };
+  });
+}
