@@ -9,7 +9,6 @@ import {
   seriesCoeffs,
   seriesPartialSum,
   ftPair,
-  lowpassEquivalent,
   hilbert,
 } from '@/lib/dsp/fourier';
 import { butterworthMag, chebyshev1Mag, chebyshev2Mag } from '@/lib/dsp/analogfilters';
@@ -453,47 +452,6 @@ export function buildFtProperty(
   };
 }
 
-/** Panel 5: Bandpass Signals & Hilbert */
-export interface AnalyticView {
-  time: number[];
-  signal: number[];
-  analyticRe: number[];
-  analyticIm: number[];
-  iComponent: number[];
-  qComponent: number[];
-  envelope: number[];
-}
-
-export function buildAnalytic(
-  fc: number,
-  fm: number,
-  m: number, // modulation index
-  fs: number = 1000,
-  tStart: number = 0, // animation: scroll the bandpass signal
-): AnalyticView {
-  const N = 4096;
-  const time = linspace(0, N / fs, N);
-
-  // AM signal: (1 + m*cos(2π*fm*t)) * cos(2π*fc*t), scrolled by tStart.
-  const signal = time.map((t) => {
-    const tt = tStart + t;
-    return (1 + m * Math.cos(2 * Math.PI * fm * tt)) * Math.cos(2 * Math.PI * fc * tt);
-  });
-
-  const xhat = hilbert(signal); // Proakis §2.6: x̂(t) = Hilbert{x(t)}
-  const result = lowpassEquivalent(signal, fc, fs);
-
-  return {
-    time,
-    signal,
-    analyticRe: signal, // Real part of analytic signal
-    analyticIm: xhat, // Imag part = Hilbert transform (no longer stubbed to zeros)
-    iComponent: result.i,
-    qComponent: result.q,
-    envelope: result.env,
-  };
-}
-
 export interface HilbertView {
   time: number[];
   signal: number[];
@@ -716,7 +674,7 @@ function basicSignal(kind: BasicKind, t: number, tau = 0.5): number {
  * F is a time-rate: for sine → sin(2πF·t); for pulses → width ∝ 1/F.
  */
 export function buildSignalExplorer(kind: BasicKind, ops: SignalOps): SignalExplorerView {
-  const n = Math.max(100, Math.min(4096, ops.N));
+  const n = Math.max(512, Math.min(8192, ops.N));
   const time = linspace(ops.tMin, ops.tMax, n);
   const F = ops.F || 1;
 

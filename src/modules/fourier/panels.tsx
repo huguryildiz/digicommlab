@@ -11,8 +11,6 @@ import { CHART } from '@/lib/plot/colors';
 import type {
   SeriesSynthView,
   SpectrumAnalyzerView,
-  FilterView,
-  AnalyticView,
 } from './model';
 
 const PAD = { l: 62, r: 20, t: 20, b: 40 };
@@ -172,116 +170,6 @@ export const SpectrumAnalyzerPlots: React.FC<{ data: SpectrumAnalyzerView }> = (
           };
           drawAxes(ctx, ax, [fLo, fHi], { xLabel: '$f\\,(Hz)$', yLabel: '$\\angle X(f)\\,(^\\circ)$' });
           drawGappedLine(ctx, ax, data.freqs, phasesDeg, CHART.pink, 1);
-        }}
-      />
-    </>
-  );
-};
-
-/** Panel 3: LTI Filter */
-export const FilterPlots: React.FC<{ data: FilterView }> = ({ data }) => {
-  const fDataMax = Math.max(...data.freqs, 1);
-  const [fLo, fHi, onWheelF, , onPanF] = useZoom(0, fDataMax, { minSpan: 1, maxSpan: fDataMax * 4, clampMin: 0 });
-
-  return (
-    <>
-      <Canvas
-        height={180}
-        ariaLabel="Filter frequency response |H(f)|"
-        deps={[data, fLo, fHi]}
-        onWheel={onWheelF}
-        onPan={onPanF}
-        draw={(ctx, w, h) => {
-          ctx.clearRect(0, 0, w, h);
-          const ax: Axes = {
-            x: linScale([fLo, fHi], [PAD.l, w - PAD.r]),
-            y: linScale([0, 1.1], [h - PAD.b, PAD.t]),
-          };
-          drawAxes(ctx, ax, [fLo, fHi], { xLabel: '$f\\,(Hz)$', yLabel: '$|H(f)|$' });
-          drawLine(ctx, ax, data.freqs, data.filterMag, CHART.orange, 2);
-        }}
-      />
-      <Canvas
-        height={180}
-        ariaLabel="Input and output spectra"
-        deps={[data, fLo, fHi]}
-        onWheel={onWheelF}
-        onPan={onPanF}
-        draw={(ctx, w, h) => {
-          ctx.clearRect(0, 0, w, h);
-          const mMax = Math.max(...data.inputMag, ...data.outputMag, 0.1) * 1.1;
-          const ax: Axes = {
-            x: linScale([fLo, fHi], [PAD.l, w - PAD.r]),
-            y: linScale([0, mMax], [h - PAD.b, PAD.t]),
-          };
-          drawAxes(ctx, ax, [fLo, fHi], { xLabel: '$f\\,(Hz)$', yLabel: '$|X(f)|$' });
-          drawLine(ctx, ax, data.freqs, data.inputMag, CHART.green, 1.5, false);
-          drawLine(ctx, ax, data.freqs, data.outputMag, CHART.blue, 1.5, false);
-        }}
-      />
-    </>
-  );
-};
-
-/** Panel 5: Analytic Signal & Hilbert */
-export const AnalyticPlots: React.FC<{ data: AnalyticView }> = ({ data }) => {
-  const tDataMax = Math.max(...data.time);
-  const [tLo, tHi, onWheelT, , onPanT] = useZoom(0, tDataMax, { minSpan: 1e-4, maxSpan: tDataMax * 4, clampMin: 0 });
-
-  return (
-    <>
-      <Canvas
-        height={150}
-        ariaLabel="Bandpass signal x(t)"
-        deps={[data, tLo, tHi]}
-        onWheel={onWheelT}
-        onPan={onPanT}
-        draw={(ctx, w, h) => {
-          ctx.clearRect(0, 0, w, h);
-          const sMin = Math.min(...data.signal) - 0.2;
-          const sMax = Math.max(...data.signal) + 0.2;
-          const ax: Axes = {
-            x: linScale([tLo, tHi], [PAD.l, w - PAD.r]),
-            y: linScale([sMin, sMax], [h - PAD.b, PAD.t]),
-          };
-          drawAxes(ctx, ax, [tLo, tHi], { xLabel: '$t$', yLabel: '$x(t)$' });
-          drawLine(ctx, ax, data.time, data.signal, CHART.orange, 1.5);
-        }}
-      />
-      <Canvas
-        height={150}
-        ariaLabel="I/Q components"
-        deps={[data, tLo, tHi]}
-        onWheel={onWheelT}
-        onPan={onPanT}
-        draw={(ctx, w, h) => {
-          ctx.clearRect(0, 0, w, h);
-          const qMin = Math.min(...data.iComponent, ...data.qComponent) - 0.2;
-          const qMax = Math.max(...data.iComponent, ...data.qComponent) + 0.2;
-          const ax: Axes = {
-            x: linScale([tLo, tHi], [PAD.l, w - PAD.r]),
-            y: linScale([qMin, qMax], [h - PAD.b, PAD.t]),
-          };
-          drawAxes(ctx, ax, [tLo, tHi], { xLabel: '$t$', yLabel: '$I(t), Q(t)$' });
-          drawLine(ctx, ax, data.time, data.iComponent, CHART.green, 1.5);
-          drawLine(ctx, ax, data.time, data.qComponent, CHART.blue, 1.5);
-        }}
-      />
-      <Canvas
-        height={150}
-        ariaLabel="Envelope V(t)"
-        deps={[data, tLo, tHi]}
-        onWheel={onWheelT}
-        onPan={onPanT}
-        draw={(ctx, w, h) => {
-          ctx.clearRect(0, 0, w, h);
-          const envMax = Math.max(...data.envelope) * 1.1;
-          const ax: Axes = {
-            x: linScale([tLo, tHi], [PAD.l, w - PAD.r]),
-            y: linScale([0, envMax], [h - PAD.b, PAD.t]),
-          };
-          drawAxes(ctx, ax, [tLo, tHi], { xLabel: '$t$', yLabel: '$V(t)$' });
-          drawLine(ctx, ax, data.time, data.envelope, CHART.pink, 2);
         }}
       />
     </>
