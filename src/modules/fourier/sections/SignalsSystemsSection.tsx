@@ -137,8 +137,8 @@ export function SignalsSystemsSection(_props: SectionProps) {
               : <Slider label={<L text="Decay" tex="\tau" />} unit="(s)" value={tau} min={0.05} max={5} step={0.05} onChange={setTau} />
           )}
           <Toggle label={t('fourier.sig.reverse')} checked={reverse} onChange={setReverse} />
-          {audioSupported() && (
-            <div className="studio__audio">
+          <div className="studio__audio studio__audio--row">
+            {audioSupported() && (
               <button
                 type="button"
                 className={`studio__audio__listen${playing ? ' studio__audio__listen--playing' : ''}`}
@@ -146,10 +146,10 @@ export function SignalsSystemsSection(_props: SectionProps) {
               >
                 {playing ? t('fourier.studio.stop') : t('fourier.studio.listen')}
               </button>
-            </div>
-          )}
-          <div className="transport">
-            <button type="button" onClick={handleReset}>{t('fourier.sig.reset')}</button>
+            )}
+            <button type="button" className="studio__audio__reset" onClick={handleReset}>
+              {t('fourier.sig.reset')}
+            </button>
           </div>
         </Panel>
 

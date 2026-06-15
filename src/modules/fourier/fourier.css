@@ -318,6 +318,19 @@
   border-top: 1px solid var(--border);
 }
 
+/* LISTEN + Reset on a single row (Basic Signals controls) */
+.studio__audio--row {
+  flex-direction: row;
+  align-items: stretch;
+}
+.studio__audio--row .studio__audio__listen {
+  flex: 1 1 auto;
+  width: auto;
+}
+.studio__audio__reset {
+  flex: 0 0 auto;
+}
+
 .studio__audio__listen {
   width: 100%;
   padding: 10px var(--space-3);
