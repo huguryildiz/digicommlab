@@ -74,13 +74,14 @@ function seededNoise(count: number, pink: boolean): number[] {
 function sampleSource(p: FilterStudioParams): number[] {
   const dt = 1 / STUDIO_FS;
   if (p.source === 'white' || p.source === 'pink') return seededNoise(N, p.source === 'pink');
-  return Array.from({ length: N }, (_, i) => {
-    const t = p.tStart + i * dt;
-    if (p.source === 'multitone') {
+  if (p.source === 'multitone') {
+    return Array.from({ length: N }, (_, i) => {
+      const t = p.tStart + i * dt;
       return p.tones.reduce((s, tone) => s + tone.amp * Math.cos(2 * Math.PI * tone.freq * t), 0);
-    }
-    return periodicWave(p.source, p.f0, t, p.duty);
-  });
+    });
+  }
+  const kind = p.source; // narrowed to Periodic: 'square' | 'sawtooth' | 'triangle' | 'pulse'
+  return Array.from({ length: N }, (_, i) => periodicWave(kind, p.f0, p.tStart + i * dt, p.duty));
 }
 
 /** |H(f)| for the selected type + response. */
