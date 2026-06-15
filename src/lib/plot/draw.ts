@@ -223,6 +223,8 @@ export function formatMathLabel(label: string): string {
     .replace(/^\$(.*)\$$/, '$1')
     .replace(/\\mathrm\{([^}]*)\}/g, '$1')
     .replace(/\\text\{([^}]*)\}/g, '$1')
+    .replace(/\\operatorname\{([^}]*)\}/g, '$1')
+    .replace(/\\(log|ln|exp|sin|cos|tan|max|min|sinc)(?![a-zA-Z])/g, '$1')
     .replace(/\\left|\\right/g, '')
     .replace(/\\lvert|\\rvert|\\vert/g, '|')
     .replace(/\(\^\\circ\)/g, '°')
@@ -493,6 +495,33 @@ export function drawLine(
   }
   ctx.stroke();
   ctx.setLineDash([]);
+  recordPlotPoints(ctx, ax, xs, ys, color);
+}
+
+/**
+ * Like drawLine but breaks the stroke at NaN y values (masked phase regions).
+ * Also registers cursor points, skipping NaN entries.
+ */
+export function drawGappedLine(
+  ctx: CanvasRenderingContext2D,
+  ax: Axes,
+  xs: number[],
+  ys: number[],
+  color: string,
+  width = 1.5,
+): void {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  let pen = false;
+  for (let i = 0; i < xs.length; i++) {
+    if (!Number.isFinite(ys[i])) { pen = false; continue; }
+    const px = ax.x(xs[i]);
+    const py = ax.y(ys[i]);
+    if (!pen) { ctx.moveTo(px, py); pen = true; } else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
   recordPlotPoints(ctx, ax, xs, ys, color);
 }
 

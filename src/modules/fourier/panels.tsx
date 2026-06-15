@@ -6,7 +6,7 @@
 import React from 'react';
 import { Canvas } from '@/lib/plot/Canvas';
 import { useZoom } from '@/lib/plot/useZoom';
-import { linScale, drawAxes, drawLine, drawStems, type Axes } from '@/lib/plot/draw';
+import { linScale, drawAxes, drawLine, drawGappedLine, drawStems, type Axes } from '@/lib/plot/draw';
 import { CHART } from '@/lib/plot/colors';
 import type {
   SeriesSynthView,
@@ -15,7 +15,7 @@ import type {
   AnalyticView,
 } from './model';
 
-const PAD = { l: 50, r: 20, t: 20, b: 40 };
+const PAD = { l: 62, r: 20, t: 20, b: 40 };
 
 /** Panel 1: Fourier Series Synthesis — time + magnitude & phase spectra */
 export const SeriesSynthPlots: React.FC<{ data: SeriesSynthView }> = ({ data }) => {
@@ -77,6 +77,8 @@ export const SeriesSynthPlots: React.FC<{ data: SeriesSynthView }> = ({ data }) 
       />
       {/* Magnitude and phase spectra side by side, sharing the same frequency zoom */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2)' }}>
+        <div>
+          <p style={{ textAlign: 'center', color: 'var(--text-dim)', fontFamily: 'var(--font)', fontSize: '0.8rem', marginBottom: '4px' }}>Magnitude Spectrum</p>
         <Canvas
           height={200}
           ariaLabel="Magnitude spectrum |cₙ|"
@@ -88,6 +90,9 @@ export const SeriesSynthPlots: React.FC<{ data: SeriesSynthView }> = ({ data }) 
             drawSpec(ctx, w, h, data.mags, 0, mMax, '$|c_n|$', CHART.green);
           }}
         />
+        </div>
+        <div>
+          <p style={{ textAlign: 'center', color: 'var(--text-dim)', fontFamily: 'var(--font)', fontSize: '0.8rem', marginBottom: '4px' }}>Phase Spectrum</p>
         <Canvas
           height={200}
           ariaLabel="Phase spectrum ∠cₙ"
@@ -99,6 +104,7 @@ export const SeriesSynthPlots: React.FC<{ data: SeriesSynthView }> = ({ data }) 
             drawSpec(ctx, w, h, phasesDeg, -198, 198, '$\\angle c_n\\,(^\\circ)$', CHART.blue);
           }}
         />
+        </div>
       </div>
     </>
   );
@@ -159,12 +165,13 @@ export const SpectrumAnalyzerPlots: React.FC<{ data: SpectrumAnalyzerView }> = (
         onPan={onPanF}
         draw={(ctx, w, h) => {
           ctx.clearRect(0, 0, w, h);
+          const phasesDeg = data.phases.map((p) => (p * 180) / Math.PI);
           const ax: Axes = {
             x: linScale([fLo, fHi], [PAD.l, w - PAD.r]),
-            y: linScale([-Math.PI, Math.PI], [h - PAD.b, PAD.t]),
+            y: linScale([-198, 198], [h - PAD.b, PAD.t]),
           };
-          drawAxes(ctx, ax, [fLo, fHi], { xLabel: '$f\\,(Hz)$', yLabel: '$\\angle X(f)$' });
-          drawLine(ctx, ax, data.freqs, data.phases, CHART.pink, 1);
+          drawAxes(ctx, ax, [fLo, fHi], { xLabel: '$f\\,(Hz)$', yLabel: '$\\angle X(f)\\,(^\\circ)$' });
+          drawGappedLine(ctx, ax, data.freqs, phasesDeg, CHART.pink, 1);
         }}
       />
     </>

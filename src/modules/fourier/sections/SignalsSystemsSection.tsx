@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Panel, Slider, Toggle, Formula, HintText } from '@/components';
+import { Panel, Slider, Toggle, Formula } from '@/components';
 import { Canvas } from '@/lib/plot/Canvas';
 import { useZoom } from '@/lib/plot/useZoom';
 import { linScale, drawAxes, drawLine, type Axes } from '@/lib/plot/draw';
@@ -180,7 +180,6 @@ export function SignalsSystemsSection(_props: SectionProps) {
               drawLine(ctx, ax, sig.time, sig.transformed, CHART.orange, 2);
             }}
           />
-          <p className="fourier__hint"><HintText text={t('fourier.hint.signal')} /></p>
         </Panel>
 
         {/* Signal reference cards — Proakis §2.1 */}

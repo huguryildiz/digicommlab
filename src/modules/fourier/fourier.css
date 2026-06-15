@@ -68,6 +68,15 @@
   font-family: var(--font);
 }
 
+/* Centered caption above a plot canvas (e.g. "Magnitude Spectrum"). */
+.fourier__plot-title {
+  margin: var(--space-2) 0 4px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-family: var(--font);
+}
+
 /* Premium metric cards — replace plain <Readout> rows in this module */
 .fourier__metric {
   background: var(--bg-panel);

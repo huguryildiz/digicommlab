@@ -134,7 +134,7 @@ export const fourier: Record<string, string> = {
   'fourier.conv.panel.overlap': 'Overlap',
   'fourier.conv.panel.y': 'Output',
   'fourier.conv.hint.overlap':
-    'Drag here (or use the slider) to slide the flipped response $h(t-\\tau)$. The shaded pink area is the overlap — and that area is exactly $y$ at this $t$.',
+    'Drag here to slide the flipped response $h(t-\\tau)$. The shaded pink area is the overlap — and that area is exactly $y$ at this $t$.',
   'fourier.conv.hint.y': 'The pink dot is $y(t)$: the overlap area plotted against the slide position $t$.',
   'fourier.conv.theory':
     'Proakis §2.1.5 (p. 41): an LTI system output is the convolution of the input x(t) with the impulse response h(t). To get y(t), flip h about τ = 0, slide it to position t, multiply by x(τ), and integrate (sum) the overlap. Sweep t to trace out the whole y(t) curve.',
@@ -152,7 +152,6 @@ export const fourier: Record<string, string> = {
   'fourier.readout.bw': 'Bandwidth',
   'fourier.readout.eTime': 'Energy (time)',
   'fourier.readout.eFreq': 'Energy (freq)',
-  'fourier.hint.leakage': 'A rectangular window on an off-bin tone smears energy into neighboring bins (leakage).',
   'fourier.hint.prop.shift': 'Shifting in time leaves $|X(f)|$ unchanged — only the phase ramps.',
   'fourier.hint.prop.modulate': 'Multiplying by a carrier copies the spectrum up to $\\pm f_0$.',
   'fourier.hint.prop.scale': 'Compressing in time stretches the spectrum: narrower pulse $\\Rightarrow$ wider bandwidth.',
@@ -165,4 +164,21 @@ export const fourier: Record<string, string> = {
   'fourier.hint.filter': 'The output spectrum is the input times $|H(f)|$; outside the passband it is suppressed.',
   'fourier.hint.baseband': 'Baseband sits at $f=0$ over $[-W,\\,W]$; bandpass is the same shape shifted to $\\pm f_c$.',
   'fourier.hint.iq': '$I$ (green) and $Q$ (blue) are slow baseband signals; the envelope is $\\sqrt{I^2+Q^2}$.',
+
+  // Tab 3 — Spectrum Explorer (Fourier transform of any Basic Signal)
+  'fourier.panel.spectrum': 'Spectrum Explorer',
+  'fourier.spec.signal': 'Signal',
+  'fourier.spec.mod': 'Modulation $\\cos(2\\pi f_m t)$',
+  'fourier.spec.fm': 'Mod. frequency',
+  'fourier.spec.db': 'dB magnitude',
+  'fourier.spec.twoSided': 'Two-sided spectrum',
+  'fourier.spec.overlay': 'Theory overlay (Table 2.1)',
+  'fourier.spec.mag': 'Magnitude Spectrum',
+  'fourier.spec.phase': 'Phase Spectrum',
+  'fourier.spec.legend.fft': 'computed',
+  'fourier.spec.legend.theory': 'theory',
+  'fourier.readout.peakF': 'Peak frequency',
+  'fourier.spec.noOverlay': 'FFT only — no simple closed-form transform for this signal (Proakis Table 2.1).',
+  'fourier.spec.lineNote': 'Theory lines show $|c_n|$ at $\\pm n f_0$, scaled to the FFT peak for comparison.',
+  'fourier.hint.spectrum': 'Pick a signal and watch its Fourier transform $X(f)$. Time shift $t_0$ ramps the phase; scaling $\\alpha$ spreads $|X(f)|$; modulation copies it to $\\pm f_m$.',
 };

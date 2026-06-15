@@ -13,7 +13,10 @@ import {
   lowpassEquivalent,
   hilbert,
 } from '@/lib/dsp/fourier';
-import { spectrum } from '@/lib/dsp/fft';
+import { spectrum, type Complex } from '@/lib/dsp/fft';
+import { analyticFt, type AnalyticFtKind } from '@/lib/dsp/ftpairs';
+import { signalEnergy } from '@/lib/dsp/energy';
+import { occupiedBandwidth } from '@/lib/dsp/bandwidth';
 import {
   evalSignal,
   periodicWave,
@@ -706,4 +709,194 @@ export function buildConvOverlap(curve: ConvCurve, slideT: number): ConvOverlap 
   const product = x.map((xi, i) => xi * hReflected[i]);
   const yAtSlide = product.reduce((acc, p) => acc + p, 0) * dt;
   return { hReflected, product, slideT, yAtSlide };
+}
+
+// --- Spectrum Explorer: Fourier transform of any Basic Signal (Proakis §2.3) ---
+
+/** Operations applied to the chosen signal in the Spectrum Explorer. */
+export interface SpectrumOps {
+  amp: number; // A
+  t0: number; // time shift (s)
+  F: number; // frequency / time-scale
+  tau: number; // time constant / width for exp/exp2/gaussian/damped_sine
+  reverse: boolean; // time reversal
+  modOn: boolean; // multiply by cos(2πf_m t)
+  fm: number; // modulation frequency (Hz)
+}
+
+/** Analytic-overlay descriptor: a continuous curve, a line spectrum, or none. */
+export type SpectrumOverlay =
+  | { type: 'curve'; f: number[]; mag: number[]; phase: number[] }
+  | { type: 'line'; f: number[]; mag: number[] }
+  | { type: 'none'; reason: string };
+
+export interface SpectrumExplorerView {
+  // Time domain (analysis/display buffer)
+  time: number[];
+  x: number[]; // operated signal
+  xOriginal: number[]; // un-operated reference
+  // Numeric two-sided spectrum in physical units (|X(f)| ≈ ∫x e^{-j2πft} dt)
+  freq: number[];
+  mag: number[];
+  magDb: number[]; // 20·log10(|X|/max), floored
+  phase: number[]; // ∠X(f), masked to NaN where |X| is negligible
+  // Analytic overlay (Proakis Table 2.1)
+  overlay: SpectrumOverlay;
+  // Readouts
+  bandwidth: number; // null-to-null (Hz)
+  eTime: number; // ∫|x|²dt
+  eFreq: number; // ∫|X|²df (Parseval check)
+  peakF: number; // |X(f)| peak frequency (Hz)
+  classification: SignalClass;
+}
+
+/** Energy signals with a closed-form FT (continuous curve overlay). */
+const ENERGY_OVERLAY: Partial<Record<BasicKind, AnalyticFtKind>> = {
+  rect: 'rect', tri: 'tri', exp: 'exp', exp2: 'exp2', sinc: 'sinc', damped_sine: 'damped_sine',
+};
+/** Periodic signals → line-spectrum overlay via Fourier-series coefficients. */
+const LINE_OVERLAY: Partial<Record<BasicKind, SeriesWaveKind>> = {
+  sine: 'sine', cosine: 'cosine', square: 'square', sawtooth: 'sawtooth', tri_wave: 'triangle',
+  half_rect: 'half_rect', full_rect: 'full_rect', dirac_comb: 'dirac_comb',
+};
+
+const SPEC_T_WIN = 20; // analysis window [-10, 10] s
+const SPEC_N = 4096; // FFT length (power of 2)
+const PHASE_EPS = 1e-3; // mask phase where |X| < PHASE_EPS·max|X|
+const DB_FLOOR = -120;
+
+/**
+ * Build the Spectrum Explorer view: numerical FFT of the operated signal in
+ * physical units plus the book's analytic transform as an overlay.
+ *
+ * Physical scaling (Proakis Eq. 2.3.1): for samples xₙ = x(t_start + n·dt),
+ * X(f_k) ≈ dt·e^{-j2πf_k·t_start}·DFT{xₙ}. Hence |X(f_k)| = dt·N·(|DFT|/N) and
+ * the phase carries a −2πf·t_start term that we remove so the result matches
+ * the closed-form transform.
+ */
+export function buildSpectrumExplorer(
+  kind: BasicKind,
+  ops: SpectrumOps,
+  windowType: WindowType = 'rect',
+): SpectrumExplorerView {
+  const { amp, t0, F, tau, reverse, modOn, fm } = ops;
+  const Feff = F || 1;
+
+  // Analysis buffer (also used for display).
+  const time = linspace(-SPEC_T_WIN / 2, SPEC_T_WIN / 2, SPEC_N);
+  const dt = time[1] - time[0];
+  const fs = 1 / dt;
+  const tStart = time[0];
+
+  const sampleOp = (t: number): number => {
+    const tp = reverse ? -t : t;
+    let s = amp * basicSignal(kind, Feff * (tp - t0), tau);
+    if (modOn) s *= Math.cos(2 * Math.PI * fm * t);
+    return s;
+  };
+  const x = time.map(sampleOp);
+  const xOriginal = time.map((t) => basicSignal(kind, t, tau));
+
+  // Windowed FFT.
+  const win = windowFunc(windowType, SPEC_N);
+  const winGain = win.reduce((a, b) => a + b, 0) / SPEC_N; // coherent gain
+  const windowed = x.map((v, i) => v * win[i]);
+  const spec = spectrum(windowed, fs);
+
+  // Physical magnitude and time-origin-corrected, masked phase.
+  const physFactor = (dt * SPEC_N) / (winGain || 1);
+  const mag = spec.mag.map((m) => m * physFactor);
+  const maxMag = Math.max(...mag, 1e-12);
+  const phase = spec.phase.map((p, i) => {
+    if (mag[i] < PHASE_EPS * maxMag) return NaN;
+    let ph = p - 2 * Math.PI * spec.freq[i] * tStart;
+    ph = Math.atan2(Math.sin(ph), Math.cos(ph)); // wrap to [-π, π]
+    return ph;
+  });
+  const magDb = mag.map((m) => Math.max(20 * Math.log10(m / maxMag), DB_FLOOR));
+
+  // Readouts.
+  const df = fs / SPEC_N;
+  const eFreq = mag.reduce((s, m) => s + m * m, 0) * df;
+  const eTime = signalEnergy(x, dt);
+  // Occupied (99% energy) bandwidth — stable under time shift/scaling, unlike a
+  // null-to-null threshold walk which jitters when sampled nulls miss exact zero.
+  const bandwidth = occupiedBandwidth(spec.freq, mag, 0.99).W;
+  let peakI = 0;
+  for (let i = 1; i < mag.length; i++) if (mag[i] > mag[peakI]) peakI = i;
+  const peakF = spec.freq[peakI];
+
+  const overlay = buildOverlay(kind, ops, spec.freq);
+
+  return {
+    time, x, xOriginal,
+    freq: spec.freq, mag, magDb, phase,
+    overlay,
+    bandwidth, eTime, eFreq, peakF,
+    classification: classifySignal(time, xOriginal),
+  };
+}
+
+/** Closed-form transform overlay matching the operated signal. */
+function buildOverlay(kind: BasicKind, ops: SpectrumOps, freq: number[]): SpectrumOverlay {
+  const { amp, t0, F, tau, reverse, modOn, fm } = ops;
+  const Feff = F || 1;
+
+  const aKind = ENERGY_OVERLAY[kind];
+  if (aKind) {
+    // Hₛ(f) = (1/|F|)·G(f/F); operated X(f) adds amplitude, shift and reversal.
+    const baseHs = (fq: number): Complex => {
+      const G = analyticFt(aKind, fq / Feff, tau);
+      const inv = 1 / Math.abs(Feff);
+      return { re: G.re * inv, im: G.im * inv };
+    };
+    const Xop = (fq: number): Complex => {
+      const Hs = baseHs(reverse ? -fq : fq);
+      const ph = (reverse ? 1 : -1) * 2 * Math.PI * fq * t0; // shift theorem
+      const c = Math.cos(ph), s = Math.sin(ph);
+      return { re: amp * (Hs.re * c - Hs.im * s), im: amp * (Hs.re * s + Hs.im * c) };
+    };
+    const Xf = (fq: number): Complex => {
+      if (!modOn) return Xop(fq);
+      const a = Xop(fq - fm), b = Xop(fq + fm); // ½[X(f−f₀)+X(f+f₀)]
+      return { re: 0.5 * (a.re + b.re), im: 0.5 * (a.im + b.im) };
+    };
+    const cval = freq.map(Xf);
+    const mag = cval.map((c) => Math.hypot(c.re, c.im));
+    const mMax = Math.max(...mag, 1e-12);
+    const phase = cval.map((c, i) => (mag[i] < PHASE_EPS * mMax ? NaN : Math.atan2(c.im, c.re)));
+    return { type: 'curve', f: freq, mag, phase };
+  }
+
+  const sKind = LINE_OVERLAY[kind];
+  if (sKind) {
+    // Two-sided line spectrum: |c_n| = A_n/2 at ±n·F (+ DC), scaled by amplitude.
+    const Nharm = 16;
+    const f: number[] = [];
+    const mag: number[] = [];
+    const push = (freqVal: number, height: number) => {
+      f.push(freqVal);
+      mag.push(Math.abs(amp) * height);
+    };
+    if (sKind === 'square' || sKind === 'triangle' || sKind === 'sawtooth') {
+      for (const c of seriesCoeffs(sKind, Feff, Nharm)) {
+        if (c.mag < 1e-9) continue;
+        push(c.freq, c.mag / 2);
+        push(-c.freq, c.mag / 2);
+      }
+    } else {
+      const ext = sKind as Exclude<SeriesWaveKind, Periodic>;
+      const { dc, an, bn } = dftSeriesCoeffs(ext, Feff, Nharm);
+      if (Math.abs(dc) > 1e-9) push(0, Math.abs(dc));
+      for (let n = 0; n < an.length; n++) {
+        const An = Math.hypot(an[n], bn[n]);
+        if (An < 1e-9) continue;
+        push((n + 1) * Feff, An / 2);
+        push(-(n + 1) * Feff, An / 2);
+      }
+    }
+    return { type: 'line', f, mag };
+  }
+
+  return { type: 'none', reason: 'No simple closed-form transform (Proakis Table 2.1).' };
 }
