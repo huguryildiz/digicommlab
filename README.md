@@ -51,20 +51,20 @@ Communication theory is hard to internalize from static equations. The intuition
 
 All twelve modules are live and follow book-chapter order.
 
-| # | Module | What it covers |
-|---|--------|----------------|
-| 01 | **Signals & Spectra** | Basic signals, convolution, Fourier series synthesis, FFT & spectra, transform pairs, filter design (LTI · realizable · studio with audio), Hilbert transform, bandpass & I/Q representation |
-| 02 | **Amplitude Modulation (AM)** | DSB-SC, conventional AM, SSB & VSB, power/efficiency; power-law, switching, balanced & ring modulators with circuit block diagrams; envelope & coherent demodulators; FDM channel stacking & quadrature-carrier multiplexing (QAM); superheterodyne receiver frequency plan |
-| 03 | **Angle Modulation (FM/PM)** | FM & PM waveforms, instantaneous frequency, Bessel sidebands, Carson bandwidth, discriminator & PLL detection; FM radio (stereo multiplexing, pre/de-emphasis, superheterodyne) |
-| 04 | **Random Processes** | Probability, Bayes & random variables (distributions, Q-function, functions of an RV, joint Gaussian, CLT); ensembles, autocorrelation, ergodicity, PSD (Wiener–Khinchin), cross-correlation & LTI filtering; Gaussian, white/thermal & bandpass-filtered noise (I/Q, noise-equivalent bandwidth) |
-| 05 | **Noise in Analog Systems** | Output SNR, demodulation gain, FM threshold, pre/de-emphasis for DSB-SC / AM / FM |
-| 06 | **Analog-to-Digital Conversion** | Nyquist theorem, aliasing, PCM coding, scalar quantization, SQNR, delta modulation, audio playback |
-| 07 | **Digital Modulation & Detection** | M-ary constellations (PSK/QAM/ASK/FSK), AWGN, ML/MAP decision regions, SER curves, optimum receiver |
-| 08 | **Baseband Transmission & ISI** | Raised-cosine pulse shaping, matched filtering, ISI, eye diagrams, ZF/MMSE equalization |
-| 09 | **Information Theory** | Entropy, Kraft inequality, Huffman coding, Lempel-Ziv compression, source-coding efficiency |
-| 10 | **Channel Capacity & Coding** | Mutual information, capacity, block/conv/cyclic/BCH/Reed-Solomon/concatenated codes, Viterbi |
-| 11 | **Wireless Communications** | Rayleigh/Rician fading, Doppler, BER, DS-SS, FHSS, CDMA, OFDM, RAKE, MIMO, CPM, link budget |
-| 12 | **End-to-End Link** | Full chain: source → quantizer → modulation → channel → detection → sink with stage inspection |
+| #   | Module                             | What it covers                                                                                                                                                                                                                                                                                                                                                                                   |
+| --- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 01  | **Signals & Spectra**              | Basic signals, convolution, Fourier series synthesis, FFT & spectra, transform pairs, filter design (LTI · realizable · studio with audio), Hilbert transform, bandpass & I/Q representation                                                                                                                                                                                                     |
+| 02  | **Amplitude Modulation (AM)**      | DSB-SC, conventional AM, SSB & VSB, power/efficiency; power-law, switching, balanced & ring modulators with circuit block diagrams; envelope & coherent demodulators; FDM channel stacking & quadrature-carrier multiplexing (QAM); superheterodyne receiver frequency plan                                                                                                                      |
+| 03  | **Angle Modulation (FM/PM)**       | FM & PM waveforms, instantaneous frequency, Bessel sidebands, Carson bandwidth, discriminator & PLL detection; FM radio (stereo multiplexing, pre/de-emphasis, superheterodyne)                                                                                                                                                                                                                  |
+| 04  | **Random Processes**               | Probability, Bayes & random variables (distributions, Q-function, functions of an RV, joint Gaussian, CLT); ensembles, autocorrelation, ergodicity, PSD (Wiener–Khinchin), cross-correlation & LTI filtering; Gaussian, white/thermal & bandpass-filtered noise (I/Q, noise-equivalent bandwidth)                                                                                                |
+| 05  | **Noise in Analog Systems**        | AM noise with real demod chains (baseband reference, DSB-SC, SSB, conventional-AM envelope detection, efficiency & threshold); angle-modulation noise (parabolic FM / flat PM output PSD, FM/PM output SNR, threshold effect, pre/de-emphasis); DSB/SSB/AM/FM/PM SNR comparison; transmission losses & link budget (thermal noise kTB, noise figure & Friis cascade, path loss, repeater chains) |
+| 06  | **Analog-to-Digital Conversion**   | Nyquist theorem, aliasing, PCM coding, scalar quantization, SQNR, delta modulation, audio playback                                                                                                                                                                                                                                                                                               |
+| 07  | **Digital Modulation & Detection** | M-ary constellations (PSK/QAM/ASK/FSK), AWGN, ML/MAP decision regions, SER curves, optimum receiver                                                                                                                                                                                                                                                                                              |
+| 08  | **Baseband Transmission & ISI**    | Raised-cosine pulse shaping, matched filtering, ISI, eye diagrams, ZF/MMSE equalization                                                                                                                                                                                                                                                                                                          |
+| 09  | **Information Theory**             | Entropy, Kraft inequality, Huffman coding, Lempel-Ziv compression, source-coding efficiency                                                                                                                                                                                                                                                                                                      |
+| 10  | **Channel Capacity & Coding**      | Mutual information, capacity, block/conv/cyclic/BCH/Reed-Solomon/concatenated codes, Viterbi                                                                                                                                                                                                                                                                                                     |
+| 11  | **Wireless Communications**        | Rayleigh/Rician fading, Doppler, BER, DS-SS, FHSS, CDMA, OFDM, RAKE, MIMO, CPM, link budget                                                                                                                                                                                                                                                                                                      |
+| 12  | **End-to-End Link**                | Full chain: source → quantizer → modulation → channel → detection → sink with stage inspection                                                                                                                                                                                                                                                                                                   |
 
 ---
 
@@ -83,17 +83,17 @@ source → sampling → source coding → modulation → channel → detection �
 
 ## Architecture
 
-| Layer | Stack |
-|-------|-------|
-| Frontend | React 18 · TypeScript strict · Vite 5 · React Router v6 |
-| Math typesetting | KaTeX |
-| Audio | Web Audio API |
-| Rendering | Custom Canvas + SVG plotting primitives |
-| DSP core | Pure TypeScript in `src/lib/dsp` (54 modules, no framework deps) |
-| Styling | CSS design tokens · glassmorphism · neon signal palette |
-| Testing | Vitest · Testing Library · jsdom (80+ test suites) |
-| Tooling | ESLint · Prettier · `tsc --noEmit` |
-| Deployment | Vercel static SPA |
+| Layer            | Stack                                                            |
+| ---------------- | ---------------------------------------------------------------- |
+| Frontend         | React 18 · TypeScript strict · Vite 5 · React Router v6          |
+| Math typesetting | KaTeX                                                            |
+| Audio            | Web Audio API                                                    |
+| Rendering        | Custom Canvas + SVG plotting primitives                          |
+| DSP core         | Pure TypeScript in `src/lib/dsp` (54 modules, no framework deps) |
+| Styling          | CSS design tokens · glassmorphism · neon signal palette          |
+| Testing          | Vitest · Testing Library · jsdom (80+ test suites)               |
+| Tooling          | ESLint · Prettier · `tsc --noEmit`                               |
+| Deployment       | Vercel static SPA                                                |
 
 The architecture enforces a hard boundary between math and UI. All DSP, coding, channel, and simulation logic lives in pure functions under `src/lib/dsp` and `src/lib/sim`, independently testable without React.
 
@@ -122,7 +122,7 @@ src/
 │   ├── random-process/   Probability & RVs, random processes/PSD, Gaussian & white noise
 │   ├── sampling-quantization/  Nyquist, aliasing, PCM, SQNR
 │   ├── deltamod/         Delta modulation and adaptive waveform coding
-│   ├── analog-noise/     Analog noise performance and SNR comparisons
+│   ├── analog-noise/     AM/FM noise, SNR comparison, transmission & link budget (Ch 6)
 │   ├── infotheory/       Entropy, prefix codes, Huffman, LZ78
 │   ├── modulation/       Constellations, AWGN, ML/MAP, optimum receiver
 │   ├── baseband/         Pulse shaping, matched filter, eye, equalization
