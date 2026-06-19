@@ -49,7 +49,7 @@ export const en: Record<string, string> = {
   'adc.card.midrisetread.body':
     'Mid-rise has no zero level (a decision boundary at 0); mid-tread places a level at 0 — better for near-silence.',
   // PCM section info cards (§7.3, 7.4.1)
-  'adc.card.pcm.title': 'PCM bitstream',
+  'adc.card.pcm.title': 'PCM codewords',
   'adc.card.pcm.body':
     'Each level index becomes an $R$-bit codeword; the line rate is $R_b=R\\,f_s$ bits/s.',
   'adc.card.gray.title': 'Gray vs natural binary',
