@@ -62,6 +62,75 @@ export const en: Record<string, string> = {
   'adc.card.slope.title': 'Slope overload vs granular noise',
   'adc.card.slope.body':
     'The staircase tracks at most $\\Delta f_s$ per second; steeper inputs cause slope overload, flat inputs cause granular hunting.',
+  // Stage C — companding (§7.4.1)
+  'adc.compand.law': 'Companding law',
+  'adc.compand.none': 'None (uniform)',
+  'adc.compand.mu': 'μ-law',
+  'adc.compand.a': 'A-law',
+  'adc.compand.param': 'Companding parameter',
+  'adc.compand.curve': 'Compander curve g(x)',
+  'adc.compand.sqnr': 'SQNR vs input amplitude',
+  'adc.card.compand.title': 'Companding',
+  'adc.card.compand.body':
+    'Compress amplitude before uniform quantizing, then expand on decode — small signals get finer steps. $g(x)=\\dfrac{\\ln(1+\\mu|x|)}{\\ln(1+\\mu)}\\operatorname{sgn}(x)$.',
+  'adc.card.mualaw.title': 'μ-law vs A-law',
+  'adc.card.mualaw.body':
+    'μ-law ($\\mu=255$, North America) and A-law ($A=87.56$, Europe) are standard companding curves giving near-constant SQNR across loud and quiet speech.',
+  // Stage C — Lloyd-Max (§7.2.1)
+  'adc.lm.mode': 'Quantizer',
+  'adc.lm.uniform': 'Uniform',
+  'adc.lm.optimal': 'Lloyd-Max',
+  'adc.lm.pdf': 'Source distribution',
+  'adc.lm.gaussian': 'Gaussian',
+  'adc.lm.uniformsrc': 'Uniform',
+  'adc.lm.laplacian': 'Laplacian',
+  'adc.lm.levels': 'Levels N',
+  'adc.lm.panel': 'Quantizer levels vs source pdf',
+  'adc.lm.distortion': 'Distortion D',
+  'adc.lm.distUniform': 'D (uniform)',
+  'adc.lm.sqnrOpt': 'SQNR (optimal)',
+  'adc.card.optimal.title': 'Optimal quantizer',
+  'adc.card.optimal.body':
+    'Lloyd-Max minimizes MSE: every boundary sits midway between its two levels, and every level is the centroid of its region — finer steps where the pdf is dense.',
+  // Stage C — vector quantization (§7.2.2)
+  'adc.vq.data': 'Training data',
+  'adc.vq.clusters': 'Clusters',
+  'adc.vq.cloud': 'Single Gaussian',
+  'adc.vq.k': 'Codebook size K',
+  'adc.vq.iter': 'Iteration',
+  'adc.vq.rate': 'Rate (bits/sample)',
+  'adc.vq.scatter': 'Codebook & Voronoi regions',
+  'adc.vq.distortion': 'Distortion vs iteration',
+  'adc.card.vq.title': 'Vector quantization',
+  'adc.card.vq.body':
+    'Quantize blocks of samples jointly to the nearest codeword. Rate $R=\\dfrac{\\log_2 K}{n}$ bits/sample.',
+  'adc.card.voronoi.title': 'Voronoi regions',
+  'adc.card.voronoi.body':
+    'Each codeword owns the points nearest to it; LBG alternates nearest-neighbour assignment with centroid updates until distortion converges.',
+  // Stage C — DPCM (§7.4.2)
+  'adc.dpcm.order': 'Predictor order',
+  'adc.dpcm.first': 'First-order',
+  'adc.dpcm.second': 'Second-order',
+  'adc.dpcm.bits': 'Quantizer bits R',
+  'adc.dpcm.freq': 'Tone frequency',
+  'adc.dpcm.gain': 'Prediction gain',
+  'adc.dpcm.bitrate': 'DPCM vs PCM rate',
+  'adc.dpcm.trace': 'Signal, prediction error, reconstruction',
+  'adc.card.dpcm.title': 'Differential PCM',
+  'adc.card.dpcm.body':
+    'Quantize the prediction error $y_n=x_n-\\hat{x}_{n-1}$ instead of the sample — its smaller range needs fewer bits for the same quality.',
+  'adc.card.dpcmloop.title': 'Closed prediction loop',
+  'adc.card.dpcmloop.body':
+    'The encoder predicts from reconstructed (not original) samples, so the decoder running the same recursion stays perfectly in step.',
+  // Stage C — adaptive delta modulation (§7.4.3)
+  'adc.dm.mode': 'Mode',
+  'adc.dm.linear': 'Linear DM',
+  'adc.dm.adaptive': 'Adaptive DM',
+  'adc.dm.k': 'Adaptation factor K',
+  'adc.dm.steps': 'Step size over time',
+  'adc.card.adm.title': 'Adaptive step',
+  'adc.card.adm.body':
+    'When the staircase keeps climbing (slope overload) the step grows by $K$; when it hunts on a flat input the step shrinks — one knob fixes both DM failure modes.',
   'nav.modulation': 'Digital Modulation & Detection',
   'nav.baseband': 'Baseband & ISI',
   'nav.huffman': 'Huffman & Entropy',
