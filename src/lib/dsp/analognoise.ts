@@ -1,30 +1,36 @@
-// Noise in analog systems (Proakis & Salehi Ch 6). Pure, framework-free.
-// Verify exact FM/threshold/emphasis constants against refs/Book.pdf §5.3 (PDF ~256-260).
-import { amEfficiency } from './analog';
+// Noise in analog communication systems — Proakis & Salehi, Ch 6. Pure, framework-free.
+import { amEfficiency, emphasisSnrGainDb } from './analog';
 import { gaussian } from './awgn';
 
-export type AnalogScheme = 'dsb' | 'ssb' | 'am' | 'fm';
+export type AnalogScheme = 'dsb' | 'ssb' | 'am' | 'fm' | 'pm';
 
 export interface SnrParams {
-  amIndex: number; // a (AM)
-  beta: number; // β (FM)
-  messagePower: number; // normalized message power P_Mn
-  emphasis: boolean; // pre/de-emphasis (FM)
+  amIndex: number; // a (conventional AM)
+  beta: number; // β (FM/PM modulation index)
+  messagePower: number; // normalized message power P_Mn (single tone = 0.5)
+  emphasis: boolean; // pre/de-emphasis (FM only)
   W: number; // message bandwidth (Hz)
+  f1?: number; // de-emphasis corner frequency (Hz)
 }
 
-/** Linear SNR improvement factor of the output over the channel SNR γ = P_R/(N0 W). */
+/** Commercial-FM de-emphasis corner f₁ = 1/(2π·75 µs) ≈ 2122 Hz (Proakis §6.2.2). */
+export const DEEMPHASIS_F1_DEFAULT = 1 / (2 * Math.PI * 75e-6);
+
+/** Linear SNR improvement of the demod output over the baseband SNR γ = P_R/(N₀W). */
 export function snrImprovement(scheme: AnalogScheme, p: SnrParams): number {
   switch (scheme) {
     case 'dsb':
     case 'ssb':
-      return 1; // coherent: output SNR equals baseband SNR (Proakis §5.1)
+      return 1; // coherent: (S/N)_o = (S/N)_b  (Proakis §6.1.2 Eq. 6.1.13, §6.1.3 Eq. 6.1.22)
     case 'am':
-      return amEfficiency(p.amIndex, p.messagePower); // η = a²P/(1+a²P) (Proakis §5.1)
+      return amEfficiency(p.amIndex, p.messagePower); // η  (§6.1.4 Eq. 6.1.28)
+    case 'pm':
+      return p.beta ** 2 * p.messagePower; // (§6.2 Eq. 6.2.20)
     case 'fm': {
-      // FM gain ∝ β² (Proakis §5.3, eq. 5.3.24): 3β²·P_Mn (p. 243)
-      const base = 3 * p.beta ** 2 * p.messagePower;
-      return p.emphasis ? base * emphasisFactor(p.beta) : base;
+      const base = 3 * p.beta ** 2 * p.messagePower; // (§6.2 Eq. 6.2.21)
+      if (!p.emphasis) return base;
+      const f1 = p.f1 ?? DEEMPHASIS_F1_DEFAULT;
+      return base * 10 ** (emphasisSnrGainDb(f1, p.W) / 10); // ×10^(gain_dB/10) (§6.2.2 Eq. 6.2.42)
     }
   }
 }
@@ -39,21 +45,8 @@ export function demodulationGainDb(scheme: AnalogScheme, p: SnrParams): number {
   return 10 * Math.log10(snrImprovement(scheme, p));
 }
 
-/** Pre/de-emphasis linear improvement factor for FM (Proakis §5.3.2). The book's exact
- *  factor depends on the de-emphasis cutoff and W (filter-specific); we use a monotonic
- *  β²-growth approximation suitable for the teaching curve (improvement grows with deviation). */
-function emphasisFactor(beta: number): number {
-  return 1 + (beta * beta) / 3;
-}
-
-/** Pre/de-emphasis SNR gain in dB for FM (Proakis §5.3.2, p. 250). */
-export function emphasisGainDb(beta: number, _W: number): number {
-  return 10 * Math.log10(emphasisFactor(beta));
-}
-
-/** FM threshold channel-SNR in dB as a function of β. The threshold rises with the
- *  transmission bandwidth B_c = 2(β+1)W, so it grows with β. Standard ~20(β+1) rule;
- *  confirm the constant vs Proakis §5.3.1 (p. 245, eq. 5.3.27). */
+/** FM threshold baseband-SNR in dB: (S/N)_b,th = 20(β+1). The threshold rises with the
+ *  transmission bandwidth B_c = 2(β+1)W, so it grows with β (Proakis §6.2.1 Eq. 6.2.25). */
 export function fmThresholdCnrDb(beta: number): number {
   return 10 * Math.log10(20 * (beta + 1));
 }

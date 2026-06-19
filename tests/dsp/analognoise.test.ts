@@ -3,10 +3,11 @@ import {
   outputSnrDb,
   demodulationGainDb,
   fmThresholdCnrDb,
-  emphasisGainDb,
   addNoiseAtSnr,
   measuredSnrDb,
+  DEEMPHASIS_F1_DEFAULT,
 } from '@/lib/dsp/analognoise';
+import { emphasisSnrGainDb } from '@/lib/dsp/analog';
 import { makeRng } from '@/lib/dsp/random';
 
 const p = { amIndex: 0.5, beta: 5, messagePower: 0.5, emphasis: false, W: 15000 };
@@ -37,20 +38,38 @@ describe('outputSnrDb / demodulationGainDb', () => {
   });
 });
 
-describe('FM threshold & emphasis', () => {
+describe('PM output SNR', () => {
+  it('PM gain is beta^2 * P_Mn (no factor of 3)', () => {
+    const gain = demodulationGainDb('pm', { ...p, beta: 5 });
+    expect(gain).toBeCloseTo(10 * Math.log10(5 ** 2 * 0.5), 6);
+  });
+
+  it('FM is 3x PM (≈ +4.77 dB) at equal beta', () => {
+    const fm = demodulationGainDb('fm', { ...p, beta: 5 });
+    const pm = demodulationGainDb('pm', { ...p, beta: 5 });
+    expect(fm - pm).toBeCloseTo(10 * Math.log10(3), 6);
+  });
+});
+
+describe('FM threshold & emphasis (book formula)', () => {
   it('threshold CNR increases with beta (more bandwidth → higher threshold)', () => {
     expect(fmThresholdCnrDb(10)).toBeGreaterThan(fmThresholdCnrDb(2));
   });
 
-  it('threshold CNR is a sane positive dB value', () => {
-    const t = fmThresholdCnrDb(5);
-    expect(t).toBeGreaterThan(5);
-    expect(t).toBeLessThan(40);
+  it('threshold = 10log10(20(beta+1))', () => {
+    expect(fmThresholdCnrDb(5)).toBeCloseTo(10 * Math.log10(20 * 6), 6);
   });
 
-  it('pre/de-emphasis provides a positive SNR gain that grows with beta', () => {
-    expect(emphasisGainDb(2, 15000)).toBeGreaterThan(0);
-    expect(emphasisGainDb(10, 15000)).toBeGreaterThan(emphasisGainDb(2, 15000));
+  it('emphasis adds the analog.ts Eq. 6.2.42 gain to FM (independent of beta)', () => {
+    const W = 15000;
+    const expected = emphasisSnrGainDb(DEEMPHASIS_F1_DEFAULT, W);
+    const withE = demodulationGainDb('fm', { ...p, W, emphasis: true });
+    const without = demodulationGainDb('fm', { ...p, W, emphasis: false });
+    expect(withE - without).toBeCloseTo(expected, 6);
+  });
+
+  it('default de-emphasis corner ≈ 2122 Hz (τ = 75 µs)', () => {
+    expect(DEEMPHASIS_F1_DEFAULT).toBeCloseTo(1 / (2 * Math.PI * 75e-6), 6);
   });
 });
 
