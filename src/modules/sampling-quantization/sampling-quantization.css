@@ -51,3 +51,8 @@
 .regime-badge--err {
   color: var(--err, #ff5c5c);
 }
+
+.adc__placeholder {
+  color: var(--text-dim);
+  line-height: 1.6;
+}
