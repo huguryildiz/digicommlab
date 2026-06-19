@@ -30,6 +30,13 @@ export const analognoise: Record<string, string> = {
   'an.angle.sub.threshold': 'Threshold',
   'an.angle.sub.emphasis': 'Pre/De-emphasis',
 
+  // §6.2 Noise PSD & SNR
+  'an.psd.title': 'Noise spectrum & SNR',
+  'an.psd.scheme': 'FM / PM',
+  'an.psd.plot': 'Output noise PSD (normalized)',
+  'an.psd.theory':
+    'In FM the output-noise PSD is parabolic ($N_0 f^2/A_c^2$): high-frequency message components suffer far more noise — this motivates pre-emphasis. PM has a flat noise PSD. FM gains $3\\beta^2 P_{M_n}$ over baseband and PM gains $\\beta^2 P_{M_n}$ (FM is 3× better, ≈ +4.8 dB). SNR rises as $\\beta^2$ — about +6 dB per doubling of $\\beta$ — at the cost of bandwidth $2(\\beta+1)W$.',
+
   // §6.1.1 Baseband
   'an.bb.title': 'Baseband reference',
   'an.bb.note': 'Every AM scheme is compared to this system: ideal LPF, noise power $N_0 W$.',
