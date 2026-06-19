@@ -1,75 +1,74 @@
 export const analognoise: Record<string, string> = {
   'nav.analogNoise': 'Noise in Analog Systems',
-  'an.title': 'Analog Sistemlerde Gürültü',
+  'an.title': 'Noise in Analog Systems',
   'an.subtitle':
-    'Gürültünün AM/FM üzerine etkisi, eşik, pre/de-emphasis, link bütçesi — Proakis Bölüm 6',
+    'Effect of noise on AM/FM, threshold, pre/de-emphasis, and link budget — Proakis Ch 6',
 
   // Top-level tabs
-  'an.tab.ariaLabel': 'Bölüm 6 sekmeleri',
-  'an.tab.am': "AM'de Gürültü",
-  'an.tab.angle': 'Açı Mod.',
-  'an.tab.compare': 'Karşılaştırma',
-  'an.tab.link': 'İletim & Link',
+  'an.tab.ariaLabel': 'Chapter 6 tabs',
+  'an.tab.am': 'Noise in AM',
+  'an.tab.angle': 'Angle Mod.',
+  'an.tab.compare': 'Comparison',
+  'an.tab.link': 'Transmission & Link',
 
   // Generic
-  'an.gen.reset': 'Sıfırla',
+  'an.gen.reset': 'Reset',
   'an.gen.gamma': 'Baseband SNR $\\gamma=P_R/(N_0 W)$',
-  'an.gen.fm': 'Mesaj frekansı $f_m$',
+  'an.gen.fm': 'Message frequency $f_m$',
 
   // §6.1 AM noise tab
-  'an.am.sub.ariaLabel': 'AM gürültü alt sekmeleri',
+  'an.am.sub.ariaLabel': 'AM noise sub-tabs',
   'an.am.sub.baseband': 'Baseband',
   'an.am.sub.dsb': 'DSB-SC',
   'an.am.sub.ssb': 'SSB',
   'an.am.sub.am': 'Conventional AM',
-  'an.am.channel': 'Kanal senaryosu',
+  'an.am.channel': 'Channel scenario',
 
   // §6.1.1 Baseband
-  'an.bb.title': 'Baseband referans',
-  'an.bb.note':
-    'Tüm AM şemaları bu sisteme göre kıyaslanır: ideal LPF, gürültü gücü $N_0 W$.',
-  'an.bb.signal': 'Mesaj ve gürültülü çıkış',
-  'an.bb.trace.msg': 'Mesaj $m(t)$',
-  'an.bb.trace.noisy': 'Gürültülü çıkış',
+  'an.bb.title': 'Baseband reference',
+  'an.bb.note': 'Every AM scheme is compared to this system: ideal LPF, noise power $N_0 W$.',
+  'an.bb.signal': 'Message and noisy output',
+  'an.bb.trace.msg': 'Message $m(t)$',
+  'an.bb.trace.noisy': 'Noisy output',
   'an.bb.theory':
-    'Baseband sistemde çıkış SNR’si doğrudan $\\gamma=P_R/(N_0 W)$’dir. DSB-SC ve SSB tam olarak bunu verir; conventional AM bunun altında ($\\eta<1$), FM ise eşik üstünde bunun $3\\beta^2 P_{M_n}$ katıdır.',
+    'In a baseband system the output SNR is simply $\\gamma=P_R/(N_0 W)$. DSB-SC and SSB deliver exactly this; conventional AM falls below it ($\\eta<1$), while FM above threshold is $3\\beta^2 P_{M_n}$ times it.',
 
   // §6.1.2 DSB-SC
-  'an.dsb.title': 'DSB-SC demodülasyonu',
+  'an.dsb.title': 'DSB-SC demodulation',
   'an.dsb.note':
-    'Koherent demod: $r(t)$ ile $\\cos\\omega_c t$ çarpılıp LPF uygulanır; karesel gürültü $n_s$ atılır.',
-  'an.dsb.passband': 'Alınan işaret $r(t)=u(t)+n(t)$',
-  'an.dsb.output': 'Demodüle çıkış $y(t)$ ve mesaj $m(t)$',
-  'an.dsb.gain': 'Demod kazancı',
-  'an.dsb.bw': 'Bant genişliği',
-  'an.dsb.trace.r': 'Alınan $r(t)$',
-  'an.dsb.trace.u': 'Modüleli $u(t)$',
-  'an.dsb.trace.y': 'Çıkış $y(t)$',
-  'an.dsb.trace.m': 'Mesaj $m(t)$',
+    'Coherent demod: multiply $r(t)$ by $\\cos\\omega_c t$ and lowpass-filter; the quadrature noise $n_s$ is rejected.',
+  'an.dsb.passband': 'Received signal $r(t)=u(t)+n(t)$',
+  'an.dsb.output': 'Demodulated output $y(t)$ and message $m(t)$',
+  'an.dsb.gain': 'Demod gain',
+  'an.dsb.bw': 'Bandwidth',
+  'an.dsb.trace.r': 'Received $r(t)$',
+  'an.dsb.trace.u': 'Modulated $u(t)$',
+  'an.dsb.trace.y': 'Output $y(t)$',
+  'an.dsb.trace.m': 'Message $m(t)$',
   'an.dsb.theory':
-    'DSB-SC’de koherent demod sonrası çıkış SNR’si baseband ile aynıdır: $(S/N)_o=(S/N)_b$ (kazanç 0 dB). Karesel gürültü bileşeni $n_s$ atılır; bedeli $2W$ bant genişliğidir.',
+    'For DSB-SC, coherent demodulation gives an output SNR equal to baseband: $(S/N)_o=(S/N)_b$ (0 dB gain). The quadrature noise component $n_s$ is rejected; the cost is $2W$ bandwidth.',
 
   // §6.1.3 SSB
-  'an.ssb.title': 'SSB demodülasyonu',
+  'an.ssb.title': 'SSB demodulation',
   'an.ssb.note':
-    'Tek yan bant: $u(t)=A_c[m\\cos\\omega_c t \\mp \\hat m\\sin\\omega_c t]$. Koherent demod ile $m(t)$ geri alınır.',
+    'Single sideband: $u(t)=A_c[m\\cos\\omega_c t \\mp \\hat m\\sin\\omega_c t]$. Coherent demod recovers $m(t)$.',
   'an.ssb.theory':
-    'SSB çıkış SNR’si de baseband ile aynıdır ($(S/N)_o=(S/N)_b$), ancak yalnızca $W$ bant genişliği kullanır — DSB-SC’nin yarısı. Aynı SNR, yarı bant: bu yüzden bant-kritik linklerde tercih edilir.',
+    'SSB output SNR also equals baseband ($(S/N)_o=(S/N)_b$), but it uses only $W$ bandwidth — half of DSB-SC. Same SNR, half the band: preferred on bandwidth-critical links.',
 
   // §6.1.4 Conventional AM
   'an.cam.title': 'Conventional AM',
-  'an.cam.aIndex': 'Modülasyon indeksi $a$',
+  'an.cam.aIndex': 'Modulation index $a$',
   'an.cam.note':
-    'Zarf dedektörü: diyot + RC. Yüksek SNR’de çıkış senkron demod ile aynı, $(S/N)_o=\\eta\\,(S/N)_b$.',
-  'an.cam.envPanel': 'Alınan işaret ve zarf dedektörü',
-  'an.cam.msgPanel': 'DC bloklamadan sonra geri alınan mesaj',
+    'Envelope detector: diode + RC. At high SNR the output matches synchronous demod, $(S/N)_o=\\eta\\,(S/N)_b$.',
+  'an.cam.envPanel': 'Received signal and envelope detector',
+  'an.cam.msgPanel': 'Recovered message after DC block',
   'an.cam.threshold':
-    '⚠ Eşik etkisi: $\\gamma$ düşük olduğunda zarf dedektörü sinyali gürültüyle iç içe geçirir; çıkış bozulur.',
-  'an.cam.trace.refEnv': 'Gerçek zarf $A_c[1+a m_n]$',
-  'an.cam.trace.detEnv': 'Dedektör çıkışı',
-  'an.cam.trace.r': 'Alınan $r(t)$',
-  'an.cam.trace.refMsg': 'Mesaj $a\\,m_n(t)$',
-  'an.cam.trace.recovered': 'Geri alınan',
+    '⚠ Threshold effect: when $\\gamma$ is low the envelope detector intermixes signal and noise, so the output breaks down.',
+  'an.cam.trace.refEnv': 'True envelope $A_c[1+a m_n]$',
+  'an.cam.trace.detEnv': 'Detector output',
+  'an.cam.trace.r': 'Received $r(t)$',
+  'an.cam.trace.refMsg': 'Message $a\\,m_n(t)$',
+  'an.cam.trace.recovered': 'Recovered',
   'an.cam.theory':
-    'Conventional AM verimliliği $\\eta=a^2 P_{M_n}/(1+a^2 P_{M_n})<1$ olduğundan çıkış SNR’si daima baseband’in altındadır (taşıyıcı güç israfı). Basit zarf dedektörü yalnızca yüksek SNR’de çalışır; eşik altında ($\\gamma$ küçük) sinyal gürültüye gömülür (§6.1.4).',
+    'Conventional-AM efficiency $\\eta=a^2 P_{M_n}/(1+a^2 P_{M_n})<1$, so the output SNR is always below baseband (carrier power is wasted). The simple envelope detector works only at high SNR; below threshold ($\\gamma$ small) the signal is buried in noise (§6.1.4).',
 };
