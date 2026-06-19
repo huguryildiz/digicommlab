@@ -66,6 +66,13 @@ export const analognoise: Record<string, string> = {
   'an.cmp.theory':
     'SSB and DSB-SC match the baseline SNR; SSB does it in half the bandwidth. Conventional AM stays below the baseline ($\\eta<1$) but uses the simplest receiver. FM/PM climb as $\\beta^2$ above threshold, trading the wide Carson bandwidth $2(\\beta+1)W$ for noise immunity — FM is 3× PM at equal $\\beta$.',
 
+  // §6.4 Transmission & link tab
+  'an.link.sub.ariaLabel': 'Transmission & link sub-tabs',
+  'an.link.sub.thermal': 'Thermal noise',
+  'an.link.sub.figure': 'Noise figure',
+  'an.link.sub.pathloss': 'Path loss',
+  'an.link.sub.repeater': 'Repeaters',
+
   // §6.1.1 Baseband
   'an.bb.title': 'Baseband reference',
   'an.bb.note': 'Every AM scheme is compared to this system: ideal LPF, noise power $N_0 W$.',
