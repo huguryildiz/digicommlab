@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Panel, Formula, TheoryBox, HintText } from '@/components';
+import { Panel, Segmented, Formula, TheoryBox, HintText } from '@/components';
 import { t } from '@/i18n';
 import type { Derived, ProcessParams } from '../model';
 import {
@@ -9,6 +9,9 @@ import {
   PsdPanel,
   FilterMagPanel,
 } from '../panels';
+import { CrossCorrSection } from './process/CrossCorrSection';
+
+type Sub = 'single' | 'multiple';
 
 interface Props {
   params: ProcessParams;
@@ -24,6 +27,7 @@ interface Props {
  * and the LTI filter magnitude response (5.2.4). Shared process generator on the left.
  */
 export function ProcessTab({ params, set, resample, reset, d }: Props) {
+  const [sub, setSub] = useState<Sub>('single');
   const [resetKey, setResetKey] = useState(0);
   const handleReset = () => {
     reset();
@@ -35,6 +39,20 @@ export function ProcessTab({ params, set, resample, reset, d }: Props) {
 
   return (
     <div className="rp__section">
+      <div className="rp__subtabbar">
+        <Segmented<Sub>
+          ariaLabel={t('rp.process.sub.ariaLabel')}
+          value={sub}
+          options={[
+            { value: 'single', label: t('rp.process.sub.single') },
+            { value: 'multiple', label: t('rp.process.sub.multiple') },
+          ]}
+          onChange={setSub}
+        />
+      </div>
+
+      {sub === 'multiple' && <CrossCorrSection />}
+      {sub === 'single' && (
       <div className="module-layout">
         <aside className="rp__controls">
           <ProcessControls params={params} set={set} resample={resample} reset={handleReset} />
@@ -100,6 +118,7 @@ export function ProcessTab({ params, set, resample, reset, d }: Props) {
           </Panel>
         </div>
       </div>
+      )}
     </div>
   );
 }

@@ -235,3 +235,65 @@ export function theoreticalPsd(p: ProcessParams, freqs: Float64Array): Float64Ar
   }
   return s;
 }
+
+// ─── Multiple random processes (§5.2.3 / §5.2.6) ──────────────────────────────
+
+/**
+ * Two jointly-WSS random-phase sinusoids sharing the same random phase Θ with a fixed
+ * relative offset φ: X(t)=A cos(2πf₀t+Θ), Y(t)=A cos(2πf₀t+Θ+φ). Used to demonstrate
+ * cross-correlation (§5.2.3) and the power of a sum process (§5.2.6). φ in radians.
+ */
+export function genTwoSineEnsembles(
+  p: ProcessParams,
+  phi: number,
+): { x: Float64Array[]; y: Float64Array[] } {
+  const rng = makeRng(p.seed);
+  const x: Float64Array[] = [];
+  const y: Float64Array[] = [];
+  for (let m = 0; m < p.M; m++) {
+    const theta = 2 * Math.PI * rng(); // Θ ~ U[0,2π)
+    const xi = new Float64Array(p.N);
+    const yi = new Float64Array(p.N);
+    for (let n = 0; n < p.N; n++) {
+      const w = (2 * Math.PI * p.f0 * n) / p.fs;
+      xi[n] = p.amplitude * Math.cos(w + theta);
+      yi[n] = p.amplitude * Math.cos(w + theta + phi);
+    }
+    x.push(xi);
+    y.push(yi);
+  }
+  return { x, y };
+}
+
+/**
+ * Two-sided ensemble cross-correlation R_XY[k] = E[X(n)Y(n+k)] for k = −maxLag..maxLag
+ * (Eq. 5.2.9). Output index i maps to lag k = i − maxLag. Unbiased: each lag is averaged
+ * over the valid overlap so the amplitude is comparable across lags.
+ */
+export function crossCorrelation(
+  ensX: Float64Array[],
+  ensY: Float64Array[],
+  maxLag: number,
+): Float64Array {
+  const M = ensX.length;
+  const N = ensX[0].length;
+  const out = new Float64Array(2 * maxLag + 1);
+  for (let i = 0; i < out.length; i++) {
+    const k = i - maxLag;
+    let acc = 0;
+    let cnt = 0;
+    for (let m = 0; m < M; m++) {
+      const xs = ensX[m];
+      const ys = ensY[m];
+      for (let n = 0; n < N; n++) {
+        const nk = n + k;
+        if (nk >= 0 && nk < N) {
+          acc += xs[n] * ys[nk];
+          cnt++;
+        }
+      }
+    }
+    out[i] = cnt > 0 ? acc / cnt : 0;
+  }
+  return out;
+}

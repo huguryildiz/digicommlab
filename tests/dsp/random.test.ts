@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { makeRng, generateEnsemble, type ProcessParams } from '@/lib/dsp/random';
+import {
+  makeRng,
+  generateEnsemble,
+  genTwoSineEnsembles,
+  crossCorrelation,
+  type ProcessParams,
+} from '@/lib/dsp/random';
 
 describe('makeRng', () => {
   it('is deterministic for a given seed', () => {
@@ -171,5 +177,50 @@ describe('theoretical references', () => {
     const h = filterMagSq(p, Float64Array.from([5, 15]));
     expect(h[0]).toBe(1);
     expect(h[1]).toBe(0);
+  });
+});
+
+describe('multiple processes (§5.2.3 / §5.2.6)', () => {
+  const two: ProcessParams = {
+    kind: 'randphase-sine',
+    amplitude: 1,
+    f0: 5,
+    n0: 1,
+    fs: 200,
+    M: 300,
+    N: 256,
+    seed: 3,
+    filterKind: 'rc',
+    cutoff: 20,
+  };
+
+  it('cross-correlation at zero lag matches (A²/2)cosφ', () => {
+    const maxLag = 40;
+    for (const phiDeg of [0, 90, 180]) {
+      const phi = (phiDeg * Math.PI) / 180;
+      const { x, y } = genTwoSineEnsembles(two, phi);
+      const rxy = crossCorrelation(x, y, maxLag);
+      const atZero = rxy[maxLag]; // index maxLag → lag 0
+      const theory = (two.amplitude ** 2 / 2) * Math.cos(phi);
+      expect(atZero).toBeCloseTo(theory, 1);
+    }
+  });
+
+  it('φ = 90° makes the two sinusoids uncorrelated at zero lag', () => {
+    const { x, y } = genTwoSineEnsembles(two, Math.PI / 2);
+    const rxy = crossCorrelation(x, y, 20);
+    expect(Math.abs(rxy[20])).toBeLessThan(0.05);
+  });
+
+  it('sum-process power adds the cross term: P_Z = A²(1+cosφ)', () => {
+    const phi = Math.PI / 3; // 60°
+    const { x, y } = genTwoSineEnsembles(two, phi);
+    const z = x.map((xi, m) => xi.map((v, n) => v + y[m][n]));
+    // mean power of Z across the ensemble
+    let pz = 0;
+    for (const zi of z) for (const v of zi) pz += v * v;
+    pz /= z.length * z[0].length;
+    const theory = two.amplitude ** 2 * (1 + Math.cos(phi));
+    expect(pz).toBeCloseTo(theory, 1);
   });
 });

@@ -115,6 +115,29 @@ export const randomprocess: Record<string, string> = {
   'rp.psd.title': 'Power spectral density (§5.2.5)',
   'rp.filter.title': 'LTI filtering (§5.2.4)',
 
+  // ── §5.2 sub-tabs (single vs multiple processes) ─────────────────────────
+  'rp.process.sub.ariaLabel': '§5.2 view',
+  'rp.process.sub.single': 'Single process',
+  'rp.process.sub.multiple': 'Multiple processes',
+
+  // ── §5.2.3 / §5.2.6 cross-correlation & sum process ──────────────────────
+  'rp.cross.controls': 'Two sinusoids',
+  'rp.cross.phi': 'phase offset $\\varphi$',
+  'rp.cross.plotXY': 'Auto- & cross-correlation',
+  'rp.cross.plotSum': 'Sum process $Z=X+Y$',
+  'rp.cross.rxy0': 'cross $R_{XY}(0)$',
+  'rp.cross.pz': 'sum power $P_Z$',
+  'rp.cross.state': 'at $\\tau=0$',
+  'rp.cross.corr': 'correlated',
+  'rp.cross.uncorr': 'uncorrelated',
+  'rp.cross.trace.rx': '$R_X$',
+  'rp.cross.trace.ry': '$R_Y$',
+  'rp.cross.trace.rxy': '$R_{XY}$',
+  'rp.cross.trace.rz': '$R_Z$ (with cross term)',
+  'rp.cross.trace.sum': '$R_X+R_Y$ (no cross term)',
+  'rp.cross.theory':
+    'For jointly stationary processes the cross-correlation $R_{XY}(\\tau)=E[X(t)Y(t+\\tau)]$ measures their similarity. The sum $Z=X+Y$ has $R_Z=R_X+R_Y+R_{XY}+R_{YX}$, so $S_Z(f)=S_X(f)+S_Y(f)+2\\,\\mathrm{Re}[S_{XY}(f)]$; when the two are uncorrelated the cross term vanishes and powers simply add (Eq. 5.2.31).',
+
   // ── §5.3 section titles ──────────────────────────────────────────────────
   'rp.filtermag.title': 'Filter magnitude $|H(f)|^2$ (§5.2.4)',
   'rp.filterhist.title': 'Filtered Gaussian stays Gaussian (§5.3.3)',
