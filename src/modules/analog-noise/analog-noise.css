@@ -62,3 +62,45 @@
 .an__reset {
   margin-top: 8px;
 }
+
+/* ── Legend + Metric helpers ────────────────────────────────────────────── */
+.an__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+.an__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.an__legend-swatch {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  border: 1px solid;
+}
+.an__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+.an__metric-label {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+.an__metric-value {
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  color: var(--text);
+}
+.an__metric-unit {
+  color: var(--text-faint);
+  font-size: 0.8rem;
+}
