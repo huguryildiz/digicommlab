@@ -48,4 +48,11 @@ export const analognoise: Record<string, string> = {
   'an.dsb.trace.m': 'Mesaj $m(t)$',
   'an.dsb.theory':
     'DSB-SC’de koherent demod sonrası çıkış SNR’si baseband ile aynıdır: $(S/N)_o=(S/N)_b$ (kazanç 0 dB). Karesel gürültü bileşeni $n_s$ atılır; bedeli $2W$ bant genişliğidir.',
+
+  // §6.1.3 SSB
+  'an.ssb.title': 'SSB demodülasyonu',
+  'an.ssb.note':
+    'Tek yan bant: $u(t)=A_c[m\\cos\\omega_c t \\mp \\hat m\\sin\\omega_c t]$. Koherent demod ile $m(t)$ geri alınır.',
+  'an.ssb.theory':
+    'SSB çıkış SNR’si de baseband ile aynıdır ($(S/N)_o=(S/N)_b$), ancak yalnızca $W$ bant genişliği kullanır — DSB-SC’nin yarısı. Aynı SNR, yarı bant: bu yüzden bant-kritik linklerde tercih edilir.',
 };
