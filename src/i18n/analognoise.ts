@@ -88,6 +88,19 @@ export const analognoise: Record<string, string> = {
   'an.figure.theory':
     'A noise figure $F=1+T_e/T_0$ measures how much an amplifier degrades SNR. In a cascade the total figure $F=F_1+(F_2-1)/G_1+(F_3-1)/(G_1 G_2)+\\dots$ is dominated by the first stage, so the receiver front end should be a low-noise, high-gain amplifier (§6.4.2).',
 
+  // §6.4.3 Path loss
+  'an.pathloss.title': 'Transmission loss',
+  'an.pathloss.medium': 'Medium',
+  'an.pathloss.free': 'Free space',
+  'an.pathloss.cable': 'Cable',
+  'an.pathloss.dist': 'Distance $d$',
+  'an.pathloss.freq': 'Frequency $f$',
+  'an.pathloss.dbkm': 'Loss rate',
+  'an.pathloss.pt': 'Transmit power $P_T$',
+  'an.pathloss.plot': 'Loss $L$ vs distance',
+  'an.pathloss.theory':
+    'Free-space loss grows as the square of distance, $L=(4\\pi d/\\lambda)^2$ — about +6 dB per doubling of $d$ (and with frequency). A wireline cable instead loses a fixed dB per km, so its loss is linear in length. The received power is $P_R=P_T-L$ (§6.4.3).',
+
   // §6.1.1 Baseband
   'an.bb.title': 'Baseband reference',
   'an.bb.note': 'Every AM scheme is compared to this system: ideal LPF, noise power $N_0 W$.',
