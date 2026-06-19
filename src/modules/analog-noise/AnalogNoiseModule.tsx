@@ -1,16 +1,21 @@
-import { useMemo, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Segmented } from '@/components';
 import { t } from '@/i18n';
-import { DEFAULT_PARAMS, deriveAll, type ScenarioParams } from './model';
-import { ScenarioControls } from './panels';
-import { DemodOutputSection } from './sections/DemodOutputSection';
+import { AmNoiseTab } from './sections/AmNoiseTab';
+import { AngleNoiseTab } from './sections/AngleNoiseTab';
 import { ComparisonSection } from './sections/ComparisonSection';
-import { ThresholdEmphasisSection } from './sections/ThresholdEmphasisSection';
+import { LinkBudgetTab } from './sections/LinkBudgetTab';
 import './analog-noise.css';
 
+type Tab = 'am' | 'angle' | 'compare' | 'link';
+
 export function AnalogNoiseModule() {
-  const [params, setParams] = useState<ScenarioParams>(DEFAULT_PARAMS);
-  const set = (patch: Partial<ScenarioParams>) => setParams((p) => ({ ...p, ...patch }));
-  const d = useMemo(() => deriveAll(params), [params]);
+  const { tab: slug = '' } = useParams<{ tab?: string }>();
+  const navigate = useNavigate();
+  const tab: Tab = (['am', 'angle', 'compare', 'link'].includes(slug) ? slug : 'am') as Tab;
+
+  const onTab = (v: Tab) =>
+    navigate(v === 'am' ? '/analog-noise' : `/analog-noise/${v}`, { replace: true });
 
   return (
     <div className="an">
@@ -18,12 +23,23 @@ export function AnalogNoiseModule() {
         <h1>{t('an.title')}</h1>
         <p>{t('an.subtitle')}</p>
       </header>
-      <ScenarioControls params={params} set={set} />
-      <div className="an__grid">
-        <DemodOutputSection params={params} d={d} />
-        <ComparisonSection params={params} d={d} />
-        <ThresholdEmphasisSection params={params} d={d} />
+      <div className="an__tabbar">
+        <Segmented<Tab>
+          ariaLabel={t('an.tab.ariaLabel')}
+          value={tab}
+          options={[
+            { value: 'am', label: t('an.tab.am') },
+            { value: 'angle', label: t('an.tab.angle') },
+            { value: 'compare', label: t('an.tab.compare') },
+            { value: 'link', label: t('an.tab.link') },
+          ]}
+          onChange={onTab}
+        />
       </div>
+      {tab === 'am' && <AmNoiseTab />}
+      {tab === 'angle' && <AngleNoiseTab />}
+      {tab === 'compare' && <ComparisonSection />}
+      {tab === 'link' && <LinkBudgetTab />}
     </div>
   );
 }

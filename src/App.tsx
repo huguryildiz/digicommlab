@@ -99,6 +99,7 @@ function Shell() {
           <Route path="/analog-fm" element={<AnalogFmModule />} />
           <Route path="/analog-fm/:tab" element={<AnalogFmModule />} />
           <Route path="/analog-noise" element={<AnalogNoiseModule />} />
+          <Route path="/analog-noise/:tab" element={<AnalogNoiseModule />} />
           <Route path="/random-process" element={<RandomProcessModule />} />
           <Route path="/random-process/:tab" element={<RandomProcessModule />} />
           <Route path="/sampling" element={<AdcModule />} />

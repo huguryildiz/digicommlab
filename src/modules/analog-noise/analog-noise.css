@@ -29,3 +29,36 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Tabbed layout (Ch 6 rebuild) ───────────────────────────────────────── */
+.an__tabbar {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.an__subtabbar {
+  margin-bottom: 12px;
+}
+.an__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.an__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.an__content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.an__readouts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.an__reset {
+  margin-top: 8px;
+}
