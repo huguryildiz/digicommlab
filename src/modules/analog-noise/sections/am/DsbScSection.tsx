@@ -21,7 +21,7 @@ const PAD = { l: 44, r: 12, t: 12, b: 30 };
 const FC = 40; // teaching carrier (Hz), well below fs/2 with fs=400
 
 /** §6.1.2 — DSB-SC: real coherent demodulator chain. (S/N)_o = (S/N)_b. */
-export function DsbScSection({ gammaDb, fm, fs, N, W }: AmSectionProps) {
+export function DsbScSection({ gammaDb, fm, fs, N, W, channel }: AmSectionProps) {
   const [resetKey, setResetKey] = useState(0);
   const reset = () => setResetKey((k) => k + 1);
 
@@ -97,6 +97,7 @@ export function DsbScSection({ gammaDb, fm, fs, N, W }: AmSectionProps) {
     <div className="an__section">
       <div className="module-layout">
         <aside className="an__controls">
+          {channel}
           <Panel title={t('an.dsb.title')}>
             <p className="an__hint">
               <HintText text={t('an.dsb.note')} />

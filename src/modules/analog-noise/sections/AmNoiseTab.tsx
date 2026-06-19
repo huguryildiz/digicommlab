@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Panel, Slider, Segmented, HintText } from '@/components';
 import { t } from '@/i18n';
 import { BasebandSection } from './am/BasebandSection';
@@ -6,7 +6,15 @@ import { DsbScSection } from './am/DsbScSection';
 import { SsbSection } from './am/SsbSection';
 import { ConventionalAmSection } from './am/ConventionalAmSection';
 
-export type AmSectionProps = { gammaDb: number; W: number; fm: number; fs: number; N: number };
+export type AmSectionProps = {
+  gammaDb: number;
+  W: number;
+  fm: number;
+  fs: number;
+  N: number;
+  /** Shared channel-scenario panel, rendered at the top of each section's controls column. */
+  channel: ReactNode;
+};
 
 type Sub = 'baseband' | 'dsb' | 'ssb' | 'am';
 const DEFAULTS = { gammaDb: 20, fm: 4, W: 15000 };
@@ -17,7 +25,31 @@ export function AmNoiseTab() {
   const [sub, setSub] = useState<Sub>('baseband');
   const [gammaDb, setGammaDb] = useState(DEFAULTS.gammaDb);
   const [fm, setFm] = useState(DEFAULTS.fm);
-  const props: AmSectionProps = { gammaDb, W: DEFAULTS.W, fm, fs: FS, N };
+
+  const channel = (
+    <Panel title={t('an.am.channel')}>
+      <Slider
+        label={<HintText text={t('an.gen.gamma')} />}
+        min={0}
+        max={40}
+        step={1}
+        unit="dB"
+        value={gammaDb}
+        onChange={setGammaDb}
+      />
+      <Slider
+        label={<HintText text={t('an.gen.fm')} />}
+        min={1}
+        max={12}
+        step={1}
+        unit="Hz"
+        value={fm}
+        onChange={setFm}
+      />
+    </Panel>
+  );
+
+  const props: AmSectionProps = { gammaDb, W: DEFAULTS.W, fm, fs: FS, N, channel };
 
   return (
     <div className="an__section">
@@ -33,28 +65,6 @@ export function AmNoiseTab() {
           ]}
           onChange={setSub}
         />
-      </div>
-      <div className="an__channel">
-        <Panel title={t('an.am.channel')}>
-          <Slider
-            label={<HintText text={t('an.gen.gamma')} />}
-            min={0}
-            max={40}
-            step={1}
-            unit="dB"
-            value={gammaDb}
-            onChange={setGammaDb}
-          />
-          <Slider
-            label={<HintText text={t('an.gen.fm')} />}
-            min={1}
-            max={12}
-            step={1}
-            unit="Hz"
-            value={fm}
-            onChange={setFm}
-          />
-        </Panel>
       </div>
       {sub === 'baseband' && <BasebandSection {...props} />}
       {sub === 'dsb' && <DsbScSection {...props} />}

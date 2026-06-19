@@ -15,7 +15,7 @@ const PAD = { l: 44, r: 12, t: 12, b: 30 };
 const MSG_POWER = 0.5; // single-tone normalized message power P_Mn
 
 /** §6.1.1 — baseband reference: the SNR all AM schemes are compared against. */
-export function BasebandSection({ gammaDb, fm, fs, N }: AmSectionProps) {
+export function BasebandSection({ gammaDb, fm, fs, N, channel }: AmSectionProps) {
   const [resetKey, setResetKey] = useState(0);
   const reset = () => setResetKey((k) => k + 1);
 
@@ -63,6 +63,7 @@ export function BasebandSection({ gammaDb, fm, fs, N }: AmSectionProps) {
     <div className="an__section">
       <div className="module-layout">
         <aside className="an__controls">
+          {channel}
           <Panel title={t('an.bb.title')}>
             <p className="an__hint">
               <HintText text={t('an.bb.note')} />

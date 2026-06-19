@@ -21,7 +21,7 @@ const PAD = { l: 44, r: 12, t: 12, b: 30 };
 const FC = 40;
 
 /** §6.1.3 — SSB: same output SNR as DSB-SC/baseband but half the bandwidth. */
-export function SsbSection({ gammaDb, fm, fs, N, W }: AmSectionProps) {
+export function SsbSection({ gammaDb, fm, fs, N, W, channel }: AmSectionProps) {
   const [resetKey, setResetKey] = useState(0);
   const reset = () => setResetKey((k) => k + 1);
 
@@ -97,6 +97,7 @@ export function SsbSection({ gammaDb, fm, fs, N, W }: AmSectionProps) {
     <div className="an__section">
       <div className="module-layout">
         <aside className="an__controls">
+          {channel}
           <Panel title={t('an.ssb.title')}>
             <p className="an__hint">
               <HintText text={t('an.ssb.note')} />

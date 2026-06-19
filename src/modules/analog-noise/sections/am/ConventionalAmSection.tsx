@@ -16,7 +16,7 @@ const FC = 40;
 const A_DEFAULT = 0.5;
 
 /** §6.1.4 — conventional AM: envelope detection, efficiency η, threshold effect. */
-export function ConventionalAmSection({ gammaDb, fm, fs, N, W }: AmSectionProps) {
+export function ConventionalAmSection({ gammaDb, fm, fs, N, W, channel }: AmSectionProps) {
   const [a, setA] = useState(A_DEFAULT);
   const [resetKey, setResetKey] = useState(0);
   const reset = () => {
@@ -107,6 +107,7 @@ export function ConventionalAmSection({ gammaDb, fm, fs, N, W }: AmSectionProps)
     <div className="an__section">
       <div className="module-layout">
         <aside className="an__controls">
+          {channel}
           <Panel title={t('an.cam.title')}>
             <Slider
               label={<HintText text={t('an.cam.aIndex')} />}
