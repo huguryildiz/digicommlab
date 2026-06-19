@@ -7,7 +7,12 @@ import { useZoom } from '@/lib/plot/useZoom';
 import { t } from '@/i18n';
 import { amSignal } from '@/lib/dsp/analog';
 import { evalSignal } from '@/lib/dsp/signals';
-import { coherentDemod, quadratureNoise, outputSnrDb, demodulationGainDb } from '@/lib/dsp/analognoise';
+import {
+  coherentDemod,
+  quadratureNoise,
+  outputSnrDb,
+  demodulationGainDb,
+} from '@/lib/dsp/analognoise';
 import { makeRng } from '@/lib/dsp/random';
 import type { AmSectionProps } from '../AmNoiseTab';
 import { Legend, Metric } from '../shared';
@@ -56,14 +61,21 @@ export function SsbSection({ gammaDb, fm, fs, N, W }: AmSectionProps) {
     clampMax: t1,
   });
   const ampR = useMemo(() => Math.max(1, ...data.r.map(Math.abs)) * 1.1, [data]);
-  const ampY = useMemo(() => Math.max(1, ...data.y.map(Math.abs), ...data.m.map(Math.abs)) * 1.1, [data]);
+  const ampY = useMemo(
+    () => Math.max(1, ...data.y.map(Math.abs), ...data.m.map(Math.abs)) * 1.1,
+    [data],
+  );
 
   const drawPassband = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     const ax: Axes = {
       x: linScale([lo, hi], [PAD.l, w - PAD.r]),
       y: linScale([-ampR, ampR], [h - PAD.b, PAD.t]),
     };
-    drawAxes(ctx, ax, [lo, hi], { xLabel: '$t\\,(\\mathrm{s})$', yLabel: '$r(t)$', domainY: [-ampR, ampR] });
+    drawAxes(ctx, ax, [lo, hi], {
+      xLabel: '$t\\,(\\mathrm{s})$',
+      yLabel: '$r(t)$',
+      domainY: [-ampR, ampR],
+    });
     drawLine(ctx, ax, data.ts, data.r, CHART.orange, 1);
     drawLine(ctx, ax, data.ts, data.u, alpha(CHART.dim, 0.9), 1);
   };
@@ -72,7 +84,11 @@ export function SsbSection({ gammaDb, fm, fs, N, W }: AmSectionProps) {
       x: linScale([lo, hi], [PAD.l, w - PAD.r]),
       y: linScale([-ampY, ampY], [h - PAD.b, PAD.t]),
     };
-    drawAxes(ctx, ax, [lo, hi], { xLabel: '$t\\,(\\mathrm{s})$', yLabel: '$y(t)$', domainY: [-ampY, ampY] });
+    drawAxes(ctx, ax, [lo, hi], {
+      xLabel: '$t\\,(\\mathrm{s})$',
+      yLabel: '$y(t)$',
+      domainY: [-ampY, ampY],
+    });
     drawLine(ctx, ax, data.ts, data.y, CHART.orange, 1.2);
     drawLine(ctx, ax, data.ts, data.m, CHART.green, 2);
   };
@@ -100,13 +116,40 @@ export function SsbSection({ gammaDb, fm, fs, N, W }: AmSectionProps) {
             <Metric label={t('an.dsb.bw')} value="W" />
           </div>
           <Panel title={t('an.dsb.passband')}>
-            <Canvas height={180} draw={drawPassband} deps={[data, lo, hi, ampR]} ariaLabel="SSB received passband signal" onWheel={onWheel} onPan={onPan} />
-            <Legend entries={[{ color: CHART.orange, label: t('an.dsb.trace.r') }, { color: CHART.dim, label: t('an.dsb.trace.u') }]} />
+            <Canvas
+              height={180}
+              draw={drawPassband}
+              deps={[data, lo, hi, ampR]}
+              ariaLabel="SSB received passband signal"
+              onWheel={onWheel}
+              onPan={onPan}
+            />
+            <Legend
+              entries={[
+                { color: CHART.orange, label: t('an.dsb.trace.r') },
+                { color: CHART.dim, label: t('an.dsb.trace.u') },
+              ]}
+            />
           </Panel>
           <Panel title={t('an.dsb.output')}>
-            <Canvas height={200} draw={drawOutput} deps={[data, lo, hi, ampY]} ariaLabel="SSB coherently demodulated output" onWheel={onWheel} onPan={onPan} />
-            <Legend entries={[{ color: CHART.green, label: t('an.dsb.trace.m') }, { color: CHART.orange, label: t('an.dsb.trace.y') }]} />
-            <Formula tex="\left(\tfrac{S}{N}\right)_o=\left(\tfrac{S}{N}\right)_b,\quad B_{\mathrm{SSB}}=W=\tfrac12 B_{\mathrm{DSB}}" block />
+            <Canvas
+              height={200}
+              draw={drawOutput}
+              deps={[data, lo, hi, ampY]}
+              ariaLabel="SSB coherently demodulated output"
+              onWheel={onWheel}
+              onPan={onPan}
+            />
+            <Legend
+              entries={[
+                { color: CHART.green, label: t('an.dsb.trace.m') },
+                { color: CHART.orange, label: t('an.dsb.trace.y') },
+              ]}
+            />
+            <Formula
+              tex="\left(\tfrac{S}{N}\right)_o=\left(\tfrac{S}{N}\right)_b,\quad B_{\mathrm{SSB}}=W=\tfrac12 B_{\mathrm{DSB}}"
+              block
+            />
           </Panel>
           <TheoryBox>
             <HintText text={t('an.ssb.theory')} />

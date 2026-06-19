@@ -39,7 +39,12 @@ export function EmphasisSection() {
 
   const gainDb = emphasisSnrGainDb(f1, wKhz * 1000);
 
-  const [lo, hi, onWheel, , onPan] = useZoom(0, 20, { minSpan: 2, maxSpan: 20, clampMin: 0, clampMax: 20 });
+  const [lo, hi, onWheel, , onPan] = useZoom(0, 20, {
+    minSpan: 2,
+    maxSpan: 20,
+    clampMin: 0,
+    clampMax: 20,
+  });
 
   const drawFilter = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     const yMax = Math.max(...data.preDb) + 2;
@@ -48,7 +53,11 @@ export function EmphasisSection() {
       x: linScale([lo, hi], [PAD.l, w - PAD.r]),
       y: linScale([yMin, yMax], [h - PAD.b, PAD.t]),
     };
-    drawAxes(ctx, ax, [lo, hi], { xLabel: '$f\\,(\\mathrm{kHz})$', yLabel: '$|H(f)|\\,(\\mathrm{dB})$', domainY: [yMin, yMax] });
+    drawAxes(ctx, ax, [lo, hi], {
+      xLabel: '$f\\,(\\mathrm{kHz})$',
+      yLabel: '$|H(f)|\\,(\\mathrm{dB})$',
+      domainY: [yMin, yMax],
+    });
     drawLine(ctx, ax, data.fk, data.preDb, CHART.green, 2);
     drawLine(ctx, ax, data.fk, data.deDb, CHART.blue, 2);
     drawVLine(ctx, ax, f1 / 1000, yMin, yMax, CHART.dim, true);
@@ -58,7 +67,11 @@ export function EmphasisSection() {
       x: linScale([lo, hi], [PAD.l, w - PAD.r]),
       y: linScale([0, 1.1], [h - PAD.b, PAD.t]),
     };
-    drawAxes(ctx, ax, [lo, hi], { xLabel: '$f\\,(\\mathrm{kHz})$', yLabel: '$S_n(f)\\ (\\mathrm{norm.})$', domainY: [0, 1.1] });
+    drawAxes(ctx, ax, [lo, hi], {
+      xLabel: '$f\\,(\\mathrm{kHz})$',
+      yLabel: '$S_n(f)\\ (\\mathrm{norm.})$',
+      domainY: [0, 1.1],
+    });
     drawLine(ctx, ax, data.fk, data.beforeN, CHART.pink, 2);
     drawLine(ctx, ax, data.fk, data.afterN, CHART.blue, 2);
     drawVLine(ctx, ax, wKhz, 0, 1.1, CHART.dim, true);
@@ -69,8 +82,24 @@ export function EmphasisSection() {
       <div className="module-layout">
         <aside className="an__controls">
           <Panel title={t('an.emph.title')}>
-            <Slider label={<HintText text={t('an.emph.W')} />} min={5} max={20} step={1} unit="kHz" value={wKhz} onChange={setWKhz} />
-            <Slider label={<HintText text={t('an.emph.tau')} />} min={25} max={75} step={5} unit="µs" value={tauUs} onChange={setTauUs} />
+            <Slider
+              label={<HintText text={t('an.emph.W')} />}
+              min={5}
+              max={20}
+              step={1}
+              unit="kHz"
+              value={wKhz}
+              onChange={setWKhz}
+            />
+            <Slider
+              label={<HintText text={t('an.emph.tau')} />}
+              min={25}
+              max={75}
+              step={5}
+              unit="µs"
+              value={tauUs}
+              onChange={setTauUs}
+            />
             <div className="an__reset">
               <button type="button" onClick={reset}>
                 {t('an.gen.reset')}
@@ -85,13 +114,40 @@ export function EmphasisSection() {
             <Metric label={t('an.emph.gain')} value={gainDb.toFixed(1)} unit="dB" />
           </div>
           <Panel title={t('an.emph.filter')}>
-            <Canvas height={190} draw={drawFilter} deps={[data, f1, lo, hi]} ariaLabel="Pre- and de-emphasis magnitude responses" onWheel={onWheel} onPan={onPan} />
-            <Legend entries={[{ color: CHART.green, label: t('an.emph.trace.pre') }, { color: CHART.blue, label: t('an.emph.trace.de') }]} />
+            <Canvas
+              height={190}
+              draw={drawFilter}
+              deps={[data, f1, lo, hi]}
+              ariaLabel="Pre- and de-emphasis magnitude responses"
+              onWheel={onWheel}
+              onPan={onPan}
+            />
+            <Legend
+              entries={[
+                { color: CHART.green, label: t('an.emph.trace.pre') },
+                { color: CHART.blue, label: t('an.emph.trace.de') },
+              ]}
+            />
           </Panel>
           <Panel title={t('an.emph.noise')}>
-            <Canvas height={190} draw={drawNoise} deps={[data, wKhz, lo, hi]} ariaLabel="FM output noise PSD before and after de-emphasis" onWheel={onWheel} onPan={onPan} />
-            <Legend entries={[{ color: CHART.pink, label: t('an.emph.trace.before') }, { color: CHART.blue, label: t('an.emph.trace.after') }]} />
-            <Formula tex="H_d(f)=\dfrac{1}{1+j f/f_1},\quad \text{gain}=\dfrac{(W/f_1)^3}{3\,[\,W/f_1-\arctan(W/f_1)\,]}" block />
+            <Canvas
+              height={190}
+              draw={drawNoise}
+              deps={[data, wKhz, lo, hi]}
+              ariaLabel="FM output noise PSD before and after de-emphasis"
+              onWheel={onWheel}
+              onPan={onPan}
+            />
+            <Legend
+              entries={[
+                { color: CHART.pink, label: t('an.emph.trace.before') },
+                { color: CHART.blue, label: t('an.emph.trace.after') },
+              ]}
+            />
+            <Formula
+              tex="H_d(f)=\dfrac{1}{1+j f/f_1},\quad \text{gain}=\dfrac{(W/f_1)^3}{3\,[\,W/f_1-\arctan(W/f_1)\,]}"
+              block
+            />
           </Panel>
           <TheoryBox>
             <HintText text={t('an.emph.theory')} />

@@ -52,8 +52,24 @@ export function ThermalNoiseSection() {
       <div className="module-layout">
         <aside className="an__controls">
           <Panel title={t('an.thermal.title')}>
-            <Slider label={<HintText text={t('an.thermal.temp')} />} min={50} max={400} step={5} unit="K" value={tempK} onChange={setTempK} />
-            <Slider label={<HintText text={t('an.thermal.bw')} />} min={1} max={1000} step={1} unit="kHz" value={bKhz} onChange={setBKhz} />
+            <Slider
+              label={<HintText text={t('an.thermal.temp')} />}
+              min={50}
+              max={400}
+              step={5}
+              unit="K"
+              value={tempK}
+              onChange={setTempK}
+            />
+            <Slider
+              label={<HintText text={t('an.thermal.bw')} />}
+              min={1}
+              max={1000}
+              step={1}
+              unit="kHz"
+              value={bKhz}
+              onChange={setBKhz}
+            />
             <div className="an__reset">
               <button type="button" onClick={reset}>
                 {t('an.gen.reset')}
@@ -69,7 +85,14 @@ export function ThermalNoiseSection() {
             <Metric label={<HintText text="$T_0$ floor" />} value="4.0e-21" unit="W/Hz" />
           </div>
           <Panel title={t('an.thermal.plot')}>
-            <Canvas height={220} draw={draw} deps={[data, tempK, lo, hi]} ariaLabel="Thermal noise PSD versus temperature" onWheel={onWheel} onPan={onPan} />
+            <Canvas
+              height={220}
+              draw={draw}
+              deps={[data, tempK, lo, hi]}
+              ariaLabel="Thermal noise PSD versus temperature"
+              onWheel={onWheel}
+              onPan={onPan}
+            />
             <Formula tex="P_n=kTB,\quad N_0=kT,\quad k=1.38\times10^{-23}\,\mathrm{J/K}" block />
           </Panel>
           <TheoryBox>

@@ -29,7 +29,13 @@ export function ThresholdSection() {
   const data = useMemo(() => {
     const gamma = linspace(0, 40, 161);
     const curves = BETAS.map((b) => {
-      const gdb = demodulationGainDb('fm', { amIndex: 0, beta: b, messagePower: pmn, emphasis: false, W });
+      const gdb = demodulationGainDb('fm', {
+        amIndex: 0,
+        beta: b,
+        messagePower: pmn,
+        emphasis: false,
+        W,
+      });
       const thr = fmThresholdCnrDb(b);
       const y = gamma.map((g) => {
         const above = g + gdb;
@@ -44,7 +50,12 @@ export function ThresholdSection() {
 
   const sel = data.curves[betaSel - 1];
 
-  const [lo, hi, onWheel, , onPan] = useZoom(0, 40, { minSpan: 8, maxSpan: 40, clampMin: 0, clampMax: 40 });
+  const [lo, hi, onWheel, , onPan] = useZoom(0, 40, {
+    minSpan: 8,
+    maxSpan: 40,
+    clampMin: 0,
+    clampMax: 40,
+  });
 
   const draw = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     const ax: Axes = {
@@ -67,8 +78,22 @@ export function ThresholdSection() {
       <div className="module-layout">
         <aside className="an__controls">
           <Panel title={t('an.thr.title')}>
-            <Slider label={<HintText text={t('an.thr.betaSel')} />} min={1} max={5} step={1} value={betaSel} onChange={setBetaSel} />
-            <Slider label={<HintText text="$P_{M_n}$" />} min={0.1} max={1} step={0.05} value={pmn} onChange={setPmn} />
+            <Slider
+              label={<HintText text={t('an.thr.betaSel')} />}
+              min={1}
+              max={5}
+              step={1}
+              value={betaSel}
+              onChange={setBetaSel}
+            />
+            <Slider
+              label={<HintText text="$P_{M_n}$" />}
+              min={0.1}
+              max={1}
+              step={0.05}
+              value={pmn}
+              onChange={setPmn}
+            />
             <div className="an__reset">
               <button type="button" onClick={reset}>
                 {t('an.gen.reset')}
@@ -79,11 +104,22 @@ export function ThresholdSection() {
 
         <div className="an__content" key={resetKey}>
           <div className="an__readouts">
-            <Metric label={<HintText text={`$\\gamma_{th}(\\beta=${betaSel})$`} />} value={sel.thr.toFixed(1)} unit="dB" />
+            <Metric
+              label={<HintText text={`$\\gamma_{th}(\\beta=${betaSel})$`} />}
+              value={sel.thr.toFixed(1)}
+              unit="dB"
+            />
             <Metric label={t('an.thr.gain')} value={sel.gdb.toFixed(1)} unit="dB" />
           </div>
           <Panel title={t('an.thr.plot')}>
-            <Canvas height={250} draw={draw} deps={[data, betaSel, lo, hi]} ariaLabel="FM output SNR versus baseband SNR with threshold knee" onWheel={onWheel} onPan={onPan} />
+            <Canvas
+              height={250}
+              draw={draw}
+              deps={[data, betaSel, lo, hi]}
+              ariaLabel="FM output SNR versus baseband SNR with threshold knee"
+              onWheel={onWheel}
+              onPan={onPan}
+            />
             <Legend entries={BETAS.map((b, i) => ({ color: COLORS[i], label: `β=${b}` }))} />
             <Formula tex="\left(\tfrac{S}{N}\right)_{b,\mathrm{th}}=20(\beta+1)" block />
           </Panel>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Panel, Slider, Segmented, Formula, TheoryBox, HintText } from '@/components';
 import { Canvas } from '@/lib/plot/Canvas';
 import { linScale, drawAxes, drawLine, drawVLine, type Axes } from '@/lib/plot/draw';
@@ -30,18 +30,26 @@ export function PathLossSection() {
     setResetKey((k) => k + 1);
   };
 
-  const lossAt = (d: number) =>
-    medium === 'free' ? freeSpacePathLossDb(fMhz * 1e6, d * 1000) : cableLossDb(d, dbPerKm);
+  const lossAt = useCallback(
+    (d: number) =>
+      medium === 'free' ? freeSpacePathLossDb(fMhz * 1e6, d * 1000) : cableLossDb(d, dbPerKm),
+    [medium, fMhz, dbPerKm],
+  );
 
   const data = useMemo(() => {
     const ds = linspace(0.1, DMAX, 200);
     return { ds, loss: ds.map(lossAt) };
-  }, [medium, fMhz, dbPerKm]);
+  }, [lossAt]);
 
   const lossNow = lossAt(dKm);
   const prDbw = ptDbw - lossNow;
 
-  const [lo, hi, onWheel, , onPan] = useZoom(0, DMAX, { minSpan: 5, maxSpan: DMAX, clampMin: 0, clampMax: DMAX });
+  const [lo, hi, onWheel, , onPan] = useZoom(0, DMAX, {
+    minSpan: 5,
+    maxSpan: DMAX,
+    clampMin: 0,
+    clampMax: DMAX,
+  });
 
   const draw = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     const yMax = Math.max(...data.loss) * 1.05;
@@ -72,14 +80,46 @@ export function PathLossSection() {
               ]}
               onChange={setMedium}
             />
-            <Slider label={<HintText text={t('an.pathloss.dist')} />} min={0.1} max={DMAX} step={0.1} unit="km" value={dKm} onChange={setDKm} />
+            <Slider
+              label={<HintText text={t('an.pathloss.dist')} />}
+              min={0.1}
+              max={DMAX}
+              step={0.1}
+              unit="km"
+              value={dKm}
+              onChange={setDKm}
+            />
             {medium === 'free' && (
-              <Slider label={<HintText text={t('an.pathloss.freq')} />} min={1} max={3000} step={1} unit="MHz" value={fMhz} onChange={setFMhz} />
+              <Slider
+                label={<HintText text={t('an.pathloss.freq')} />}
+                min={1}
+                max={3000}
+                step={1}
+                unit="MHz"
+                value={fMhz}
+                onChange={setFMhz}
+              />
             )}
             {medium === 'cable' && (
-              <Slider label={<HintText text={t('an.pathloss.dbkm')} />} min={0.5} max={10} step={0.5} unit="dB/km" value={dbPerKm} onChange={setDbPerKm} />
+              <Slider
+                label={<HintText text={t('an.pathloss.dbkm')} />}
+                min={0.5}
+                max={10}
+                step={0.5}
+                unit="dB/km"
+                value={dbPerKm}
+                onChange={setDbPerKm}
+              />
             )}
-            <Slider label={<HintText text={t('an.pathloss.pt')} />} min={-30} max={60} step={1} unit="dBW" value={ptDbw} onChange={setPtDbw} />
+            <Slider
+              label={<HintText text={t('an.pathloss.pt')} />}
+              min={-30}
+              max={60}
+              step={1}
+              unit="dBW"
+              value={ptDbw}
+              onChange={setPtDbw}
+            />
             <div className="an__reset">
               <button type="button" onClick={reset}>
                 {t('an.gen.reset')}
@@ -94,8 +134,18 @@ export function PathLossSection() {
             <Metric label={<HintText text="$P_R$" />} value={prDbw.toFixed(1)} unit="dBW" />
           </div>
           <Panel title={t('an.pathloss.plot')}>
-            <Canvas height={230} draw={draw} deps={[data, dKm, lo, hi]} ariaLabel="Transmission loss versus distance" onWheel={onWheel} onPan={onPan} />
-            <Formula tex="L=\left(\dfrac{4\pi d}{\lambda}\right)^2,\quad L_{\mathrm{dB}}=20\log_{10}\dfrac{4\pi d}{\lambda},\quad \lambda=c/f" block />
+            <Canvas
+              height={230}
+              draw={draw}
+              deps={[data, dKm, lo, hi]}
+              ariaLabel="Transmission loss versus distance"
+              onWheel={onWheel}
+              onPan={onPan}
+            />
+            <Formula
+              tex="L=\left(\dfrac{4\pi d}{\lambda}\right)^2,\quad L_{\mathrm{dB}}=20\log_{10}\dfrac{4\pi d}{\lambda},\quad \lambda=c/f"
+              block
+            />
           </Panel>
           <TheoryBox>
             <HintText text={t('an.pathloss.theory')} />

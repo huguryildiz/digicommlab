@@ -37,7 +37,12 @@ export function ConventionalAmSection({ gammaDb, fm, fs, N, W }: AmSectionProps)
     }
     const pr = u.reduce((s, v) => s + v * v, 0) / N;
     const sigma = Math.sqrt(pr / 10 ** (gammaDb / 10));
-    const { nc, ns } = quadratureNoise(N, sigma, makeRng(Math.round(gammaDb * 7 + fm * 13 + a * 31 + 3)), 4);
+    const { nc, ns } = quadratureNoise(
+      N,
+      sigma,
+      makeRng(Math.round(gammaDb * 7 + fm * 13 + a * 31 + 3)),
+      4,
+    );
     const r = u.map(
       (v, i) =>
         v +
@@ -65,14 +70,21 @@ export function ConventionalAmSection({ gammaDb, fm, fs, N, W }: AmSectionProps)
     clampMax: t1,
   });
   const ampR = useMemo(() => Math.max(1.2, ...data.r.map(Math.abs)) * 1.1, [data]);
-  const ampM = useMemo(() => Math.max(0.2, ...data.recovered.map(Math.abs), ...data.refMsg.map(Math.abs)) * 1.2, [data]);
+  const ampM = useMemo(
+    () => Math.max(0.2, ...data.recovered.map(Math.abs), ...data.refMsg.map(Math.abs)) * 1.2,
+    [data],
+  );
 
   const drawEnv = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     const ax: Axes = {
       x: linScale([lo, hi], [PAD.l, w - PAD.r]),
       y: linScale([-ampR, ampR], [h - PAD.b, PAD.t]),
     };
-    drawAxes(ctx, ax, [lo, hi], { xLabel: '$t\\,(\\mathrm{s})$', yLabel: '$r(t)$', domainY: [-ampR, ampR] });
+    drawAxes(ctx, ax, [lo, hi], {
+      xLabel: '$t\\,(\\mathrm{s})$',
+      yLabel: '$r(t)$',
+      domainY: [-ampR, ampR],
+    });
     drawLine(ctx, ax, data.ts, data.r, alpha(CHART.orange, 0.55), 1);
     drawLine(ctx, ax, data.ts, data.refEnv, CHART.green, 2);
     drawLine(ctx, ax, data.ts, data.env, CHART.cyan, 1.6);
@@ -82,7 +94,11 @@ export function ConventionalAmSection({ gammaDb, fm, fs, N, W }: AmSectionProps)
       x: linScale([lo, hi], [PAD.l, w - PAD.r]),
       y: linScale([-ampM, ampM], [h - PAD.b, PAD.t]),
     };
-    drawAxes(ctx, ax, [lo, hi], { xLabel: '$t\\,(\\mathrm{s})$', yLabel: '$\\hat m(t)$', domainY: [-ampM, ampM] });
+    drawAxes(ctx, ax, [lo, hi], {
+      xLabel: '$t\\,(\\mathrm{s})$',
+      yLabel: '$\\hat m(t)$',
+      domainY: [-ampM, ampM],
+    });
     drawLine(ctx, ax, data.ts, data.recovered, CHART.orange, 1.3);
     drawLine(ctx, ax, data.ts, data.refMsg, CHART.green, 2);
   };
@@ -123,13 +139,41 @@ export function ConventionalAmSection({ gammaDb, fm, fs, N, W }: AmSectionProps)
             </p>
           )}
           <Panel title={t('an.cam.envPanel')}>
-            <Canvas height={200} draw={drawEnv} deps={[data, lo, hi, ampR]} ariaLabel="Conventional AM received signal and envelope detector output" onWheel={onWheel} onPan={onPan} />
-            <Legend entries={[{ color: CHART.green, label: t('an.cam.trace.refEnv') }, { color: CHART.cyan, label: t('an.cam.trace.detEnv') }, { color: CHART.orange, label: t('an.cam.trace.r') }]} />
+            <Canvas
+              height={200}
+              draw={drawEnv}
+              deps={[data, lo, hi, ampR]}
+              ariaLabel="Conventional AM received signal and envelope detector output"
+              onWheel={onWheel}
+              onPan={onPan}
+            />
+            <Legend
+              entries={[
+                { color: CHART.green, label: t('an.cam.trace.refEnv') },
+                { color: CHART.cyan, label: t('an.cam.trace.detEnv') },
+                { color: CHART.orange, label: t('an.cam.trace.r') },
+              ]}
+            />
           </Panel>
           <Panel title={t('an.cam.msgPanel')}>
-            <Canvas height={180} draw={drawMsg} deps={[data, lo, hi, ampM]} ariaLabel="Recovered message after DC block" onWheel={onWheel} onPan={onPan} />
-            <Legend entries={[{ color: CHART.green, label: t('an.cam.trace.refMsg') }, { color: CHART.orange, label: t('an.cam.trace.recovered') }]} />
-            <Formula tex="\eta=\dfrac{a^2 P_{M_n}}{1+a^2 P_{M_n}},\quad \left(\tfrac{S}{N}\right)_o=\eta\left(\tfrac{S}{N}\right)_b" block />
+            <Canvas
+              height={180}
+              draw={drawMsg}
+              deps={[data, lo, hi, ampM]}
+              ariaLabel="Recovered message after DC block"
+              onWheel={onWheel}
+              onPan={onPan}
+            />
+            <Legend
+              entries={[
+                { color: CHART.green, label: t('an.cam.trace.refMsg') },
+                { color: CHART.orange, label: t('an.cam.trace.recovered') },
+              ]}
+            />
+            <Formula
+              tex="\eta=\dfrac{a^2 P_{M_n}}{1+a^2 P_{M_n}},\quad \left(\tfrac{S}{N}\right)_o=\eta\left(\tfrac{S}{N}\right)_b"
+              block
+            />
           </Panel>
           <TheoryBox>
             <HintText text={t('an.cam.theory')} />

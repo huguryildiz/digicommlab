@@ -121,6 +121,9 @@
 }
 
 /* ── Comparison table ───────────────────────────────────────────────────── */
+.an__table-wrap {
+  overflow-x: auto;
+}
 .an__table {
   width: 100%;
   border-collapse: collapse;

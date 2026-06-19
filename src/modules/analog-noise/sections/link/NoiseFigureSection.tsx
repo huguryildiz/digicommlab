@@ -38,9 +38,27 @@ export function NoiseFigureSection() {
           <Panel title={t('an.figure.title')}>
             {stages.map((st, i) => (
               <div key={i} className="an__stage">
-                <span className="an__stage-label">{t('an.figure.stage')} {i + 1}</span>
-                <Slider label={<HintText text={`$G_${i + 1}$`} />} min={0} max={20} step={1} unit="dB" value={st.gainDb} onChange={(v) => setStage(i, 'gainDb', v)} />
-                <Slider label={<HintText text={`$F_${i + 1}$`} />} min={0} max={12} step={0.5} unit="dB" value={st.noiseFigureDb} onChange={(v) => setStage(i, 'noiseFigureDb', v)} />
+                <span className="an__stage-label">
+                  {t('an.figure.stage')} {i + 1}
+                </span>
+                <Slider
+                  label={<HintText text={`$G_${i + 1}$`} />}
+                  min={0}
+                  max={20}
+                  step={1}
+                  unit="dB"
+                  value={st.gainDb}
+                  onChange={(v) => setStage(i, 'gainDb', v)}
+                />
+                <Slider
+                  label={<HintText text={`$F_${i + 1}$`} />}
+                  min={0}
+                  max={12}
+                  step={0.5}
+                  unit="dB"
+                  value={st.noiseFigureDb}
+                  onChange={(v) => setStage(i, 'noiseFigureDb', v)}
+                />
               </div>
             ))}
             <div className="an__reset">
@@ -60,14 +78,23 @@ export function NoiseFigureSection() {
             <div style={{ maxWidth: 690 }}>
               {/* Coordinate space 420×90, BH=30. cy=45 → block 30–60; per-stage G/F label
                   at y=78 (18px below block, 12px above bottom edge 90). */}
-              <Schematic width={420} height={90} ariaLabel="Friis cascade of three amplifiers (§6.4.2)">
+              <Schematic
+                width={420}
+                height={90}
+                ariaLabel="Friis cascade of three amplifiers (§6.4.2)"
+              >
                 <MathLabel x={16} y={45} tex="P_i" w={24} />
                 <Wire points={[30, 45, 62, 45]} />
                 <Arrowhead x={64} y={45} />
                 {[66, 168, 270].map((x, i) => (
                   <g key={i}>
                     <Block x={x} y={30} w={82} h={30} label="" tex={`\\text{Amp }${i + 1}`} />
-                    <MathLabel x={x + 41} y={78} tex={`${stages[i].gainDb}/${stages[i].noiseFigureDb}\\,\\mathrm{dB}`} w={78} />
+                    <MathLabel
+                      x={x + 41}
+                      y={78}
+                      tex={`${stages[i].gainDb}/${stages[i].noiseFigureDb}\\,\\mathrm{dB}`}
+                      w={78}
+                    />
                   </g>
                 ))}
                 <Wire points={[148, 45, 166, 45]} />
@@ -81,10 +108,17 @@ export function NoiseFigureSection() {
             </div>
             <div className="an__readouts">
               {contrib.map((c, i) => (
-                <Metric key={i} label={`${t('an.figure.stage')} ${i + 1}`} value={`${((c / result.F) * 100).toFixed(0)}%`} />
+                <Metric
+                  key={i}
+                  label={`${t('an.figure.stage')} ${i + 1}`}
+                  value={`${((c / result.F) * 100).toFixed(0)}%`}
+                />
               ))}
             </div>
-            <Formula tex="F=F_1+\dfrac{F_2-1}{G_1}+\dfrac{F_3-1}{G_1 G_2}+\cdots,\quad T_e=T_0(F-1)" block />
+            <Formula
+              tex="F=F_1+\dfrac{F_2-1}{G_1}+\dfrac{F_3-1}{G_1 G_2}+\cdots,\quad T_e=T_0(F-1)"
+              block
+            />
           </Panel>
           <TheoryBox>
             <HintText text={t('an.figure.theory')} />

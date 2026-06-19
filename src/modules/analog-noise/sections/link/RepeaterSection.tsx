@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Panel, Slider, Formula, TheoryBox, HintText } from '@/components';
 import { Canvas } from '@/lib/plot/Canvas';
 import { linScale, drawAxes, drawLine, drawVLine, type Axes } from '@/lib/plot/draw';
@@ -29,24 +29,32 @@ export function RepeaterSection() {
     setResetKey((kk) => kk + 1);
   };
 
-  const snrOf = (segments: number) =>
-    repeaterChainSnrDb({
-      ptDbW: ptDbw,
-      perSegLossDb: lossDb,
-      faDb,
-      tempK: 290,
-      bandwidthHz: bKhz * 1000,
-      segments,
-    });
+  const snrOf = useCallback(
+    (segments: number) =>
+      repeaterChainSnrDb({
+        ptDbW: ptDbw,
+        perSegLossDb: lossDb,
+        faDb,
+        tempK: 290,
+        bandwidthHz: bKhz * 1000,
+        segments,
+      }),
+    [lossDb, faDb, ptDbw, bKhz],
+  );
 
   const data = useMemo(() => {
     const ks = Array.from({ length: KMAX }, (_, i) => i + 1);
     return { ks, snr: ks.map(snrOf) };
-  }, [lossDb, faDb, ptDbw, bKhz]);
+  }, [snrOf]);
 
   const snrNow = snrOf(k);
 
-  const [lo, hi, onWheel, , onPan] = useZoom(1, KMAX, { minSpan: 5, maxSpan: KMAX, clampMin: 1, clampMax: KMAX });
+  const [lo, hi, onWheel, , onPan] = useZoom(1, KMAX, {
+    minSpan: 5,
+    maxSpan: KMAX,
+    clampMin: 1,
+    clampMax: KMAX,
+  });
 
   const draw = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     const yMax = Math.max(...data.snr) + 3;
@@ -69,11 +77,50 @@ export function RepeaterSection() {
       <div className="module-layout">
         <aside className="an__controls">
           <Panel title={t('an.rep.title')}>
-            <Slider label={<HintText text="$K$" />} min={1} max={KMAX} step={1} value={k} onChange={setK} />
-            <Slider label={<HintText text={t('an.rep.loss')} />} min={5} max={40} step={1} unit="dB" value={lossDb} onChange={setLossDb} />
-            <Slider label={<HintText text={t('an.rep.fa')} />} min={0} max={12} step={0.5} unit="dB" value={faDb} onChange={setFaDb} />
-            <Slider label={<HintText text="$P_T$" />} min={-120} max={0} step={1} unit="dBW" value={ptDbw} onChange={setPtDbw} />
-            <Slider label={<HintText text="$B$" />} min={1} max={100} step={1} unit="kHz" value={bKhz} onChange={setBKhz} />
+            <Slider
+              label={<HintText text="$K$" />}
+              min={1}
+              max={KMAX}
+              step={1}
+              value={k}
+              onChange={setK}
+            />
+            <Slider
+              label={<HintText text={t('an.rep.loss')} />}
+              min={5}
+              max={40}
+              step={1}
+              unit="dB"
+              value={lossDb}
+              onChange={setLossDb}
+            />
+            <Slider
+              label={<HintText text={t('an.rep.fa')} />}
+              min={0}
+              max={12}
+              step={0.5}
+              unit="dB"
+              value={faDb}
+              onChange={setFaDb}
+            />
+            <Slider
+              label={<HintText text="$P_T$" />}
+              min={-120}
+              max={0}
+              step={1}
+              unit="dBW"
+              value={ptDbw}
+              onChange={setPtDbw}
+            />
+            <Slider
+              label={<HintText text="$B$" />}
+              min={1}
+              max={100}
+              step={1}
+              unit="kHz"
+              value={bKhz}
+              onChange={setBKhz}
+            />
             <div className="an__reset">
               <button type="button" onClick={reset}>
                 {t('an.gen.reset')}
@@ -90,7 +137,11 @@ export function RepeaterSection() {
             <div style={{ maxWidth: 760 }}>
               {/* Coordinate space 460×90, BH=30. cy=45 → blocks 30–60; "L" wire labels at
                   y=24 (6px above block top); ellipsis at cy. */}
-              <Schematic width={460} height={90} ariaLabel="Repeater chain Tx → amplifiers → Rx (§6.4.4)">
+              <Schematic
+                width={460}
+                height={90}
+                ariaLabel="Repeater chain Tx → amplifiers → Rx (§6.4.4)"
+              >
                 <Block x={8} y={30} w={54} h={30} label="" tex="\text{Tx}" />
                 <Wire points={[62, 45, 104, 45]} />
                 <MathLabel x={83} y={24} tex="L" w={20} />
@@ -110,7 +161,14 @@ export function RepeaterSection() {
                 <Block x={412} y={30} w={44} h={30} label="" tex="\text{Rx}" />
               </Schematic>
             </div>
-            <Canvas height={210} draw={draw} deps={[data, k, lo, hi]} ariaLabel="Output SNR versus number of repeater segments" onWheel={onWheel} onPan={onPan} />
+            <Canvas
+              height={210}
+              draw={draw}
+              deps={[data, k, lo, hi]}
+              ariaLabel="Output SNR versus number of repeater segments"
+              onWheel={onWheel}
+              onPan={onPan}
+            />
             <Formula tex="\left(\tfrac{S}{N}\right)_o=\dfrac{P_T}{K\,L\,F_a\,N_0 B}" block />
           </Panel>
           <TheoryBox>

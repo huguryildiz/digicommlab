@@ -37,7 +37,12 @@ export function NoisePsdSection() {
   const gain = demodulationGainDb(scheme, sp);
 
   const wk = W / 1000;
-  const [lo, hi, onWheel, , onPan] = useZoom(0, wk, { minSpan: wk / 8, maxSpan: wk, clampMin: 0, clampMax: wk });
+  const [lo, hi, onWheel, , onPan] = useZoom(0, wk, {
+    minSpan: wk / 8,
+    maxSpan: wk,
+    clampMin: 0,
+    clampMax: wk,
+  });
 
   const draw = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     const ax: Axes = {
@@ -66,8 +71,22 @@ export function NoisePsdSection() {
               ]}
               onChange={setScheme}
             />
-            <Slider label={<HintText text="$\\beta$" />} min={1} max={15} step={1} value={beta} onChange={setBeta} />
-            <Slider label={<HintText text="$P_{M_n}$" />} min={0.1} max={1} step={0.05} value={pmn} onChange={setPmn} />
+            <Slider
+              label={<HintText text="$\\beta$" />}
+              min={1}
+              max={15}
+              step={1}
+              value={beta}
+              onChange={setBeta}
+            />
+            <Slider
+              label={<HintText text="$P_{M_n}$" />}
+              min={0.1}
+              max={1}
+              step={0.05}
+              value={pmn}
+              onChange={setPmn}
+            />
             <div className="an__reset">
               <button type="button" onClick={reset}>
                 {t('an.gen.reset')}
@@ -81,9 +100,22 @@ export function NoisePsdSection() {
             <Metric label={<HintText text="$(S/N)_o$ gain" />} value={gain.toFixed(1)} unit="dB" />
           </div>
           <Panel title={t('an.psd.plot')}>
-            <Canvas height={230} draw={draw} deps={[data, lo, hi]} ariaLabel="Angle-modulation output noise PSD" onWheel={onWheel} onPan={onPan} />
-            <Formula tex="S_n(f)=\dfrac{N_0 f^2}{A_c^2}\;(\mathrm{FM}),\qquad \dfrac{N_0}{A_c^2}\;(\mathrm{PM})" block />
-            <Formula tex="\left(\tfrac{S}{N}\right)_o=3\beta^2 P_{M_n}\left(\tfrac{S}{N}\right)_b\;(\mathrm{FM}),\qquad \beta^2 P_{M_n}\left(\tfrac{S}{N}\right)_b\;(\mathrm{PM})" block />
+            <Canvas
+              height={230}
+              draw={draw}
+              deps={[data, lo, hi]}
+              ariaLabel="Angle-modulation output noise PSD"
+              onWheel={onWheel}
+              onPan={onPan}
+            />
+            <Formula
+              tex="S_n(f)=\dfrac{N_0 f^2}{A_c^2}\;(\mathrm{FM}),\qquad \dfrac{N_0}{A_c^2}\;(\mathrm{PM})"
+              block
+            />
+            <Formula
+              tex="\left(\tfrac{S}{N}\right)_o=3\beta^2 P_{M_n}\left(\tfrac{S}{N}\right)_b\;(\mathrm{FM}),\qquad \beta^2 P_{M_n}\left(\tfrac{S}{N}\right)_b\;(\mathrm{PM})"
+              block
+            />
           </Panel>
           <TheoryBox>
             <HintText text={t('an.psd.theory')} />

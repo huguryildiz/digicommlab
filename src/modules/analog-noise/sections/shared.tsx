@@ -22,15 +22,7 @@ export function Legend({
 }
 
 /** Compact labelled numeric readout for the readouts row. */
-export function Metric({
-  label,
-  value,
-  unit,
-}: {
-  label: ReactNode;
-  value: string;
-  unit?: string;
-}) {
+export function Metric({ label, value, unit }: { label: ReactNode; value: string; unit?: string }) {
   return (
     <div className="an__metric">
       <span className="an__metric-label">{label}</span>
