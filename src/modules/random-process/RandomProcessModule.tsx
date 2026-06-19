@@ -61,9 +61,7 @@ export function RandomProcessModule() {
       {tab === 'process' && (
         <ProcessTab params={params} set={set} resample={resample} reset={reset} d={d} />
       )}
-      {tab === 'gaussian' && (
-        <GaussianTab params={params} set={set} resample={resample} reset={reset} d={d} />
-      )}
+      {tab === 'gaussian' && <GaussianTab />}
     </div>
   );
 }

@@ -297,3 +297,27 @@ export function crossCorrelation(
   }
   return out;
 }
+
+// ─── White & thermal noise (§5.3.2) ───────────────────────────────────────────
+
+const PLANCK = 6.62607015e-34; // J·s
+const BOLTZMANN = 1.380649e-23; // J/K
+
+/**
+ * Quantum-mechanical thermal-noise PSD S_n(f) = hf / (e^{hf/kT} − 1) (Eq. 5.3.1).
+ * Flat at kT for f → 0 (the white approximation N_0/2 = kT/2) and rolls off only near
+ * f ≈ kT/h ≈ 2·10¹² Hz at room temperature — far beyond any communication band.
+ */
+export function thermalNoisePsd(f: number, T: number): number {
+  const x = (PLANCK * Math.abs(f)) / (BOLTZMANN * T);
+  if (x < 1e-9) return BOLTZMANN * T; // limit hf/(e^x−1) → kT as f → 0
+  return (PLANCK * Math.abs(f)) / (Math.exp(x) - 1);
+}
+
+/**
+ * Noise-equivalent bandwidth of a one-pole RC low-pass with 3-dB frequency f_c:
+ * B_neq = ∫|H(f)|² df / (2 H_max²) = π f_c / 2 = 1/(4RC) (Eq. 5.3.12, Example 5.3.4).
+ */
+export function rcNoiseEquivBandwidth(fc: number): number {
+  return (Math.PI * fc) / 2;
+}

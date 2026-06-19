@@ -4,6 +4,8 @@ import {
   generateEnsemble,
   genTwoSineEnsembles,
   crossCorrelation,
+  thermalNoisePsd,
+  rcNoiseEquivBandwidth,
   type ProcessParams,
 } from '@/lib/dsp/random';
 
@@ -222,5 +224,17 @@ describe('multiple processes (§5.2.3 / §5.2.6)', () => {
     pz /= z.length * z[0].length;
     const theory = two.amplitude ** 2 * (1 + Math.cos(phi));
     expect(pz).toBeCloseTo(theory, 1);
+  });
+});
+
+describe('white & thermal noise (§5.3.2)', () => {
+  it('thermal PSD is flat (≈ kT) at low f and rolls off at high f', () => {
+    const kT = 1.380649e-23 * 300;
+    expect(thermalNoisePsd(1e6, 300) / kT).toBeCloseTo(1, 5); // 1 MHz ≈ kT (relative)
+    expect(thermalNoisePsd(0, 300) / kT).toBeCloseTo(1, 9); // f → 0 limit
+    expect(thermalNoisePsd(1e13, 300)).toBeLessThan(kT * 0.9); // rolls off near 10 THz
+  });
+  it('RC noise-equivalent bandwidth is π f_c / 2', () => {
+    expect(rcNoiseEquivBandwidth(20)).toBeCloseTo((Math.PI * 20) / 2, 9);
   });
 });

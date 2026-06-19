@@ -4,7 +4,6 @@ import { Canvas } from '@/lib/plot/Canvas';
 import { linScale, drawAxes, drawLine, type Axes } from '@/lib/plot/draw';
 import { CHART, alpha } from '@/lib/plot/colors';
 import { useZoom } from '@/lib/plot/useZoom';
-import { generateEnsemble } from '@/lib/dsp/random';
 import { t } from '@/i18n';
 import type { Derived, ProcessParams, ProcessKind } from './model';
 
@@ -109,57 +108,6 @@ export function ProcessControls({ params, set, resample, reset }: ControlProps) 
           onChange={(v) => set({ cutoff: v })}
         />
       )}
-      <Slider
-        label={<HintText text={t('rp.gen.realizations')} />}
-        min={20}
-        max={600}
-        step={20}
-        value={params.M}
-        onChange={(v) => set({ M: v })}
-      />
-      <div className="rp__reset">
-        <button type="button" onClick={resample}>
-          {t('rp.gen.resample')}
-        </button>
-        <button type="button" onClick={reset}>
-          <RefreshIcon />
-          {t('rp.gen.reset')}
-        </button>
-      </div>
-    </Panel>
-  );
-}
-
-/** §5.3 filtered-noise generator — white-noise level + filter shape/cutoff. */
-export function GaussianControls({ params, set, resample, reset }: ControlProps) {
-  return (
-    <Panel title={t('rp.filt.title')}>
-      <Slider
-        label={<HintText text="$N_0$" />}
-        min={0.1}
-        max={4}
-        step={0.1}
-        value={params.n0}
-        onChange={(v) => set({ n0: v })}
-      />
-      <Select
-        label={t('rp.filt.kind')}
-        value={params.filterKind}
-        options={[
-          { value: 'rc', label: t('rp.filt.kind.rc') },
-          { value: 'ideal-lpf', label: t('rp.filt.kind.ideal') },
-        ]}
-        onChange={(v) => set({ filterKind: v as ProcessParams['filterKind'] })}
-      />
-      <Slider
-        label={<HintText text="$f_c$" />}
-        min={2}
-        max={80}
-        step={1}
-        unit="Hz"
-        value={params.cutoff}
-        onChange={(v) => set({ cutoff: v })}
-      />
       <Slider
         label={<HintText text={t('rp.gen.realizations')} />}
         min={20}
@@ -398,59 +346,6 @@ export function FilterMagPanel({ d, params }: { d: Derived; params: ProcessParam
         ariaLabel="Filter magnitude-squared response"
         onWheel={onWheel}
         onPan={onPan}
-      />
-    </div>
-  );
-}
-
-/** Histogram bins (counts) over [-lim, lim]. */
-function histogram(values: number[], bins: number, lim: number): number[] {
-  const h = new Array(bins).fill(0);
-  for (const v of values) {
-    const idx = Math.floor(((v + lim) / (2 * lim)) * bins);
-    if (idx >= 0 && idx < bins) h[idx]++;
-  }
-  return h;
-}
-
-/** §5.3.3 — output amplitude histogram: filtered Gaussian noise stays Gaussian. */
-export function FilterHistPanel({ params }: { params: ProcessParams }) {
-  const hist = useMemo(() => {
-    const colored = generateEnsemble({ ...params, kind: 'colored' });
-    const flat = colored.slice(0, 20).flatMap((x) => Array.from(x));
-    const lim = Math.max(0.1, ...flat.map(Math.abs));
-    const bins = 41;
-    const counts = histogram(flat, bins, lim);
-    const cmax = Math.max(1, ...counts);
-    return counts.map((c) => c / cmax);
-  }, [params]);
-
-  const draw = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
-    const ax: Axes = {
-      x: linScale([0, hist.length - 1], [PAD.l, w - PAD.r]),
-      y: linScale([0, 1.12], [h - PAD.b, PAD.t]),
-    };
-    drawAxes(ctx, ax, [0, hist.length - 1], {
-      xLabel: '$x$',
-      yLabel: '$f_Y(x)$ (norm.)',
-      domainY: [0, 1.12],
-      tickLabels: false,
-    });
-    for (let i = 0; i < hist.length; i++) {
-      const px = ax.x(i);
-      ctx.fillStyle = alpha(CHART.green, 0.5);
-      ctx.fillRect(px - 3, ax.y(hist[i]), 6, ax.y(0) - ax.y(hist[i]));
-    }
-  };
-
-  return (
-    <div>
-      <PlotTitle textKey="rp.filterhist.title" />
-      <Canvas
-        height={170}
-        draw={draw}
-        deps={[hist]}
-        ariaLabel="Output amplitude histogram (Gaussian)"
       />
     </div>
   );

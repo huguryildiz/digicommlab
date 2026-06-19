@@ -142,6 +142,58 @@ export const randomprocess: Record<string, string> = {
   'rp.filtermag.title': 'Filter magnitude $|H(f)|^2$ (§5.2.4)',
   'rp.filterhist.title': 'Filtered Gaussian stays Gaussian (§5.3.3)',
 
+  // ── §5.3 sub-tabs ────────────────────────────────────────────────────────
+  'rp.gauss.sub.ariaLabel': '§5.3 topic',
+  'rp.gauss.sub.gaussian': 'Gaussian process',
+  'rp.gauss.sub.white': 'White noise',
+  'rp.gauss.sub.filtered': 'Bandpass noise',
+
+  // ── §5.3.1 Gaussian processes ────────────────────────────────────────────
+  'rp.gp.controls': 'Band-limited process',
+  'rp.gp.s0': 'PSD level $S_0$',
+  'rp.gp.w': 'bandwidth $W$',
+  'rp.gp.psd': 'Flat PSD $S_X(f)$ — area is the power',
+  'rp.gp.slice': 'Slice distribution $X(t_0)\\sim\\mathcal{N}(0,\\sigma^2)$',
+  'rp.gp.sigma2': '$\\sigma^2=R_X(0)$',
+  'rp.gp.theory':
+    'A Gaussian process has a jointly Gaussian distribution at every set of time instants, so each slice $X(t_0)$ is a Gaussian RV with variance $\\sigma^2=R_X(0)=\\int_{-\\infty}^{\\infty}S_X(f)\\,df$ (Example 5.3.1). An LTI system maps a Gaussian process to another Gaussian process.',
+  'rp.gp.trace.pdf': 'Gaussian pdf',
+  'rp.gp.trace.hist': 'samples',
+
+  // ── §5.3.2 White / thermal noise ─────────────────────────────────────────
+  'rp.white.controls': 'White noise',
+  'rp.white.n0': '$N_0$',
+  'rp.white.temp': 'temperature $T$',
+  'rp.white.psd': 'Flat PSD $S_n(f)=N_0/2$',
+  'rp.white.acf': 'Autocorrelation $R_n(\\tau)=\\tfrac{N_0}{2}\\delta(\\tau)$',
+  'rp.white.samples': 'White-noise realization',
+  'rp.white.quantum': 'Quantum PSD vs the white approximation',
+  'rp.white.level': '$N_0/2$',
+  'rp.white.theory':
+    'A white process has a flat PSD $S_n(f)=N_0/2$ and therefore an impulsive autocorrelation $R_n(\\tau)=\\tfrac{N_0}{2}\\delta(\\tau)$ — samples at different times are uncorrelated. Thermal noise is a zero-mean, stationary, Gaussian, white process with $N_0/2=kT/2$ up to ≈10¹² Hz (Eq. 5.3.1).',
+  'rp.white.trace.quantum': '$S_n(f)=hf/(e^{hf/kT}-1)$',
+  'rp.white.trace.flat': 'white $kT$',
+
+  // ── §5.3.3 Filtered / bandpass noise ─────────────────────────────────────
+  'rp.bp.controls': 'Bandpass filter',
+  'rp.bp.filter': 'filter',
+  'rp.bp.filter.h1': '$H_1$: $|f-f_c|\\le W$',
+  'rp.bp.filter.h2': '$H_2$: $f_c\\le|f|\\le f_c{+}W$',
+  'rp.bp.fc': 'center $f_c$',
+  'rp.bp.w': 'bandwidth $W$',
+  'rp.bp.psd': 'White input, filter, and bandpass output $S_X(f)$',
+  'rp.bp.iq': 'Lowpass I/Q components $S_{X_c}=S_{X_s}$',
+  'rp.bp.power': 'power $P_X$',
+  'rp.bp.bneq': 'RC $B_\\mathrm{neq}$ & equivalent rectangle',
+  'rp.bp.bneqVal': '$B_\\mathrm{neq}$',
+  'rp.bp.rcfc': 'RC cutoff $f_c$',
+  'rp.bp.theory':
+    'Filtering white noise by a bandpass filter gives bandpass noise $X(t)=X_c(t)\\cos 2\\pi f_c t-X_s(t)\\sin 2\\pi f_c t$. The lowpass in-phase/quadrature components are zero-mean jointly Gaussian with the same power as $X(t)$; their PSD level is $N_0$ ($H_1$) or $N_0/2$ ($H_2$) over $|f|\\le W$. The noise-equivalent bandwidth $B_\\mathrm{neq}=\\int|H|^2df/(2H_\\mathrm{max}^2)$ replaces a real filter by an ideal brick-wall of the same output noise power.',
+  'rp.bp.trace.input': 'white $N_0/2$',
+  'rp.bp.trace.output': 'output $S_X$',
+  'rp.bp.trace.filter': '$|H(f)|^2$',
+  'rp.bp.trace.h2': '$|H(f)|^2$ (equiv. rect.)',
+
   // ── Readouts ─────────────────────────────────────────────────────────────
   'rp.readout.mean': 'ensemble mean $\\hat{m}_X$',
   'rp.readout.power': 'power $P_X = R_X(0)$',
