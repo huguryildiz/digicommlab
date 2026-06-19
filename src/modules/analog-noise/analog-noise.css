@@ -62,6 +62,12 @@
 .an__reset {
   margin-top: 8px;
 }
+.an__hint {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+  margin: 0;
+}
 
 /* ── Legend + Metric helpers ────────────────────────────────────────────── */
 .an__legend {
