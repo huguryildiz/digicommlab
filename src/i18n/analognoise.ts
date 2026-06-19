@@ -24,6 +24,12 @@ export const analognoise: Record<string, string> = {
   'an.am.sub.am': 'Conventional AM',
   'an.am.channel': 'Channel scenario',
 
+  // §6.2 Angle-modulation noise tab
+  'an.angle.sub.ariaLabel': 'Angle-modulation noise sub-tabs',
+  'an.angle.sub.psd': 'Noise PSD & SNR',
+  'an.angle.sub.threshold': 'Threshold',
+  'an.angle.sub.emphasis': 'Pre/De-emphasis',
+
   // §6.1.1 Baseband
   'an.bb.title': 'Baseband reference',
   'an.bb.note': 'Every AM scheme is compared to this system: ideal LPF, noise power $N_0 W$.',
