@@ -4,8 +4,9 @@
  * Gaussian & White Processes (§5.3). Tab selection is URL-addressable:
  * /random-process (Probability) and /random-process/:tab.
  *
- * Phase 1 ships the §5.2 process view and the §5.3 filtered-noise view at modern standard;
- * §5.1 and the dedicated §5.3.1/§5.3.2 sections arrive in later phases as placeholders.
+ * All three tabs are complete: §5.1 (Bayes, random variables + Q-function, functions of an RV,
+ * joint Gaussian, sums & CLT), §5.2 (single/multiple process views), and §5.3 (Gaussian, white,
+ * filtered noise). Every section also renders book-formula info cards (see `cards.tsx`).
  */
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -39,11 +40,6 @@ export function RandomProcessModule() {
 
   return (
     <div className="rp">
-      <header className="rp__head">
-        <h1>{t('rp.title')}</h1>
-        <p>{t('rp.subtitle')}</p>
-      </header>
-
       <div className="rp__tabbar">
         <Segmented<Tab>
           ariaLabel={t('rp.tab.ariaLabel')}

@@ -6,6 +6,7 @@ import { CHART, alpha } from '@/lib/plot/colors';
 import { t } from '@/i18n';
 import { rcNoiseEquivBandwidth } from '@/lib/dsp/random';
 import { PAD, PlotTitle, Metric, Legend } from '../prob/probShared';
+import { FormulaCards, FormulaCard, CardFormula } from '../../cards';
 
 type Filt = 'h1' | 'h2';
 const DEFAULTS = { n0: 1, fc: 30, w: 8, filt: 'h1' as Filt, rcFc: 12 };
@@ -210,6 +211,51 @@ export function FilteredNoiseSection() {
               <HintText text={t('rp.bp.theory')} />
             </TheoryBox>
           </Panel>
+
+          {/* Book formulas — §5.3.3 Filtered (bandpass) noise processes */}
+          <FormulaCards>
+            <FormulaCard
+              title={<>Bandpass-filtered noise (§5.3.3, Eqs. 5.3.5–5.3.6)</>}
+              accent="green"
+            >
+              <p>
+                White noise of level <Formula tex="N_0/2" /> through an ideal bandpass filter of
+                bandwidth <Formula tex="2W" /> has output power equal to the spectral level times
+                the total passband width:
+              </p>
+              <CardFormula tex="P_X=\int_{-\infty}^{\infty} S_X(f)\,df=\begin{cases}2N_0W & (H_1)\\[2pt] N_0W & (H_2)\end{cases}" />
+              <p>
+                <Formula tex="H_1" /> is symmetric about <Formula tex="\pm f_c" /> (both sidebands);{' '}
+                <Formula tex="H_2" /> passes a single sideband, halving the power.
+              </p>
+            </FormulaCard>
+
+            <FormulaCard title={<>In-phase &amp; quadrature components (§5.3.3)</>} accent="orange">
+              <p>
+                A bandpass noise process expands into lowpass in-phase and quadrature components,
+                exactly like a bandpass signal:
+              </p>
+              <CardFormula tex="X(t)=X_c(t)\cos 2\pi f_c t-X_s(t)\sin 2\pi f_c t" />
+              <p>
+                Both components share the same lowpass PSD, formed by folding the bandpass spectrum
+                down to baseband:
+              </p>
+              <CardFormula tex="S_{X_c}(f)=S_{X_s}(f)=S_X(f-f_c)+S_X(f+f_c)" />
+            </FormulaCard>
+
+            <FormulaCard title={<>Noise-equivalent bandwidth (§5.3.3, Eq. 5.3.12)</>} accent="blue">
+              <p>
+                <Formula tex="B_\mathrm{neq}" /> is the width of an ideal brick-wall filter (gain{' '}
+                <Formula tex="H_\mathrm{max}" />) passing the same noise power as the real filter:
+              </p>
+              <CardFormula tex="B_\mathrm{neq}=\frac{\int_{-\infty}^{\infty}|H(f)|^2\,df}{2H_\mathrm{max}^2}" />
+              <p>
+                The output noise power then becomes a one-line result (Eq. 5.3.13); for a
+                first-order RC lowpass it evaluates to:
+              </p>
+              <CardFormula tex="P_{n_o}=N_0\,B_\mathrm{neq}\,H_\mathrm{max}^2,\qquad B_\mathrm{neq}^{\,RC}=\frac{1}{4RC}=\frac{\pi f_c}{2}" />
+            </FormulaCard>
+          </FormulaCards>
         </div>
       </div>
     </div>

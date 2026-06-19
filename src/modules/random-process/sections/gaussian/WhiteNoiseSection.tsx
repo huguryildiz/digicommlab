@@ -7,6 +7,7 @@ import { useZoom } from '@/lib/plot/useZoom';
 import { t } from '@/i18n';
 import { generateEnsemble, thermalNoisePsd, type ProcessParams } from '@/lib/dsp/random';
 import { PAD, PlotTitle, Metric, Legend } from '../prob/probShared';
+import { FormulaCards, FormulaCard, CardFormula } from '../../cards';
 
 const FS = 200;
 const NS = 256;
@@ -204,6 +205,46 @@ export function WhiteNoiseSection() {
               <HintText text={t('rp.white.theory')} />
             </TheoryBox>
           </Panel>
+
+          {/* Book formulas — §5.3.2 White & thermal noise */}
+          <FormulaCards>
+            <FormulaCard title={<>White process (§5.3.2, Eq. 5.3.2)</>} accent="green">
+              <p>
+                A white process has a <strong>flat</strong> two-sided PSD; its autocorrelation is
+                therefore an impulse at the origin:
+              </p>
+              <CardFormula tex="S_n(f)=\frac{N_0}{2}\ \xleftrightarrow{\ \mathcal{F}\ }\ R_n(\tau)=\frac{N_0}{2}\,\delta(\tau)" />
+              <p>
+                Since <Formula tex="R_n(\tau)=0" /> for <Formula tex="\tau\neq0" />, samples taken
+                at distinct instants are uncorrelated (and, if Gaussian, independent).
+              </p>
+            </FormulaCard>
+
+            <FormulaCard title={<>Thermal noise (§5.3.2, Eq. 5.3.1)</>} accent="orange">
+              <p>
+                The exact (quantum) thermal-noise spectrum of a resistor peaks at{' '}
+                <Formula tex="kT/2" /> and rolls off only at extremely high frequencies:
+              </p>
+              <CardFormula tex="S_n(f)=\frac{\hbar f/2}{e^{\hbar f/kT}-1}" />
+              <p>
+                For all practical frequencies it is essentially flat, giving the white model with
+                level <Formula tex="N_0/2=kT/2" />, i.e.
+              </p>
+              <CardFormula tex="N_0=kT" />
+            </FormulaCard>
+
+            <FormulaCard title={<>Power is an idealization (§5.3.2)</>} accent="blue">
+              <p>
+                Integrating a flat spectrum over all frequencies diverges, so a truly white process
+                is not physically realizable:
+              </p>
+              <CardFormula tex="P_n=\int_{-\infty}^{\infty}\frac{N_0}{2}\,df\to\infty" />
+              <p>
+                Real noise is band-limited by the receiver; the white model is valid wherever the
+                spectrum is flat across the signal band.
+              </p>
+            </FormulaCard>
+          </FormulaCards>
         </div>
       </div>
     </div>

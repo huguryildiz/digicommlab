@@ -6,6 +6,7 @@ import { CHART, alpha } from '@/lib/plot/colors';
 import { t } from '@/i18n';
 import { correlatedSamples, covarianceEllipse } from '@/lib/dsp/probability';
 import { PAD, PlotTitle, Metric } from './probShared';
+import { FormulaCards, FormulaCard, CardFormula } from '../../cards';
 
 const DEFAULTS = { rho: 0.6, count: 1200 };
 const LIM = 3.6;
@@ -90,6 +91,49 @@ export function JointGaussianSection() {
               <HintText text={t('rp.joint.theory')} />
             </TheoryBox>
           </Panel>
+
+          {/* Book formulas — §5.1.5 Multiple random variables (correlation, covariance, ρ) */}
+          <FormulaCards>
+            <FormulaCard
+              title={<>Correlation &amp; covariance (§5.1.5, Eq. 5.1.21)</>}
+              accent="green"
+            >
+              <p>
+                The <strong>correlation</strong> is the joint-density average of the product; the{' '}
+                <strong>covariance</strong> removes the means:
+              </p>
+              <CardFormula tex="E[XY]=\iint xy\,f_{X,Y}(x,y)\,dx\,dy" />
+              <CardFormula tex="\operatorname{cov}(X,Y)=E\big[(X-m_X)(Y-m_Y)\big]=E[XY]-m_X m_Y" />
+              <p>
+                If <Formula tex="X" /> and <Formula tex="Y" /> are independent then{' '}
+                <Formula tex="E[XY]=E[X]E[Y]" /> and the covariance is zero.
+              </p>
+            </FormulaCard>
+
+            <FormulaCard title={<>Correlation coefficient (§5.1.5)</>} accent="orange">
+              <p>
+                Normalizing the covariance by the standard deviations gives a dimensionless measure
+                of linear dependence, bounded to <Formula tex="[-1,1]" />:
+              </p>
+              <CardFormula tex="\rho_{X,Y}=\frac{\operatorname{cov}(X,Y)}{\sigma_X\,\sigma_Y},\qquad |\rho_{X,Y}|\le 1" />
+              <p>
+                <Formula tex="\rho=0" /> means uncorrelated; <Formula tex="\rho=\pm1" /> means the
+                samples fall exactly on a line — the slope set by the slider here.
+              </p>
+            </FormulaCard>
+
+            <FormulaCard title={<>Jointly Gaussian density (§5.1.5)</>} accent="blue">
+              <p>
+                For zero-mean, unit-variance <Formula tex="X,Y" /> the bivariate normal density is
+                fully specified by <Formula tex="\rho" />:
+              </p>
+              <CardFormula tex="f_{X,Y}(x,y)=\frac{1}{2\pi\sqrt{1-\rho^2}}\,\exp\!\Big[-\frac{x^2-2\rho xy+y^2}{2(1-\rho^2)}\Big]" />
+              <p>
+                For jointly Gaussian variables, <strong>uncorrelated implies independent</strong> —
+                a property unique to the Gaussian case.
+              </p>
+            </FormulaCard>
+          </FormulaCards>
         </div>
       </div>
     </div>

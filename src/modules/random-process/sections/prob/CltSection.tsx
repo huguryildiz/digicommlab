@@ -12,6 +12,7 @@ import {
   densityHistogram,
 } from '@/lib/dsp/probability';
 import { PAD, PlotTitle, Metric, Legend } from './probShared';
+import { FormulaCards, FormulaCard, CardFormula } from '../../cards';
 
 const DEFAULTS = { base: 'uniform' as CltBase, n: 1 };
 const TRIALS = 4000;
@@ -115,6 +116,42 @@ export function CltSection() {
               <HintText text={t('rp.clt.theory')} />
             </TheoryBox>
           </Panel>
+
+          {/* Book formulas — §5.1.6 Sums of random variables and the CLT */}
+          <FormulaCards>
+            <FormulaCard title={<>Sum of random variables (§5.1.6)</>} accent="green">
+              <p>
+                Means always add; variances add only when the variables are uncorrelated (no
+                cross-covariance terms):
+              </p>
+              <CardFormula tex="Y=\sum_{i=1}^{n} X_i\ \Rightarrow\ m_Y=\sum_{i=1}^{n} m_i" />
+              <CardFormula tex="\sigma_Y^2=\sum_{i=1}^{n}\sigma_i^2\quad(\text{uncorrelated }X_i)" />
+            </FormulaCard>
+
+            <FormulaCard
+              title={<>Sample mean &amp; law of large numbers (§5.1.6)</>}
+              accent="orange"
+            >
+              <p>
+                For <Formula tex="n" /> i.i.d. terms the sample mean is unbiased and its spread
+                shrinks as <Formula tex="1/n" />, so it concentrates on <Formula tex="m" />:
+              </p>
+              <CardFormula tex="\bar{Y}=\frac1n\sum_{i=1}^{n} X_i,\quad E[\bar{Y}]=m,\quad \sigma_{\bar{Y}}^2=\frac{\sigma^2}{n}" />
+            </FormulaCard>
+
+            <FormulaCard title={<>Central limit theorem (§5.1.6)</>} accent="blue">
+              <p>
+                Whatever the base distribution, the normalized sum of many i.i.d. terms tends to the
+                standard normal:
+              </p>
+              <CardFormula tex="\frac{1}{\sigma\sqrt{n}}\sum_{i=1}^{n}(X_i-m)\ \xrightarrow{\ d\ }\ \mathcal{N}(0,1)" />
+              <p>
+                Equivalently the sample mean is asymptotically{' '}
+                <Formula tex="\bar{Y}\sim\mathcal{N}\!\big(m,\,\sigma^2/n\big)" /> — the bell curve
+                the histogram approaches as you raise <Formula tex="n" />.
+              </p>
+            </FormulaCard>
+          </FormulaCards>
         </div>
       </div>
     </div>

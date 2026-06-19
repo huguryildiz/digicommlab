@@ -30,6 +30,7 @@ import {
   qfuncBounds,
 } from '@/lib/dsp/probability';
 import { PAD, PlotTitle, Metric, Legend } from './probShared';
+import { FormulaCards, FormulaCard, CardFormula } from '../../cards';
 
 const DEFAULTS = {
   kind: 'gaussian' as DistKind,
@@ -393,6 +394,48 @@ export function RandomVariableSection() {
               <HintText text={t('rp.qfunc.theory')} />
             </TheoryBox>
           </Panel>
+
+          {/* Book formulas — §5.1.3 Random variables (CDF/PDF, Gaussian, Q-function) */}
+          <FormulaCards>
+            <FormulaCard title={<>CDF &amp; PDF (§5.1.3)</>} accent="green">
+              <p>
+                The <strong>cumulative distribution function</strong> is nondecreasing with{' '}
+                <Formula tex="F_X(-\infty)=0" /> and <Formula tex="F_X(\infty)=1" />:
+              </p>
+              <CardFormula tex="F_X(x)=P(X\le x)" />
+              <p>
+                Its derivative is the <strong>probability density function</strong>; the area under
+                it is unity and gives interval probabilities:
+              </p>
+              <CardFormula tex="f_X(x)=\frac{d}{dx}F_X(x),\quad P(a<X\le b)=\int_a^b f_X(x)\,dx" />
+            </FormulaCard>
+
+            <FormulaCard title={<>Gaussian variable (§5.1.3, Eq. 5.1.6)</>} accent="orange">
+              <p>
+                The normal density — the model for thermal noise — has mean <Formula tex="m" /> and
+                variance <Formula tex="\sigma^2" />, written{' '}
+                <Formula tex="X\sim\mathcal{N}(m,\sigma^2)" />:
+              </p>
+              <CardFormula tex="f_X(x)=\frac{1}{\sqrt{2\pi}\,\sigma}\,e^{-\frac{(x-m)^2}{2\sigma^2}}" />
+              <p>
+                Standardizing maps it to the unit normal <Formula tex="\mathcal{N}(0,1)" />:
+              </p>
+              <CardFormula tex="Z=\frac{X-m}{\sigma}\sim\mathcal{N}(0,1)" />
+            </FormulaCard>
+
+            <FormulaCard title={<>Q-function (§5.1.3, Eq. 5.1.7)</>} accent="blue">
+              <p>
+                The tail probability of the standard normal — the building block of error
+                probabilities throughout the book:
+              </p>
+              <CardFormula tex="Q(x)=P(X>x)=\int_x^{\infty}\frac{1}{\sqrt{2\pi}}\,e^{-t^2/2}\,dt" />
+              <p>
+                It is symmetric, <Formula tex="Q(-x)=1-Q(x)" />, and a general Gaussian tail follows
+                by standardizing: <Formula tex="P(X>a)=Q\!\big(\tfrac{a-m}{\sigma}\big)" />. Upper
+                bounds (Eqs. 5.1.8–5.1.9) are shown above.
+              </p>
+            </FormulaCard>
+          </FormulaCards>
         </div>
       </div>
     </div>

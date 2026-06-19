@@ -6,6 +6,7 @@ import { CHART, alpha } from '@/lib/plot/colors';
 import { t } from '@/i18n';
 import { binaryChannelBayes } from '@/lib/dsp/probability';
 import { PAD, PlotTitle, Metric, Legend } from './probShared';
+import { FormulaCards, FormulaCard, CardFormula } from '../../cards';
 
 const DEFAULTS = { p1: 0.5, eps0: 0.1, eps1: 0.1 };
 
@@ -128,6 +129,43 @@ export function BayesSection() {
               <HintText text={t('rp.bayes.theory')} />
             </TheoryBox>
           </Panel>
+
+          {/* Book formulas — §5.1.1 Conditional probability & §5.1.2 Bayes's rule */}
+          <FormulaCards>
+            <FormulaCard title={<>Conditional probability (§5.1.1)</>} accent="green">
+              <p>
+                The probability of event <Formula tex="E_1" /> given that <Formula tex="E_2" /> has
+                occurred, defined for <Formula tex="P(E_2)>0" />:
+              </p>
+              <CardFormula tex="P(E_1\mid E_2)=\frac{P(E_1\cap E_2)}{P(E_2)}" />
+              <p>
+                The events are <strong>independent</strong> when conditioning on one does not change
+                the other:
+              </p>
+              <CardFormula tex="P(E_1\cap E_2)=P(E_1)\,P(E_2)" />
+            </FormulaCard>
+
+            <FormulaCard title={<>Total probability (§5.1.1)</>} accent="orange">
+              <p>
+                For a partition <Formula tex="\{F_i\}" /> of the sample space (mutually exclusive,
+                exhaustive), any event <Formula tex="E" /> is reached through one of the{' '}
+                <Formula tex="F_i" />:
+              </p>
+              <CardFormula tex="P(E)=\sum_{i} P(E\mid F_i)\,P(F_i)" />
+            </FormulaCard>
+
+            <FormulaCard title={<>Bayes's rule (§5.1.2)</>} accent="blue">
+              <p>
+                Inverts the channel — recovers the posterior probability of the input{' '}
+                <Formula tex="X_i" /> from the observed output <Formula tex="Y" />:
+              </p>
+              <CardFormula tex="P(X_i\mid Y)=\frac{P(X_i)\,P(Y\mid X_i)}{\sum_{j} P(X_j)\,P(Y\mid X_j)}" />
+              <p>
+                The denominator is the total probability of <Formula tex="Y" />; here it normalizes
+                the binary-channel posteriors plotted above.
+              </p>
+            </FormulaCard>
+          </FormulaCards>
         </div>
       </div>
     </div>

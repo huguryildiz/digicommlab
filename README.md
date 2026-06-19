@@ -56,7 +56,7 @@ All twelve modules are live and follow book-chapter order.
 | 01 | **Signals & Spectra** | Basic signals, convolution, Fourier series synthesis, FFT & spectra, transform pairs, filter design (LTI · realizable · studio with audio), Hilbert transform, bandpass & I/Q representation |
 | 02 | **Amplitude Modulation (AM)** | DSB-SC, conventional AM, SSB & VSB, power/efficiency; power-law, switching, balanced & ring modulators with circuit block diagrams; envelope & coherent demodulators; FDM channel stacking & quadrature-carrier multiplexing (QAM); superheterodyne receiver frequency plan |
 | 03 | **Angle Modulation (FM/PM)** | FM & PM waveforms, instantaneous frequency, Bessel sidebands, Carson bandwidth, discriminator & PLL detection; FM radio (stereo multiplexing, pre/de-emphasis, superheterodyne) |
-| 04 | **Random Processes** | Ensembles, autocorrelation, ergodicity, PSD, LTI filtering of random processes |
+| 04 | **Random Processes** | Probability, Bayes & random variables (distributions, Q-function, functions of an RV, joint Gaussian, CLT); ensembles, autocorrelation, ergodicity, PSD (Wiener–Khinchin), cross-correlation & LTI filtering; Gaussian, white/thermal & bandpass-filtered noise (I/Q, noise-equivalent bandwidth) |
 | 05 | **Noise in Analog Systems** | Output SNR, demodulation gain, FM threshold, pre/de-emphasis for DSB-SC / AM / FM |
 | 06 | **Analog-to-Digital Conversion** | Nyquist theorem, aliasing, PCM coding, scalar quantization, SQNR, delta modulation, audio playback |
 | 07 | **Digital Modulation & Detection** | M-ary constellations (PSK/QAM/ASK/FSK), AWGN, ML/MAP decision regions, SER curves, optimum receiver |
@@ -117,8 +117,9 @@ A single visual language throughout: dark glassmorphism with restrained neon glo
 src/
 ├── modules/              One directory per communication-theory lab
 │   ├── fourier/          Signals, convolution, Fourier series/transform, filters, Hilbert, bandpass & I/Q
-│   ├── analog/           AM/FM/PM modulation and analog receivers
-│   ├── random-process/   Ensembles, autocorrelation, PSD, LTI filtering
+│   ├── analog-am/        AM (DSB-SC/SSB/VSB), modulators/demodulators, FDM/QAM, AM radio
+│   ├── analog-fm/        FM/PM, Bessel spectrum, discriminator/PLL, FM radio
+│   ├── random-process/   Probability & RVs, random processes/PSD, Gaussian & white noise
 │   ├── sampling-quantization/  Nyquist, aliasing, PCM, SQNR
 │   ├── deltamod/         Delta modulation and adaptive waveform coding
 │   ├── analog-noise/     Analog noise performance and SNR comparisons

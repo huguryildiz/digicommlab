@@ -6,6 +6,7 @@ import { CHART, alpha } from '@/lib/plot/colors';
 import { t } from '@/i18n';
 import { gaussianPdf, sampleDist, densityHistogram } from '@/lib/dsp/probability';
 import { PAD, PlotTitle, Metric, Legend } from '../prob/probShared';
+import { FormulaCards, FormulaCard, CardFormula } from '../../cards';
 
 const DEFAULTS = { s0: 1, w: 6 };
 const FMAX = 12;
@@ -132,6 +133,43 @@ export function GaussianProcessSection() {
               <HintText text={t('rp.gp.theory')} />
             </TheoryBox>
           </Panel>
+
+          {/* Book formulas — §5.3.1 Gaussian processes */}
+          <FormulaCards>
+            <FormulaCard title={<>Definition (§5.3.1)</>} accent="green">
+              <p>
+                A process is <strong>Gaussian</strong> if every finite set of samples is jointly
+                Gaussian — for all <Formula tex="n" /> and all <Formula tex="t_1,\dots,t_n" />:
+              </p>
+              <CardFormula tex="\big(X(t_1),\dots,X(t_n)\big)\ \text{is jointly Gaussian}" />
+              <p>
+                It is therefore completely specified by just its mean <Formula tex="m_X(t)" /> and
+                autocorrelation <Formula tex="R_X(t_1,t_2)" />.
+              </p>
+            </FormulaCard>
+
+            <FormulaCard title={<>Variance of a slice (§5.3.1)</>} accent="orange">
+              <p>
+                Each time slice <Formula tex="X(t)" /> is a Gaussian random variable whose variance
+                is the total power — here the area of the flat band <Formula tex="2S_0W" />:
+              </p>
+              <CardFormula tex="\sigma^2=R_X(0)=\int_{-\infty}^{\infty} S_X(f)\,df=2S_0W" />
+              <CardFormula tex="X(t)\sim\mathcal{N}\big(m_X,\,\sigma^2\big)" />
+            </FormulaCard>
+
+            <FormulaCard title={<>Key properties (§5.3.1)</>} accent="blue">
+              <p>
+                <strong>Property 1.</strong> A Gaussian process through an LTI system stays
+                Gaussian, and input and output are jointly Gaussian:
+              </p>
+              <CardFormula tex="X(t)\ \text{Gaussian}\ \xrightarrow{\ \text{LTI}\ }\ Y(t)\ \text{Gaussian}" />
+              <p>
+                <strong>Property 2.</strong> For jointly Gaussian processes, uncorrelated and
+                independent are equivalent:
+              </p>
+              <CardFormula tex="\text{uncorrelated}\iff\text{independent}" />
+            </FormulaCard>
+          </FormulaCards>
         </div>
       </div>
     </div>

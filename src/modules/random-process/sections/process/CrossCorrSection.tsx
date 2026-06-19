@@ -7,6 +7,7 @@ import { useZoom } from '@/lib/plot/useZoom';
 import { t } from '@/i18n';
 import { genTwoSineEnsembles, crossCorrelation, type ProcessParams } from '@/lib/dsp/random';
 import { PAD, PlotTitle, Metric, Legend } from '../prob/probShared';
+import { FormulaCards, FormulaCard, CardFormula } from '../../cards';
 
 const FS = 200;
 const NS = 256;
@@ -214,6 +215,41 @@ export function CrossCorrSection() {
               <HintText text={t('rp.cross.theory')} />
             </TheoryBox>
           </Panel>
+
+          {/* Book formulas — §5.2.3 cross-correlation & §5.2.6 sum process */}
+          <FormulaCards>
+            <FormulaCard title={<>Cross-correlation (§5.2.3, Eq. 5.2.9)</>} accent="green">
+              <p>
+                The cross-correlation measures the relationship between two processes at a relative
+                lag <Formula tex="\tau" />:
+              </p>
+              <CardFormula tex="R_{XY}(\tau)=E[X(t)\,Y(t+\tau)]" />
+              <p>
+                When <Formula tex="X" /> and <Formula tex="Y" /> are jointly stationary it satisfies
+                the symmetry (Eq. 5.2.11):
+              </p>
+              <CardFormula tex="R_{XY}(\tau)=R_{YX}(-\tau)" />
+            </FormulaCard>
+
+            <FormulaCard title={<>Cross-spectral density (§5.2.5, Eq. 5.2.26)</>} accent="orange">
+              <p>Its Fourier transform is the cross-spectral density:</p>
+              <CardFormula tex="S_{XY}(f)=\mathcal{F}\{R_{XY}(\tau)\}" />
+              <p>
+                When <Formula tex="Y" /> is the LTI-filtered version of <Formula tex="X" /> this
+                becomes (Eq. 5.2.27):
+              </p>
+              <CardFormula tex="S_{XY}(f)=S_X(f)\,H^{*}(f)" />
+            </FormulaCard>
+
+            <FormulaCard title={<>Sum process (§5.2.6)</>} accent="blue">
+              <p>
+                For <Formula tex="Z(t)=X(t)+Y(t)" /> the autocorrelation gains a cross term, so the
+                spectra do <em>not</em> simply add unless the processes are uncorrelated:
+              </p>
+              <CardFormula tex="R_Z(\tau)=R_X(\tau)+R_Y(\tau)+R_{XY}(\tau)+R_{YX}(\tau)" />
+              <CardFormula tex="S_Z(f)=S_X(f)+S_Y(f)+2\,\mathrm{Re}\{S_{XY}(f)\}" />
+            </FormulaCard>
+          </FormulaCards>
         </div>
       </div>
     </div>

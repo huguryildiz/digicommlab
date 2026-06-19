@@ -115,7 +115,9 @@ Fourier Transform & Spectra · Filters · Bandpass Signals) · **DSP:** `src/lib
 
 **Module:** `src/modules/random-process/` — 3-tab shell (Probability §5.1 · Random Processes
 §5.2 · Gaussian & White §5.3), URL `/random-process/:tab`. **DSP:** `src/lib/dsp/probability.ts`,
-`random.ts`, `awgn.ts`, `math.ts` (`qfunc`/`erf`).
+`random.ts`, `awgn.ts`, `math.ts` (`qfunc`/`erf`). **Formula cards:** every section renders
+book-formula info cards via the shared `cards.tsx` helper (`FormulaCards`/`FormulaCard`/`CardFormula`)
+styled by `.rp__card*` in `random-process.css`.
 
 | Subsection                                           | Page | Status | Repo mapping                                                             |
 | ---------------------------------------------------- | ---- | ------ | ------------------------------------------------------------------------ |
@@ -136,6 +138,12 @@ Fourier Transform & Spectra · Filters · Bandpass Signals) · **DSP:** `src/lib
 | 5.3.1 Gaussian Processes                             | 226  | ✅     | `gaussian/GaussianProcessSection.tsx` — σ²=∫S_X df                       |
 | 5.3.2 White Processes                                | 228  | ✅     | `gaussian/WhiteNoiseSection.tsx`, `random.ts` `thermalNoisePsd`          |
 | 5.3.3 Filtered Noise Processes (I/Q, B_neq)          | 230  | ✅     | `gaussian/FilteredNoiseSection.tsx`, `random.ts` `rcNoiseEquivBandwidth` |
+
+> **Formula cards:** each subsection above also renders titled, §/Eq.-cited book-formula info
+> cards below its plots (verified against this chapter) — e.g. Gaussian PDF (5.1.6), Q-function
+> (5.1.7), mean/autocorrelation (5.2.1–5.2.2), cross-correlation (5.2.9/5.2.11), Wiener–Khinchin
+> (5.2.15), power (5.2.18/5.2.21), LTI PSD (5.2.22/5.2.23), white & thermal noise (5.3.1–5.3.2),
+> and noise-equivalent bandwidth (5.3.12/5.3.13).
 
 ---
 

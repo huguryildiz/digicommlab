@@ -6,6 +6,7 @@ import { CHART } from '@/lib/plot/colors';
 import { t } from '@/i18n';
 import { gaussianPdf } from '@/lib/dsp/probability';
 import { PAD, PlotTitle, Metric, Legend } from './probShared';
+import { FormulaCards, FormulaCard, CardFormula } from '../../cards';
 
 const DEFAULTS = { a: 1.5, b: 1, m: 0, sigma: 1 };
 const GRID = 280;
@@ -120,6 +121,40 @@ export function FunctionsSection() {
               <HintText text={t('rp.func.theory')} />
             </TheoryBox>
           </Panel>
+
+          {/* Book formulas — §5.1.4 Functions of a random variable */}
+          <FormulaCards>
+            <FormulaCard title={<>Function of a random variable (§5.1.4)</>} accent="green">
+              <p>
+                For <Formula tex="Y=g(X)" />, sum the input density over every real root{' '}
+                <Formula tex="x_i" /> of <Formula tex="y=g(x)" />, weighting by the local slope:
+              </p>
+              <CardFormula tex="f_Y(y)=\sum_i \frac{f_X(x_i)}{|g'(x_i)|}" />
+              <p>
+                For the monotone linear map <Formula tex="g(x)=ax+b" /> there is a single root and
+                this reduces to a scaled, shifted copy:
+              </p>
+              <CardFormula tex="f_Y(y)=\frac{1}{|a|}\,f_X\!\Big(\frac{y-b}{a}\Big)" />
+            </FormulaCard>
+
+            <FormulaCard title={<>Expectation (§5.1.4)</>} accent="orange">
+              <p>
+                The mean (expected value) and, more generally, the expectation of any function are
+                density-weighted averages:
+              </p>
+              <CardFormula tex="E[X]=\int_{-\infty}^{\infty} x\,f_X(x)\,dx" />
+              <CardFormula tex="E[g(X)]=\int_{-\infty}^{\infty} g(x)\,f_X(x)\,dx" />
+            </FormulaCard>
+
+            <FormulaCard title={<>Linear transform &amp; variance (§5.1.4)</>} accent="blue">
+              <p>
+                The variance measures spread; for a Gaussian input a linear map stays Gaussian and
+                rescales the moments:
+              </p>
+              <CardFormula tex="\sigma_X^2=E\big[(X-m)^2\big]=E[X^2]-m^2" />
+              <CardFormula tex="Y=aX+b\ \Rightarrow\ m_Y=am+b,\quad \sigma_Y^2=a^2\sigma_X^2" />
+            </FormulaCard>
+          </FormulaCards>
         </div>
       </div>
     </div>
