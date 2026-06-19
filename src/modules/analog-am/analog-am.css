@@ -422,6 +422,15 @@
   margin-bottom: var(--space-2, 8px);
 }
 
+/* Caption note under a plot (e.g. Carson-band explainer): full-width, justified, dimmer. */
+.analog__hint--note {
+  margin: 10px 0 0;
+  text-align: justify;
+  font-size: 0.82em;
+  line-height: 1.45;
+  color: var(--text-faint);
+}
+
 /* §3.3 modulator view: keep schematics compact. */
 .analog__plots .schematic {
   max-height: 120px;

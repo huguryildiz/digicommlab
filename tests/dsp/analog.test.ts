@@ -11,6 +11,16 @@ import {
   carsonBandwidth,
   pllRecoverPhase,
   heterodyneMix,
+  fmModIndex,
+  maxFreqDeviation,
+  carsonBandwidthArbitrary,
+  nbfmSignal,
+  fmDiscriminate,
+  fmPllDemodulate,
+  preEmphasisMagDb,
+  deEmphasisMagDb,
+  emphasisSnrGainDb,
+  stereoMuxSpectrum,
 } from '@/lib/dsp/analog';
 
 describe('amEnvelope', () => {
@@ -267,6 +277,67 @@ describe('pllRecoverPhase', () => {
   });
 });
 
+describe('fmModIndex (Ch4 §4.2.1)', () => {
+  it('β = kf·Am/fm', () => {
+    expect(fmModIndex(1000, 1, 1000)).toBeCloseTo(1, 12);
+    expect(fmModIndex(5000, 1, 1000)).toBeCloseTo(5, 12);
+    expect(fmModIndex(2000, 2, 1000)).toBeCloseTo(4, 12);
+  });
+});
+
+describe('maxFreqDeviation (Ch4 §4.1)', () => {
+  it('FM: Δf = kf·Am', () => {
+    expect(maxFreqDeviation('fm', 5000, 1, 1000)).toBeCloseTo(5000, 12);
+  });
+  it('PM: Δf = kp·Am·fm', () => {
+    expect(maxFreqDeviation('pm', 3, 1, 1000)).toBeCloseTo(3000, 12);
+  });
+});
+
+describe('carsonBandwidthArbitrary (Ch4 §4.2.2, Eq. 4.2.19)', () => {
+  it('B = 2(β+1)W', () => {
+    expect(carsonBandwidthArbitrary(2, 5000)).toBeCloseTo(30000, 12);
+  });
+  it('reduces to the tone form carsonBandwidth(β, fm) when W = fm', () => {
+    const beta = 3;
+    const fm = 4000;
+    expect(carsonBandwidthArbitrary(beta, fm)).toBeCloseTo(carsonBandwidth(beta, fm), 9);
+  });
+});
+
+describe('nbfmSignal (Ch4 §4.1, Eq. 4.1.19)', () => {
+  const fc = 20000;
+  const fm = 1000;
+  const Ac = 1;
+  const msg = [{ freq: fm, amp: 1 }];
+
+  it('approximates exact FM closely for small β (kf = β·fm, β = 0.1)', () => {
+    const kf = 0.1 * fm; // β = 0.1
+    let maxErr = 0;
+    for (let i = 0; i < 200; i++) {
+      const t = i / (40 * fc);
+      const err = Math.abs(nbfmSignal(msg, fc, Ac, kf, t) - angleSignal('fm', msg, fc, Ac, kf, t));
+      maxErr = Math.max(maxErr, err);
+    }
+    expect(maxErr).toBeLessThan(0.02 * Ac);
+  });
+
+  it('diverges from exact FM at large β (β = 5)', () => {
+    const kf = 5 * fm; // β = 5
+    let maxErr = 0;
+    for (let i = 0; i < 400; i++) {
+      const t = i / (40 * fc);
+      const err = Math.abs(nbfmSignal(msg, fc, Ac, kf, t) - angleSignal('fm', msg, fc, Ac, kf, t));
+      maxErr = Math.max(maxErr, err);
+    }
+    expect(maxErr).toBeGreaterThan(0.5 * Ac);
+  });
+
+  it('with zero message reduces to the unmodulated carrier', () => {
+    expect(nbfmSignal([], fc, Ac, 1000, 0)).toBeCloseTo(Ac, 9);
+  });
+});
+
 describe('heterodyneMix', () => {
   it('returns if and image fields', () => {
     const input = new Array(100).fill(0);
@@ -283,5 +354,236 @@ describe('heterodyneMix', () => {
     const input = new Array(100).fill(0);
     const result = heterodyneMix(input, fLo, fIf, fs);
     expect(result.image).toBeCloseTo(fLo + fIf, 1);
+  });
+});
+
+describe('fmDiscriminate', () => {
+  // Build a clean FM signal: cos(2π·fc·t + 2π·kf·∫m dτ), m(t) = cos(2π·fm·t).
+  const fs = 100_000;
+  const fc = 5_000;
+  const fm = 500;
+  const beta = 3;
+  const kf = beta * fm;
+  const N = 4000;
+  const dt = 1 / fs;
+  const time = Array.from({ length: N }, (_, i) => i * dt);
+  const original = time.map((t) => Math.cos(2 * Math.PI * fm * t));
+  const integral: number[] = [0];
+  for (let i = 1; i < N; i++) {
+    integral.push(integral[i - 1] + 0.5 * (original[i] + original[i - 1]) * dt);
+  }
+  const fmSig = time.map((t, i) => Math.cos(2 * Math.PI * fc * t + 2 * Math.PI * kf * integral[i]));
+  const recovered = fmDiscriminate(fmSig, fs, fc);
+
+  it('returns same length as input', () => {
+    expect(recovered).toHaveLength(N);
+  });
+
+  it('output is zero-mean (DC removed)', () => {
+    const mean = recovered.reduce((a, b) => a + b, 0) / N;
+    expect(Math.abs(mean)).toBeLessThan(0.05);
+  });
+
+  it('recovers m(t) with Pearson correlation >= 0.95', () => {
+    const n = Math.min(original.length, recovered.length);
+    let sumXY = 0, sumX2 = 0, sumY2 = 0;
+    const peak = Math.max(...recovered.map(Math.abs));
+    const norm = recovered.map((v) => (peak > 1e-10 ? v / peak : v));
+    for (let i = 0; i < n; i++) {
+      sumXY += original[i] * norm[i];
+      sumX2 += original[i] ** 2;
+      sumY2 += norm[i] ** 2;
+    }
+    const r = sumXY / Math.sqrt(sumX2 * sumY2);
+    expect(r).toBeGreaterThanOrEqual(0.95);
+  });
+
+  it('does not throw on short or empty signals', () => {
+    expect(() => fmDiscriminate([1, -1], fs, fc)).not.toThrow();
+    expect(() => fmDiscriminate([], fs, fc)).not.toThrow();
+  });
+});
+
+// ── FM Radio Broadcasting DSP helpers (§4.4 / §6.2.2) ──────────────────────
+
+describe('preEmphasisMagDb', () => {
+  it('returns 0 dB at f=0', () => {
+    const [v] = preEmphasisMagDb([0], 2120);
+    expect(v).toBeCloseTo(0, 10);
+  });
+
+  it('returns +3 dB at f = f1 (corner frequency)', () => {
+    const f1 = 2120;
+    const [v] = preEmphasisMagDb([f1], f1);
+    expect(v).toBeCloseTo(10 * Math.log10(2), 5);
+  });
+
+  it('increases monotonically with frequency', () => {
+    const freqs = [100, 500, 1000, 2000, 5000, 10000, 15000];
+    const mags = preEmphasisMagDb(freqs, 2120);
+    for (let i = 1; i < mags.length; i++) {
+      expect(mags[i]).toBeGreaterThan(mags[i - 1]);
+    }
+  });
+});
+
+describe('deEmphasisMagDb', () => {
+  it('returns 0 dB at f=0', () => {
+    const [v] = deEmphasisMagDb([0], 2120);
+    expect(v).toBeCloseTo(0, 10);
+  });
+
+  it('returns −3 dB at f = f1', () => {
+    const f1 = 2120;
+    const [v] = deEmphasisMagDb([f1], f1);
+    expect(v).toBeCloseTo(-10 * Math.log10(2), 5);
+  });
+
+  it('is the exact negative of preEmphasisMagDb at every frequency', () => {
+    const f1 = 2120;
+    const freqs = [200, 1000, 2120, 5000, 15000];
+    const pe = preEmphasisMagDb(freqs, f1);
+    const de = deEmphasisMagDb(freqs, f1);
+    for (let i = 0; i < freqs.length; i++) {
+      expect(pe[i] + de[i]).toBeCloseTo(0, 10);
+    }
+  });
+});
+
+describe('emphasisSnrGainDb', () => {
+  it('returns positive gain for W > f1', () => {
+    expect(emphasisSnrGainDb(2120, 15000)).toBeGreaterThan(0);
+  });
+
+  it('returns ~13 dB at standard FM parameters (f1≈2.12 kHz, W=15 kHz)', () => {
+    const gain = emphasisSnrGainDb(2120, 15000);
+    // Typical value from Proakis §6.2.2 is approximately 13 dB
+    expect(gain).toBeGreaterThan(12);
+    expect(gain).toBeLessThan(15);
+  });
+
+  it('gain increases as f1 decreases (wider emphasis band)', () => {
+    const W = 15000;
+    const gain1 = emphasisSnrGainDb(3000, W);
+    const gain2 = emphasisSnrGainDb(1000, W);
+    expect(gain2).toBeGreaterThan(gain1);
+  });
+});
+
+describe('stereoMuxSpectrum', () => {
+  it('returns same length freq and mag arrays', () => {
+    const { freqs, mag } = stereoMuxSpectrum(0.8);
+    expect(freqs.length).toBe(mag.length);
+    expect(freqs.length).toBeGreaterThan(0);
+  });
+
+  it('mag values are all in [0, 1]', () => {
+    const { mag } = stereoMuxSpectrum(1.0);
+    for (const v of mag) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('has near-zero L-R component when balance = 0', () => {
+    const { freqs, mag } = stereoMuxSpectrum(0);
+    // At 38 kHz (L-R DSB-SC band) magnitude should be 0
+    const idx = freqs.findIndex((f) => Math.abs(f - 38000) < 200);
+    expect(mag[idx]).toBeCloseTo(0, 5);
+  });
+
+  it('has nonzero L-R component when balance ≠ 0', () => {
+    const { freqs, mag } = stereoMuxSpectrum(1.0);
+    const idx38 = freqs.findIndex((f) => Math.abs(f - 38000) < 200);
+    expect(mag[idx38]).toBeGreaterThan(0.1);
+  });
+
+  it('frequency axis starts at 0 and ends at 60 kHz', () => {
+    const { freqs } = stereoMuxSpectrum(0.5);
+    expect(freqs[0]).toBe(0);
+    expect(freqs[freqs.length - 1]).toBeCloseTo(60000, 0);
+  });
+});
+
+// ── fmPllDemodulate (§4.3.3, 2nd-order PLL) ────────────────────────────────
+// Test parameters are chosen so Bn >> fm (loop bandwidth well above message
+// frequency) — the PLL can only track FM when its noise bandwidth exceeds fm.
+describe('fmPllDemodulate', () => {
+  const fc = 10_000;
+  const fm = 300;    // message freq: Bn/fm = 10 → clean tracking
+  const beta = 1;    // modulation index: peak phase = 1 rad, within PLL linear range
+  const kf = beta * fm;  // = 300 Hz
+  const Bn = 3_000;  // loop bandwidth: 10× fm
+  const zeta = 0.707;
+  const fs = 20 * fc;  // = 200,000 Hz
+  const duration = 6 / fm;  // 6 message periods ≈ 20 ms
+  const N = Math.ceil(fs * duration);
+  const dt = duration / (N - 1);
+
+  // Build a simple FM signal: u(t) = cos(2π fc t + 2π kf ∫m(τ)dτ), m(t)=cos(2π fm t)
+  const time = Array.from({ length: N }, (_, i) => i * dt);
+  const original = time.map((tv) => Math.cos(2 * Math.PI * fm * tv));
+  const integral: number[] = new Array(N);
+  integral[0] = 0;
+  for (let i = 1; i < N; i++) {
+    integral[i] = integral[i - 1] + 0.5 * (original[i] + original[i - 1]) * dt;
+  }
+  const fmSig = integral.map((v, i) =>
+    Math.cos(2 * Math.PI * fc * time[i] + 2 * Math.PI * kf * v),
+  );
+
+  // Helper: Pearson correlation between two arrays over [start, end)
+  function correlation(a: number[], b: number[], start: number, end: number): number {
+    let num = 0, da = 0, db = 0;
+    for (let i = start; i < end; i++) {
+      num += a[i] * b[i];
+      da += a[i] * a[i];
+      db += b[i] * b[i];
+    }
+    return num / Math.sqrt(da * db + 1e-20);
+  }
+
+  it('returns arrays of the same length as input', () => {
+    const { recovered, phaseError } = fmPllDemodulate(fmSig, fc, fs, Bn, zeta);
+    expect(recovered).toHaveLength(N);
+    expect(phaseError).toHaveLength(N);
+  });
+
+  it('recovers a sine-wave message with correlation > 0.9 after transient', () => {
+    const { recovered } = fmPllDemodulate(fmSig, fc, fs, Bn, zeta);
+    const peak = Math.max(...recovered.map(Math.abs));
+    const norm = peak > 1e-10 ? recovered.map((v) => v / peak) : recovered;
+    // Skip first 25 % (transient), measure over remainder
+    const start = Math.floor(N * 0.25);
+    const corr = correlation(norm, original, start, N);
+    expect(corr).toBeGreaterThan(0.9);
+  });
+
+  it('outputs near-zero when no FM modulation (pure carrier)', () => {
+    const pureTone = time.map((tv) => Math.cos(2 * Math.PI * fc * tv));
+    const { recovered } = fmPllDemodulate(pureTone, fc, fs, Bn, zeta);
+    // After lock-on the VCO tracks the carrier, so control voltage → 0
+    const start = Math.floor(N * 0.4);
+    const rms = Math.sqrt(recovered.slice(start).reduce((s, v) => s + v * v, 0) / (N - start));
+    expect(rms).toBeLessThan(0.05);
+  });
+
+  it('phase error decays — RMS in second half < RMS in first half', () => {
+    const { phaseError } = fmPllDemodulate(fmSig, fc, fs, Bn, zeta);
+    const mid = Math.floor(N / 2);
+    const rmsFirst = Math.sqrt(phaseError.slice(0, mid).reduce((s, v) => s + v * v, 0) / mid);
+    const rmsSecond = Math.sqrt(phaseError.slice(mid).reduce((s, v) => s + v * v, 0) / (N - mid));
+    expect(rmsSecond).toBeLessThan(rmsFirst);
+  });
+
+  it('wider Bn converges faster — error RMS in first 15 % is smaller', () => {
+    // Narrow loop (Bn=200) converges in ~4/(ζωn) ≈ 4.5 ms >> first 15 %
+    // Wide loop (Bn=1500) converges in ~0.6 ms << first 15 %
+    const { phaseError: peLow } = fmPllDemodulate(fmSig, fc, fs, 200, zeta);
+    const { phaseError: peHigh } = fmPllDemodulate(fmSig, fc, fs, 1500, zeta);
+    const end = Math.floor(N * 0.15);
+    const rmsLow = Math.sqrt(peLow.slice(0, end).reduce((s, v) => s + v * v, 0) / end);
+    const rmsHigh = Math.sqrt(peHigh.slice(0, end).reduce((s, v) => s + v * v, 0) / end);
+    expect(rmsHigh).toBeLessThan(rmsLow);
   });
 });

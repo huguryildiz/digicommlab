@@ -93,14 +93,18 @@ Fourier Transform & Spectra · Filters · Bandpass Signals) · **DSP:** `src/lib
 
 ### Chapter 4 — Angle Modulation (pp. 161–189) ✅
 
-**Module:** `src/modules/analog-fm/` · **DSP:** `src/lib/dsp/analog.ts`
+**Module:** `src/modules/analog-fm/` (4 tabs: Representation · Spectrum · Modulators & Demodulators · FM Radio Broadcasting) ·
+**DSP:** `src/lib/dsp/analog.ts` · **Sections:** `src/modules/analog-fm/sections/`
 
 | Subsection | Page | Status | Repo mapping |
 |------------|------|--------|--------------|
-| 4.1 Representation of FM and PM Signals | 161 | ✅ | `analog.ts` — FM/PM |
-| 4.2 Spectral Characteristics of Angle-Mod. Signals | 166 | ✅ | `AnalogFmModule.tsx` spectrum panel |
-| 4.3 Implementation of Angle Mod./Demod. | 171 | ✅ | `analog.ts` — FM demod |
-| 4.4 FM Radio Broadcasting | 179 | ⬜ | — |
+| 4.1 Representation of FM and PM Signals | 161 | ✅ | `analog.ts` `fmModulate`/`pmModulate`; `RepresentationSection.tsx` — message m(t), angle-modulated signal u(t), instantaneous freq/phase (FM/PM toggle, NBFM overlay) |
+| 4.2 Spectral Characteristics of Angle-Mod. Signals | 166 | ✅ | `analog.ts` `besselJ`/`fmBessel`; `SpectrumSection.tsx` — Bessel line spectrum (tone), FFT spectrum (arbitrary msg), Carson bandwidth shading, Bessel curves J₀..J₇ vs β |
+| 4.3.1 FM Modulator Implementations | 171 | ✅ | `ModDemodSection.tsx` — Direct FM (VCO/varactor) and Armstrong indirect FM block diagrams (`FmModDemodDiagram.tsx`) |
+| 4.3.2 FM Demodulator / Discriminator | 175 | ✅ | `analog.ts` `fmDiscriminator`; `ModDemodSection.tsx` — discriminator simulation (differentiate → envelope → LPF) with AWGN noise toggle; block diagram in `FmDiscriminatorDiagram` |
+| 4.4.1 Superheterodyne FM Receiver | 179 | ✅ | `RadioSection.tsx` `SuperHetSubTab` — interactive block diagram, RF/LO/IF freq readouts (88–108 MHz band, f_IF = 10.7 MHz) |
+| 4.4.2 FM Stereo Multiplexing | 182 | ✅ | `analog.ts` `stereoMuxSpectrum`; `RadioSection.tsx` `StereoSubTab` — composite baseband spectrum (L+R / pilot / L−R DSB-SC), balance slider |
+| 4.4.3 Pre-emphasis and De-emphasis | 185 | ✅ | `analog.ts` `preEmphasisMagDb`/`deEmphasisMagDb`/`emphasisSnrGainDb`; `RadioSection.tsx` `PreEmphSubTab` — H_pe/H_de frequency response, SNR gain readout (τ = 75 µs standard) |
 
 ---
 
@@ -363,7 +367,7 @@ Fourier Transform & Spectra · Filters · Bandpass Signals) · **DSP:** `src/lib
 | 🔶 Partial | 1 / 15 | Chapter 9 (CPFSK exists, rest missing) |
 | ⬜ None | 1 / 15 | Chapter 1 (introduction, no simulation needed) |
 
-> Subsection breakdown: of ~95 subsections, **~68 ✅**, **~11 🔶**, **~16 ⬜**.
+> Subsection breakdown: of ~99 subsections, **~73 ✅**, **~11 🔶**, **~15 ⬜**.
 
 ---
 
