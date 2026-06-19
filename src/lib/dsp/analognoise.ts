@@ -83,3 +83,48 @@ export function measuredSnrDb(noisy: Float64Array, reference: Float64Array): num
   if (errP <= 0 || sigP <= 0) return 999; // 999 dB sentinel: perfect or empty reference
   return 10 * Math.log10(sigP / errP);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Real signal-chain helpers (for the §6.1 AM noise animations)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Centered moving-average lowpass over exactly `window` taps; preserves length
+ *  (edges average the available samples). */
+export function lowpassMA(x: number[], window: number): number[] {
+  const w = Math.max(1, Math.round(window));
+  const out = new Array<number>(x.length);
+  const lo = -Math.floor((w - 1) / 2); // exactly w taps: lo..hi spans w samples
+  const hi = Math.floor(w / 2);
+  for (let i = 0; i < x.length; i++) {
+    let s = 0;
+    let c = 0;
+    for (let k = lo; k <= hi; k++) {
+      const j = i + k;
+      if (j >= 0 && j < x.length) {
+        s += x[j];
+        c++;
+      }
+    }
+    out[i] = s / c;
+  }
+  return out;
+}
+
+/** Coherent (synchronous) demodulator: y(t) = LPF{ 2·r(t)·cos(2π f_c t) }. Proakis §6.1.2. */
+export function coherentDemod(rx: number[], fc: number, fs: number, lpWindow: number): number[] {
+  const mixed = rx.map((v, i) => 2 * v * Math.cos((2 * Math.PI * fc * i) / fs));
+  return lowpassMA(mixed, lpWindow);
+}
+
+/** In-phase/quadrature bandpass-noise components n_c, n_s (Gaussian, optionally smoothed to W). */
+export function quadratureNoise(
+  n: number,
+  sigma: number,
+  rng: () => number,
+  smooth = 1,
+): { nc: number[]; ns: number[] } {
+  const raw = (): number[] => Array.from({ length: n }, () => sigma * gaussian(rng));
+  const nc = smooth > 1 ? lowpassMA(raw(), smooth) : raw();
+  const ns = smooth > 1 ? lowpassMA(raw(), smooth) : raw();
+  return { nc, ns };
+}

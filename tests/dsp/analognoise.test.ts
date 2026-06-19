@@ -6,6 +6,9 @@ import {
   addNoiseAtSnr,
   measuredSnrDb,
   DEEMPHASIS_F1_DEFAULT,
+  lowpassMA,
+  coherentDemod,
+  quadratureNoise,
 } from '@/lib/dsp/analognoise';
 import { emphasisSnrGainDb } from '@/lib/dsp/analog';
 import { makeRng } from '@/lib/dsp/random';
@@ -92,5 +95,35 @@ describe('addNoiseAtSnr / measuredSnrDb', () => {
     expect(measuredSnrDb(addNoiseAtSnr(ref, 20, rng), ref)).toBeGreaterThan(
       measuredSnrDb(addNoiseAtSnr(ref, 5, rng), ref),
     );
+  });
+});
+
+describe('signal-chain helpers', () => {
+  it('lowpassMA smooths and preserves length & DC', () => {
+    const x = [0, 2, 0, 2, 0, 2, 0, 2];
+    const y = lowpassMA(x, 4);
+    expect(y.length).toBe(x.length);
+    expect(y[5]).toBeCloseTo(1, 1); // averages toward the mean 1
+  });
+
+  it('coherentDemod recovers the baseband message from A·m·cos', () => {
+    const fs = 2000,
+      fc = 200,
+      fm = 5;
+    const rx = Array.from({ length: 1024 }, (_, i) => {
+      const time = i / fs;
+      return Math.cos(2 * Math.PI * fm * time) * Math.cos(2 * Math.PI * fc * time);
+    });
+    const y = coherentDemod(rx, fc, fs, 32);
+    expect(Math.abs(y[512])).toBeLessThanOrEqual(1.2); // ~cos(2π fm t), bounded by ~1
+    expect(Math.max(...y.slice(100, 900))).toBeGreaterThan(0.6); // recovers amplitude ~1
+  });
+
+  it('quadratureNoise returns two equal-length zero-mean sequences', () => {
+    const { nc, ns } = quadratureNoise(2048, 1, makeRng(11));
+    expect(nc.length).toBe(2048);
+    expect(ns.length).toBe(2048);
+    const mean = nc.reduce((a, b) => a + b, 0) / nc.length;
+    expect(Math.abs(mean)).toBeLessThan(0.1);
   });
 });
