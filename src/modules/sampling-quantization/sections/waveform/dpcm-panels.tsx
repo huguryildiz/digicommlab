@@ -1,5 +1,6 @@
 import { Canvas } from '@/lib/plot/Canvas';
 import { linScale, drawAxes, drawLine, type Axes } from '@/lib/plot/draw';
+import { useZoom } from '@/lib/plot/useZoom';
 import type { DpcmResult } from '@/lib/dsp/dpcm';
 
 const COL = {
@@ -8,7 +9,8 @@ const COL = {
   recon: '#7c8cff', // reconstruction
 };
 
-const PAD = { l: 8, r: 8, t: 10, b: 10 };
+// Room for tick labels + LaTeX axis labels.
+const PAD = { l: 48, r: 18, t: 16, b: 40 };
 
 function axesFor(w: number, h: number, domX: [number, number], domY: [number, number]): Axes {
   return { x: linScale(domX, [PAD.l, w - PAD.r]), y: linScale(domY, [h - PAD.b, PAD.t]) };
@@ -20,14 +22,18 @@ export function DpcmTracePanel({ enc, signal }: { enc: DpcmResult; signal: numbe
   const all = [...signal, ...enc.rawError, ...enc.reconstructed].map(Math.abs);
   const yMax = (all.length ? Math.max(...all) : 1) * 1.1 || 1;
   const xMax = Math.max(signal.length - 1, 1);
+  // Signal length is fixed (255), so the x-domain is static — no remount key needed.
+  const [lo, hi, onWheel, , onPan] = useZoom(0, xMax, { minSpan: 5, maxSpan: xMax });
   return (
     <Canvas
       height={240}
       ariaLabel="DPCM signal, prediction error and reconstruction"
-      deps={[enc, signal]}
+      deps={[enc, signal, lo, hi]}
+      onWheel={onWheel}
+      onPan={onPan}
       draw={(ctx, w, h) => {
-        const ax = axesFor(w, h, [0, xMax], [-yMax, yMax]);
-        drawAxes(ctx, ax, [0, xMax]);
+        const ax = axesFor(w, h, [lo, hi], [-yMax, yMax]);
+        drawAxes(ctx, ax, [lo, hi], { xLabel: '$n$', yLabel: '$x[n]$' });
         drawLine(ctx, ax, xs, signal, COL.signal, 2);
         drawLine(ctx, ax, xs, enc.rawError, COL.error, 1.5);
         drawLine(ctx, ax, xs, enc.reconstructed, COL.recon, 1.5);

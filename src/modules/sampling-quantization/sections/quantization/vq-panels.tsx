@@ -1,9 +1,11 @@
 import { Canvas } from '@/lib/plot/Canvas';
 import { linScale, drawAxes, drawLine, type Axes } from '@/lib/plot/draw';
+import { useZoom } from '@/lib/plot/useZoom';
 import type { Vec2, VqResult } from '@/lib/dsp/vq';
 
 const PALETTE = ['#39ff85', '#ff9f45', '#7c8cff', '#ff5c8a', '#46d6c9', '#e0c84a', '#b07cff', '#7cffd4'];
-const PAD = { l: 8, r: 8, t: 10, b: 10 };
+// Room for tick labels + LaTeX axis labels.
+const PAD = { l: 48, r: 18, t: 16, b: 40 };
 
 function axesFor(w: number, h: number, domX: [number, number], domY: [number, number]): Axes {
   return { x: linScale(domX, [PAD.l, w - PAD.r]), y: linScale(domY, [h - PAD.b, PAD.t]) };
@@ -40,7 +42,7 @@ export function ScatterVoronoiPanel({
       deps={[data, result, step]}
       draw={(ctx, w, h) => {
         const ax = axesFor(w, h, [minX - padX, maxX + padX], [minY - padY, maxY + padY]);
-        drawAxes(ctx, ax, [minX - padX, maxX + padX]);
+        drawAxes(ctx, ax, [minX - padX, maxX + padX], { xLabel: '$x_1$', yLabel: '$x_2$' });
         for (let i = 0; i < data.length; i++) {
           ctx.fillStyle = PALETTE[snap.assignments[i] % PALETTE.length];
           ctx.beginPath();
@@ -77,14 +79,22 @@ export function DistortionPanel({ history }: { history: number[] }) {
   const xs = history.map((_, i) => i);
   const yMax = (history.length ? Math.max(...history) : 1) * 1.1 || 1;
   const xMax = Math.max(history.length - 1, 1);
+  // Guard: maxSpan must be >= minSpan even when history is very short.
+  const [lo, hi, onWheel, , onPan] = useZoom(0, xMax, {
+    minSpan: 1,
+    maxSpan: Math.max(xMax, 1),
+    clampMin: 0,
+  });
   return (
     <Canvas
       height={180}
       ariaLabel="VQ distortion versus iteration"
-      deps={[history]}
+      deps={[history, lo, hi]}
+      onWheel={onWheel}
+      onPan={onPan}
       draw={(ctx, w, h) => {
-        const ax = axesFor(w, h, [0, xMax], [0, yMax]);
-        drawAxes(ctx, ax, [0, xMax]);
+        const ax = axesFor(w, h, [lo, hi], [0, yMax]);
+        drawAxes(ctx, ax, [lo, hi], { xLabel: '$\\text{iteration}$', yLabel: '$D$' });
         drawLine(ctx, ax, xs, history, '#46c93a', 2);
       }}
     />

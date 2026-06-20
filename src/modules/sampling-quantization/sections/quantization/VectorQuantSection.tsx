@@ -72,7 +72,7 @@ export function VectorQuantSection() {
           <ScatterVoronoiPanel data={points} result={result} step={shownStep} />
         </Panel>
         <Panel title={t('adc.vq.distortion')}>
-          <DistortionPanel history={result.distortionHistory} />
+          <DistortionPanel key={`${data}-${K}`} history={result.distortionHistory} />
         </Panel>
 
         <div className="info-cards">

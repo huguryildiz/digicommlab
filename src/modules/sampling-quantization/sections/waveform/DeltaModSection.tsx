@@ -16,6 +16,7 @@ import { buildDeltaModView } from './deltamod-model';
 import { SignalStaircasePanel, ErrorPanel } from './deltamod-panels';
 import { StepTrackingPanel } from './adm-panel';
 import { useSimulationLoop } from '@/lib/sim/useSimulationLoop';
+import { useZoom } from '@/lib/plot/useZoom';
 import { playDeltaDemo } from '@/lib/audio/deltamod-audio';
 import { audioSupported } from '@/lib/audio/sampling-audio';
 import type { Bit } from '@/lib/sim/sources';
@@ -37,6 +38,16 @@ export function DeltaModSection() {
   const [adaptK, setAdaptK] = useState(1.5);
   const xhatRef = useRef(0);
   const lastIdxRef = useRef(-1);
+
+  // Offset zoom stored as offsets within [0, WINDOW_SEC] so the zoomed sub-window
+  // scrolls with the live left edge t0 during playback (same pattern as SamplingSection).
+  const [zLo, zHi, onWheelT, resetZoom, onPanT] = useZoom(0, WINDOW_SEC, {
+    minSpan: 0.1,
+    maxSpan: WINDOW_SEC,
+    clampMin: 0,
+    clampMax: WINDOW_SEC,
+  });
+  const timeDomain: [number, number] = [t0 + zLo, t0 + zHi];
 
   const loop = useSimulationLoop({
     ticksPerSecond: 30,
@@ -61,6 +72,7 @@ export function DeltaModSection() {
       setBitLog('');
       xhatRef.current = 0;
       lastIdxRef.current = -1;
+      resetZoom();
     },
   });
 
@@ -134,13 +146,13 @@ export function DeltaModSection() {
         <div className="deltamod__panels">
           {mode === 'linear' ? (
             <>
-              <Panel title={t('deltamod.panel.signal')}><SignalStaircasePanel view={view} yMax={yMax} cursorT={loop.running ? cursorT : undefined} /></Panel>
-              <Panel title={t('deltamod.panel.error')}><ErrorPanel view={view} step={step} /></Panel>
+              <Panel title={t('deltamod.panel.signal')}><SignalStaircasePanel view={view} yMax={yMax} cursorT={loop.running ? cursorT : undefined} domain={timeDomain} onWheel={onWheelT} onPan={onPanT} /></Panel>
+              <Panel title={t('deltamod.panel.error')}><ErrorPanel view={view} step={step} domain={timeDomain} onWheel={onWheelT} onPan={onPanT} /></Panel>
             </>
           ) : (
             <>
-              <Panel title={t('deltamod.panel.signal')}><SignalStaircasePanel view={admView} yMax={yMax} cursorT={loop.running ? cursorT : undefined} /></Panel>
-              <Panel title={t('adc.dm.steps')}><StepTrackingPanel steps={admView.steps} times={view.sampleTimes} /></Panel>
+              <Panel title={t('deltamod.panel.signal')}><SignalStaircasePanel view={admView} yMax={yMax} cursorT={loop.running ? cursorT : undefined} domain={timeDomain} onWheel={onWheelT} onPan={onPanT} /></Panel>
+              <Panel title={t('adc.dm.steps')}><StepTrackingPanel steps={admView.steps} times={view.sampleTimes} domain={timeDomain} onWheel={onWheelT} onPan={onPanT} /></Panel>
             </>
           )}
         </div>
