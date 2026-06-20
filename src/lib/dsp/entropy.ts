@@ -79,3 +79,37 @@ export function mutualInformationJoint(pxy: number[][]): number {
   }
   return I;
 }
+
+// Ref: Proakis & Salehi §12.1.4 — differential entropy h(X) = −∫ f(x) log2 f(x) dx (Eq. 12.1.18).
+// Unlike discrete entropy, h(X) may be negative (Examples 12.1.8 / 12.1.9).
+
+/** Differential entropy of X ~ Uniform[0,a]: h(X) = log2 a, bits. Ex. 12.1.8. a>0. */
+export function differentialEntropyUniform(a: number): number {
+  return Math.log2(a);
+}
+
+/** Differential entropy of X ~ N(0, sigma^2): h(X) = ½ log2(2πe sigma^2), bits. Eq. 12.1.20. */
+export function differentialEntropyGaussian(sigma: number): number {
+  return 0.5 * Math.log2(2 * Math.PI * Math.E * sigma * sigma);
+}
+
+/**
+ * Numeric differential entropy −∫_lo^hi f(x) log2 f(x) dx by composite Simpson's rule.
+ * `n` (even) is the number of sub-intervals. Used to draw curves and validate closed forms.
+ */
+export function differentialEntropyNumeric(
+  pdf: (x: number) => number,
+  lo: number,
+  hi: number,
+  n = 2000,
+): number {
+  const m = n % 2 === 0 ? n : n + 1;
+  const step = (hi - lo) / m;
+  const g = (x: number): number => {
+    const f = pdf(x);
+    return f > 0 ? -f * Math.log2(f) : 0;
+  };
+  let s = g(lo) + g(hi);
+  for (let i = 1; i < m; i++) s += (i % 2 === 0 ? 2 : 4) * g(lo + i * step);
+  return (step / 3) * s;
+}

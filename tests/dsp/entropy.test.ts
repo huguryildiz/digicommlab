@@ -9,6 +9,9 @@ import {
   marginals,
   conditionalEntropies,
   mutualInformationJoint,
+  differentialEntropyUniform,
+  differentialEntropyGaussian,
+  differentialEntropyNumeric,
 } from '@/lib/dsp/entropy';
 
 describe('entropy', () => {
@@ -82,5 +85,27 @@ describe('joint / conditional / mutual information', () => {
       [0.25, 0.25],
     ];
     expect(mutualInformationJoint(indep)).toBeCloseTo(0, 10);
+  });
+});
+
+describe('differential entropy', () => {
+  it('uniform [0,a]: h = log2 a, zero at a=1, negative for a<1', () => {
+    expect(differentialEntropyUniform(1)).toBeCloseTo(0, 10);
+    expect(differentialEntropyUniform(2)).toBeCloseTo(1, 10);
+    expect(differentialEntropyUniform(0.5)).toBeCloseTo(-1, 10);
+  });
+
+  it('gaussian: h = 0.5 log2(2 pi e sigma^2)', () => {
+    expect(differentialEntropyGaussian(1)).toBeCloseTo(2.0471, 3);
+  });
+
+  it('numeric integrator matches the gaussian closed form', () => {
+    const sigma = 1.3;
+    const pdf = (x: number) =>
+      Math.exp(-(x * x) / (2 * sigma * sigma)) / (sigma * Math.sqrt(2 * Math.PI));
+    expect(differentialEntropyNumeric(pdf, -10, 10)).toBeCloseTo(
+      differentialEntropyGaussian(sigma),
+      3,
+    );
   });
 });
