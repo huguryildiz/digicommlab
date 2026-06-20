@@ -13,6 +13,7 @@ import { ProductCodesSection } from './ProductCodesSection';
 import { ConcatenatedSection } from './ConcatenatedSection';
 import { TurboSection } from './TurboSection';
 import { LdpcSection } from './LdpcSection';
+import { TcmSection } from './TcmSection';
 import './channel-coding.css';
 
 type Tab =
@@ -27,7 +28,8 @@ type Tab =
   | 'product'
   | 'concat'
   | 'turbo'
-  | 'ldpc';
+  | 'ldpc'
+  | 'tcm';
 
 const TABS: { value: Tab; label: string }[] = [
   { value: 'channels', label: t('cc.tab.channels') },
@@ -42,6 +44,7 @@ const TABS: { value: Tab; label: string }[] = [
   { value: 'concat', label: t('cc.tab.concat') },
   { value: 'turbo', label: t('cc.tab.turbo') },
   { value: 'ldpc', label: t('cc.tab.ldpc') },
+  { value: 'tcm', label: t('cc.tab.tcm') },
 ];
 
 export function ChannelCodingModule() {
@@ -73,6 +76,7 @@ export function ChannelCodingModule() {
       {tab === 'concat' && <ConcatenatedSection />}
       {tab === 'turbo' && <TurboSection />}
       {tab === 'ldpc' && <LdpcSection />}
+      {tab === 'tcm' && <TcmSection />}
     </div>
   );
 }

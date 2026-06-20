@@ -232,6 +232,27 @@ export const channelcoding: Record<string, string> = {
   'cc.lp.card.modernBody':
     'Large, well-designed LDPC codes approach the Shannon limit and are used in Wi-Fi, 5G, and DVB-S2. This tiny code shows the same algorithm.',
 
+  // Trellis-coded modulation (§13.7)
+  'cc.tab.tcm': 'TCM',
+  'cc.tc.params': 'Set partitioning & gain',
+  'cc.tc.level': 'Partition level',
+  'cc.tc.modloss': 'QPSK→8-PSK loss',
+  'cc.tc.gain': 'Net coding gain',
+  'cc.tc.treeTitle': 'Set-partition tree (play to descend levels)',
+  'cc.tc.constTitle': '8-PSK constellation by subset',
+  'cc.tc.card.combined': 'Combined coding & modulation',
+  'cc.tc.card.combinedBody':
+    'Instead of adding parity bits in time, TCM expands the constellation (QPSK→8-PSK) and codes the choice of point — keeping the same 2 bits/symbol and bandwidth.',
+  'cc.tc.card.partition': 'Set partitioning',
+  'cc.tc.card.partitionBody':
+    'Split the constellation into congruent subsets whose points are maximally separated. Each level doubles the subset count and increases the minimum intra-subset distance Δ.',
+  'cc.tc.card.mapping': 'Coded vs uncoded bits',
+  'cc.tc.card.mappingBody':
+    'A rate-1/2 convolutional code picks the subset (the protected choice); the remaining uncoded bit picks the point within it, where distance is already large.',
+  'cc.tc.card.gain': 'Asymptotic gain',
+  'cc.tc.card.gainBody':
+    'The 4-state 8-PSK Ungerboeck scheme buys ≈3 dB over uncoded QPSK at the same rate — even after the ~5.33 dB loss from the denser constellation.',
+
   // Tab 5 — Cyclic / CRC
   'cc.cy.code': 'Generator polynomial',
   'cc.cy.sel': 'Code / CRC preset',
