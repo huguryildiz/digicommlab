@@ -46,7 +46,14 @@ import {
   type DetectCode,
 } from '@/lib/dsp/lcdetect';
 import { makeRng } from '@/lib/sim/sources';
-import { eyeTraces, eyeMetrics, type EyeTrace } from '@/lib/dsp/eye';
+import {
+  eyeTraces,
+  eyeMetrics,
+  isiEyePatterns,
+  eyeAnnotations,
+  type EyeTrace,
+  type EyeAnnotations,
+} from '@/lib/dsp/eye';
 import { zeroForcingTaps, mmseTaps, residualIsi } from '@/lib/dsp/equalizer';
 import { randomBitSource, type Bit } from '@/lib/sim/sources';
 
@@ -200,6 +207,40 @@ export function buildEyeView(p: EyeParams): EyeView {
     eyeHeightBefore: eyeMetrics(tracesBefore, p.sps).eyeHeight,
     eyeHeightAfter: eyeMetrics(tracesAfter, p.sps).eyeHeight,
     residualIsi: residualIsi(p.channel, eqTaps),
+    sps: p.sps,
+  };
+}
+
+// ── §10.3 Eye-pattern formation & ISI interpretation ────────────────────────
+
+export interface IsiEyeParams {
+  M: 2 | 4;
+  neighborK: number;
+  isiGain: number;
+  sps: number;
+}
+
+export interface IsiEyeView {
+  traces: EyeTrace[];
+  annotations: EyeAnnotations;
+  eyeHeight: number;
+  noiseMargin: number;
+  peakDistortion: number;
+  patternCount: number;
+  sps: number;
+}
+
+export function buildIsiEyeView(p: IsiEyeParams): IsiEyeView {
+  const traces = isiEyePatterns(p.sps, p.M, p.neighborK, p.isiGain);
+  const annotations = eyeAnnotations(traces, p.sps);
+  const metrics = eyeMetrics(traces, p.sps);
+  return {
+    traces,
+    annotations,
+    eyeHeight: metrics.eyeHeight,
+    noiseMargin: annotations.noiseMargin,
+    peakDistortion: annotations.peakDistortion,
+    patternCount: traces.length,
     sps: p.sps,
   };
 }
