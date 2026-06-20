@@ -210,6 +210,28 @@ export const channelcoding: Record<string, string> = {
   'cc.tb.card.shannonBody':
     'Turbo codes were the first practical codes to operate within a fraction of a dB of the Shannon limit.',
 
+  // LDPC codes (§13.6)
+  'cc.tab.ldpc': 'LDPC',
+  'cc.lp.params': 'LDPC code & channel',
+  'cc.lp.reroll': 'Reroll noise',
+  'cc.lp.flipHint': 'Toggle a variable node to inject/clear an error:',
+  'cc.lp.iter': 'Iteration',
+  'cc.lp.unsat': 'Unsatisfied checks',
+  'cc.lp.errors': 'Bit errors',
+  'cc.lp.graphTitle': 'Tanner graph — belief propagation (play to decode)',
+  'cc.lp.card.tanner': 'Tanner graph',
+  'cc.lp.card.tannerBody':
+    'A bipartite graph: variable nodes (the bits) connect to check nodes (the parity equations) wherever H has a 1. Decoding passes messages along these edges.',
+  'cc.lp.card.sparse': 'Low density',
+  'cc.lp.card.sparseBody':
+    'H has very few 1s, so each bit touches only a couple of checks. Sparsity keeps message passing cheap and the few short cycles let it work well.',
+  'cc.lp.card.bp': 'Belief propagation',
+  'cc.lp.card.bpBody':
+    'Each check tells its bits how likely they are to be 0 or 1 (soft LLRs); each bit sums what its checks say. Repeating this drives every parity check to ✓.',
+  'cc.lp.card.modern': 'State of the art',
+  'cc.lp.card.modernBody':
+    'Large, well-designed LDPC codes approach the Shannon limit and are used in Wi-Fi, 5G, and DVB-S2. This tiny code shows the same algorithm.',
+
   // Tab 5 — Cyclic / CRC
   'cc.cy.code': 'Generator polynomial',
   'cc.cy.sel': 'Code / CRC preset',
