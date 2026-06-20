@@ -63,6 +63,9 @@
 .modulation__legend .lg-live::before {
   background: #46c93a;
 }
+.modulation__legend .lg-marker::before {
+  background: var(--color-marker);
+}
 
 .modulation__message {
   display: grid;
