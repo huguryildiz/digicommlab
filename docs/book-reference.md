@@ -301,20 +301,20 @@ Noncoherent FSK · Multidim Signals · Repeaters · Synchronization) ·
 
 **Module:** `src/modules/infotheory/` · **DSP:** `src/lib/dsp/entropy.ts`, `huffman.ts`, `lz78.ts`, `capacity.ts`
 
-| Subsection                              | Page | Status | Repo mapping                                 |
-| --------------------------------------- | ---- | ------ | -------------------------------------------- |
-| 12.1 Modeling Information Sources       | 642  | ✅     | `entropy.ts`, `EntropySection.tsx`           |
-| 12.1.1 Measure of Information / Entropy | 644  | ✅     | `entropy.ts`                                 |
-| 12.1.2 Joint and Conditional Entropy    | 647  | ✅     | `entropy.ts`                                 |
-| 12.1.3 Mutual Information               | 650  | ⬜     | —                                            |
-| 12.1.4 Differential Entropy             | 650  | ⬜     | —                                            |
-| 12.2 Source Coding Theorem              | 652  | ✅     | `PrefixKraftSection.tsx`                     |
-| 12.3.1 Huffman Algorithm                | 655  | ✅     | `huffman.ts`, `HuffmanSection.tsx`           |
-| 12.3.2 Lempel-Ziv Algorithm             | 659  | ✅     | `lz78.ts`, `LempelZivSection.tsx`            |
-| 12.4 Modeling of Communication Channels | 661  | 🔶     | `capacity.ts` (channel model, partial)       |
-| 12.5 Channel Capacity                   | 664  | ✅     | `capacity.ts`, `ChannelsCapacitySection.tsx` |
-| 12.5.1 Gaussian Channel Capacity        | 669  | ✅     | `capacity.ts` — Shannon                      |
-| 12.6 Bounds on Communication            | 671  | ✅     | `ShannonLimitSection.tsx`                    |
+| Subsection                              | Page | Status | Repo mapping                                   |
+| --------------------------------------- | ---- | ------ | ---------------------------------------------- |
+| 12.1 Modeling Information Sources       | 642  | ✅     | `entropy.ts`, `EntropySection.tsx`             |
+| 12.1.1 Measure of Information / Entropy | 644  | ✅     | `entropy.ts`                                   |
+| 12.1.2 Joint and Conditional Entropy    | 647  | ✅     | `entropy.ts`, `JointInfoSection.tsx`           |
+| 12.1.3 Mutual Information               | 650  | ✅     | `entropy.ts`, `JointInfoSection.tsx`           |
+| 12.1.4 Differential Entropy             | 650  | ✅     | `entropy.ts`, `DifferentialEntropySection.tsx` |
+| 12.2 Source Coding Theorem              | 652  | ✅     | `PrefixKraftSection.tsx`                       |
+| 12.3.1 Huffman Algorithm                | 655  | ✅     | `huffman.ts`, `HuffmanSection.tsx`             |
+| 12.3.2 Lempel-Ziv Algorithm             | 659  | ✅     | `lz78.ts`, `LempelZivSection.tsx`              |
+| 12.4 Modeling of Communication Channels | 661  | 🔶     | `capacity.ts` — see channel-coding module      |
+| 12.5 Channel Capacity                   | 664  | ✅     | `capacity.ts` — see channel-coding module      |
+| 12.5.1 Gaussian Channel Capacity        | 669  | ✅     | `capacity.ts` — Shannon (channel-coding)       |
+| 12.6 Bounds on Communication            | 671  | ✅     | `ShannonLimitSection.tsx` (channel-coding)     |
 
 ---
 
