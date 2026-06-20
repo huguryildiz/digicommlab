@@ -543,6 +543,51 @@ export const en: Record<string, string> = {
   'modulation.repeater.theory.title': 'Regenerative repeaters — theory',
   'modulation.repeater.theory.regen': 'K regenerative repeaters — errors add (Eq. 8.10.1).',
   'modulation.repeater.theory.analog': 'K analog repeaters — noise accumulates (Eq. 8.10.2).',
+  // Synchronization (§8.8–8.9)
+  'modulation.sync.tab': 'Synchronization',
+  'modulation.sync.title': 'Synchronization',
+  'modulation.sync.view': 'Synchronization view',
+  'modulation.sync.view.carrier': 'Carrier phase',
+  'modulation.sync.view.timing': 'Symbol timing',
+  // carrier phase
+  'modulation.sync.zeta': 'Damping ζ',
+  'modulation.sync.omegan': 'Natural freq ωₙ',
+  'modulation.sync.phi0': 'Initial phase offset',
+  'modulation.sync.panel.lock': 'PLL lock-in (phase error vs time)',
+  'modulation.sync.readout.regime': 'Damping regime',
+  'modulation.sync.readout.finalerr': 'Final phase error',
+  'modulation.sync.regime.under': 'underdamped',
+  'modulation.sync.regime.critical': 'critical',
+  'modulation.sync.regime.over': 'overdamped',
+  'modulation.sync.card.pll.title': 'Phase-locked loop',
+  'modulation.sync.card.pll.body':
+    'A phase detector, loop filter and VCO drive the estimate $\\hat{\\phi}$ toward $\\phi$. The 2nd-order loop is set by damping ζ and natural frequency $\\omega_n$.',
+  'modulation.sync.card.costas.title': 'Costas loop',
+  'modulation.sync.card.costas.body':
+    'Two quadrature branches multiplied together form an error $\\propto\\sin 2\\Delta\\phi$ — it recovers a suppressed carrier without an explicit squarer (§8.8.2).',
+  'modulation.sync.card.ml.title': 'ML phase estimate',
+  'modulation.sync.card.ml.body':
+    'For a block of quadrature correlator outputs, $\\hat{\\phi}=\\arctan(\\sum y_s/\\sum y_c)$ (§8.8.4).',
+  'modulation.sync.theory.carrier.title': 'Carrier-phase recovery — theory',
+  'modulation.sync.theory.loop': 'Second-order closed-loop response (§8.8.1).',
+  'modulation.sync.theory.var': 'Linearized phase-error variance, ρ_L = loop SNR (Eq. 8.8.21).',
+  // symbol timing
+  'modulation.sync.tau': 'Timing offset τ/T',
+  'modulation.sync.delta': 'Gate spacing δ',
+  'modulation.sync.panel.earlylate': 'Early-late gate samples',
+  'modulation.sync.panel.scurve': 'Discriminator S-curve',
+  'modulation.sync.readout.errnow': 'Timing error',
+  'modulation.sync.card.earlylate.title': 'Early-late gate',
+  'modulation.sync.card.earlylate.body':
+    'Sample the matched-filter output early (τ−δ) and late (τ+δ). By symmetry they are equal only at perfect timing; the difference drives the clock (§8.9.1).',
+  'modulation.sync.card.scurve.title': 'The S-curve',
+  'modulation.sync.card.scurve.body':
+    'The discriminator output vs offset crosses zero at the lock point with a restoring slope — the loop is pulled back to perfect timing.',
+  'modulation.sync.card.ml2.title': 'ML & spectral-line',
+  'modulation.sync.card.ml2.body':
+    'Other timing recoveries: the ML condition $\\sum_m y_m\\,dy_m/d\\tau=0$ (§8.9.3) and squaring to raise a spectral line at $1/T$ (§8.9.4).',
+  'modulation.sync.theory.timing.title': 'Symbol timing — theory',
+  'modulation.sync.theory.earlylate': 'Early-late discriminator (§8.9.1).',
   // Information Theory (CH10 + book extensions)
   'nav.infotheory': 'Information Theory',
   'it.tab.aria': 'Information Theory',
