@@ -145,6 +145,7 @@ export const en: Record<string, string> = {
   'adc.card.adm.body':
     'When the staircase keeps climbing (slope overload) the step grows by $K$; when it hunts on a flat input the step shrinks — one knob fixes both DM failure modes.',
   // LPC vocoder (§7.5)
+  'adc.sub.quant': 'Quantization Effects',
   'adc.sub.lpc': 'LPC Vocoder',
   'adc.sub.audio': 'Digital Audio',
   'adc.sub.jpeg': 'JPEG (DCT)',
@@ -246,6 +247,35 @@ export const en: Record<string, string> = {
   'adc.card.quality.title': 'Quality factor',
   'adc.card.quality.body':
     'Quality 50 uses the base table; higher quality shrinks the steps (finer, larger files), lower quality scales them up — more zeros, smaller files, visible artefacts.',
+  // Quantization Effects section (§7.2)
+  'adc.qe.imagePanel': 'Image Quantization',
+  'adc.qe.imagePreset': 'Image preset',
+  'adc.qe.preset.gradient': 'Smooth gradient',
+  'adc.qe.preset.nature': 'Nature scene',
+  'adc.qe.preset.colorful': 'Colorful pattern',
+  'adc.qe.imageBits': 'Bits per channel',
+  'adc.qe.audioPanel': 'Audio Quantization',
+  'adc.qe.audioSignal': 'Audio signal',
+  'adc.qe.signal.sine': 'Sine (440 Hz)',
+  'adc.qe.signal.harmonics': 'Harmonics (voice-like)',
+  'adc.qe.signal.chord': 'C major chord',
+  'adc.qe.audioBits': 'Bits per sample',
+  'adc.qe.imageCompare': 'Image: Original vs Quantized',
+  'adc.qe.original': 'Original',
+  'adc.qe.quantized': 'Quantized',
+  'adc.qe.error': 'Error',
+  'adc.qe.audioCompare': 'Audio Waveform (first 23 ms)',
+  'adc.qe.playOriginal': 'Play original',
+  'adc.qe.playQuantized': 'Play quantized',
+  'adc.card.posterization.title': 'Posterization',
+  'adc.card.posterization.body':
+    'Reducing each RGB channel to $B$ bits maps $256$ levels to $2^B$ — smooth gradients collapse into flat bands. At $B=1$ you see only $8$ distinct colours; at $B\\ge6$ the banding is barely visible.',
+  'adc.card.quantnoise.title': 'Quantization noise',
+  'adc.card.quantnoise.body':
+    'Every sample suffers rounding error $\\varepsilon\\in[-\\Delta/2,\\,\\Delta/2]$ where $\\Delta=2/2^B$. For a uniform quantizer and full-scale sine this gives SQNR $\\approx 6.02B+1.76$ dB — add $\\approx 6$ dB per extra bit.',
+  'adc.card.bitdepth.title': 'Bit depth vs. quality',
+  'adc.card.bitdepth.body':
+    'CD audio uses $B=16$ (65 536 levels, SNR $\\approx98$ dB). Speech is intelligible at $B=8$. Images appear photorealistic at $B=8$ per channel but show obvious banding below $B=5$.',
   'nav.modulation': 'Digital Modulation & Detection',
   'nav.baseband': 'Baseband & ISI',
   'nav.huffman': 'Huffman & Entropy',
@@ -486,6 +516,33 @@ export const en: Record<string, string> = {
   'modulation.multidim.theory.union': 'Union bound on symbol error (Eq. 8.4.42 / 9.1.21).',
   'modulation.multidim.note.coded':
     'Binary-coded signals (§9.4) and their performance are covered in the Channel Coding module (Ch 13).',
+  // Regenerative repeaters (§8.10)
+  'modulation.repeater.tab': 'Repeaters',
+  'modulation.repeater.title': 'Regenerative Repeaters',
+  'modulation.repeater.hops': 'Repeater hops K',
+  'modulation.repeater.target': 'Target BER',
+  'modulation.repeater.panel.ber': 'BER over a K-hop link',
+  'modulation.repeater.panel.hop': 'Accumulated noise per hop',
+  'modulation.repeater.readout.regenNow': 'BER (regen)',
+  'modulation.repeater.readout.analogNow': 'BER (analog)',
+  'modulation.repeater.readout.reqRegen': 'Req. Eb/N0 (regen)',
+  'modulation.repeater.readout.reqAnalog': 'Req. Eb/N0 (analog)',
+  'modulation.repeater.readout.gap': 'Regen advantage',
+  'modulation.repeater.reset': 'Reset',
+  'modulation.repeater.legend.regen': 'regenerative',
+  'modulation.repeater.legend.analog': 'analog',
+  'modulation.repeater.card.regen.title': 'Regenerative repeater',
+  'modulation.repeater.card.regen.body':
+    'Each hop detects the bits and re-transmits clean, so only the rare per-hop errors add up: $P_b\\approx K\\,Q(\\sqrt{2\\mathcal{E}_b/N_0})$.',
+  'modulation.repeater.card.analog.title': 'Analog repeater',
+  'modulation.repeater.card.analog.body':
+    'An amplifier boosts signal and noise together, so noise accumulates over the hops and the effective SNR is divided by K: $P_b=Q(\\sqrt{2\\mathcal{E}_b/K N_0})$.',
+  'modulation.repeater.card.why.title': 'Why digital wins',
+  'modulation.repeater.card.why.body':
+    'Linear growth ($K\\cdot Q$) beats SNR-÷-K dramatically: for K=100 at $P_b=10^{-5}$ the regenerative link needs ~11.3 dB vs ~29.6 dB analog (Example 8.10.1).',
+  'modulation.repeater.theory.title': 'Regenerative repeaters — theory',
+  'modulation.repeater.theory.regen': 'K regenerative repeaters — errors add (Eq. 8.10.1).',
+  'modulation.repeater.theory.analog': 'K analog repeaters — noise accumulates (Eq. 8.10.2).',
   // Information Theory (CH10 + book extensions)
   'nav.infotheory': 'Information Theory',
   'it.tab.aria': 'Information Theory',
