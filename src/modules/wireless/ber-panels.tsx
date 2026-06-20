@@ -5,9 +5,10 @@ import type { BerModulation, BerParams } from './ber-model';
 interface Props {
   params: BerParams;
   set: (patch: Partial<BerParams>) => void;
+  reset: () => void;
 }
 
-export function BerControls({ params, set }: Props) {
+export function BerControls({ params, set, reset }: Props) {
   const isAntipodal = params.modulation === 'antipodal';
   return (
     <Panel title={t('wl.ber.title')}>
@@ -46,6 +47,7 @@ export function BerControls({ params, set }: Props) {
         value={params.outageThreshDb}
         onChange={(v) => set({ outageThreshDb: v })}
       />
+      <button type="button" onClick={reset}>{t('wl.reset')}</button>
     </Panel>
   );
 }

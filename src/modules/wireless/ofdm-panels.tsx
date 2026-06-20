@@ -5,6 +5,7 @@ import type { OfdmParams } from './ofdm-model';
 interface Props {
   params: OfdmParams;
   set: (patch: Partial<OfdmParams>) => void;
+  reset: () => void;
 }
 
 const N_OPTIONS = [
@@ -13,7 +14,7 @@ const N_OPTIONS = [
   { value: '64', label: '64' },
 ];
 
-export function OfdmControls({ params, set }: Props) {
+export function OfdmControls({ params, set, reset }: Props) {
   return (
     <Panel title={t('wl.ofdm.title')}>
       <Select
@@ -46,6 +47,9 @@ export function OfdmControls({ params, set }: Props) {
         value={params.ebN0Db}
         onChange={(v) => set({ ebN0Db: v })}
       />
+      <button type="button" onClick={reset}>
+        {t('wl.reset')}
+      </button>
     </Panel>
   );
 }
