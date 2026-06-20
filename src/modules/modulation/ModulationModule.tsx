@@ -32,6 +32,7 @@ import { DpskSection } from './DpskSection';
 import { NoncoherentFskSection } from './NoncoherentFskSection';
 import { MultidimSection } from './MultidimSection';
 import { RepeaterSection } from './RepeaterSection';
+import { SyncSection } from './SyncSection';
 import './modulation.css';
 
 const M_OPTIONS: Record<Scheme, number[]> = {
@@ -51,7 +52,14 @@ export function ModulationModule() {
   const { tab: slug = '' } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
   const tab =
-    (slug as 'detection' | 'optrx' | 'dpsk' | 'noncoh' | 'multidim' | 'repeater') || 'detection';
+    (slug as
+      | 'detection'
+      | 'optrx'
+      | 'dpsk'
+      | 'noncoh'
+      | 'multidim'
+      | 'repeater'
+      | 'sync') || 'detection';
 
   const handleTabChange = (v: string) => {
     navigate(v === 'detection' ? '/modulation' : `/modulation/${v}`, { replace: true });
@@ -189,7 +197,7 @@ export function ModulationModule() {
 
   return (
     <div className="modulation__tabwrap">
-      <Segmented<'detection' | 'optrx' | 'dpsk' | 'noncoh' | 'multidim' | 'repeater'>
+      <Segmented<'detection' | 'optrx' | 'dpsk' | 'noncoh' | 'multidim' | 'repeater' | 'sync'>
         ariaLabel={t('modulation.optrx.tabs')}
         value={tab}
         onChange={handleTabChange}
@@ -200,6 +208,7 @@ export function ModulationModule() {
           { value: 'noncoh', label: t('modulation.noncoh.tab') },
           { value: 'multidim', label: t('modulation.multidim.tab') },
           { value: 'repeater', label: t('modulation.repeater.tab') },
+          { value: 'sync', label: t('modulation.sync.tab') },
         ]}
       />
       {tab === 'optrx' && <OptimumReceiverSection />}
@@ -207,6 +216,7 @@ export function ModulationModule() {
       {tab === 'noncoh' && <NoncoherentFskSection />}
       {tab === 'multidim' && <MultidimSection />}
       {tab === 'repeater' && <RepeaterSection />}
+      {tab === 'sync' && <SyncSection />}
       <div className="module-layout" hidden={tab !== 'detection'}>
         <aside className="modulation__controls">
           <Panel title={t('nav.modulation')}>
