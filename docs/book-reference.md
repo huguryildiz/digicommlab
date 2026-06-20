@@ -32,7 +32,7 @@ printed numbers (PDF page offset ~+14).
 | 9   | Multidimensional Digital Modulation            | 485  | ✅     | Orthogonal/biorthogonal/simplex signals, union bound, noncoherent FSK, CPFSK (CPFSK in wireless)               |
 | 10  | Digital Transmission — Bandlimited Channels    | 543  | ✅     | Baseband, Nyquist, ISI, eye diagram                                                                            |
 | 11  | Multicarrier Modulation and OFDM               | 621  | ✅     | OFDM modulation/demodulation                                                                                   |
-| 12  | An Introduction to Information Theory          | 642  | ✅     | Entropy, Huffman, Lempel-Ziv, capacity                                                                         |
+| 12  | An Introduction to Information Theory          | 642  | ✅     | Entropy, joint/conditional & mutual info, differential entropy, Huffman, Lempel-Ziv (capacity → Ch13)          |
 | 13  | Coding for Reliable Communications             | 689  | ✅     | Block codes, convolutional, BCH, RS, concatenated                                                              |
 | 14  | Data Transmission in Fading Multipath Channels | 769  | ✅     | Rayleigh, Doppler, RAKE, MIMO, link budget                                                                     |
 | 15  | Spread-Spectrum Communication Systems          | 825  | ✅     | DS-SS, CDMA, FHSS                                                                                              |
