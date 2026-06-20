@@ -69,6 +69,16 @@ export function DpcmSection() {
               <HintText text={t('adc.card.dpcmloop.body')} />
             </p>
           </InfoCard>
+          <InfoCard title={t('adc.card.predgain.title')} accent="blue">
+            <p>
+              <HintText text={t('adc.card.predgain.body')} />
+            </p>
+          </InfoCard>
+          <InfoCard title={t('adc.card.dpcmrate.title')} accent="green">
+            <p>
+              <HintText text={t('adc.card.dpcmrate.body')} />
+            </p>
+          </InfoCard>
         </div>
 
         <TheoryBox title="Theory — DPCM">

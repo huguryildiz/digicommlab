@@ -107,6 +107,12 @@ export const en: Record<string, string> = {
   'adc.card.voronoi.title': 'Voronoi regions',
   'adc.card.voronoi.body':
     'Each codeword owns the points nearest to it; LBG alternates nearest-neighbour assignment with centroid updates until distortion converges.',
+  'adc.card.vqrate.title': 'Rate & dimension',
+  'adc.card.vqrate.body':
+    'A larger block dimension $n$ lowers distortion at a fixed rate $R=\\dfrac{\\log_2 K}{n}$, but the codebook size $K=2^{nR}$ and the search cost grow exponentially with $n$.',
+  'adc.card.vqadv.title': 'Why VQ beats scalar',
+  'adc.card.vqadv.body':
+    'Vector quantizers can shape non-rectangular cells (Fig. 7.6) and exploit correlation between samples, so they reach lower distortion than scalar quantization at the same bit rate.',
   // Stage C — DPCM (§7.4.2)
   'adc.dpcm.order': 'Predictor order',
   'adc.dpcm.first': 'First-order',
@@ -122,6 +128,12 @@ export const en: Record<string, string> = {
   'adc.card.dpcmloop.title': 'Closed prediction loop',
   'adc.card.dpcmloop.body':
     'The encoder predicts from reconstructed (not original) samples, so the decoder running the same recursion stays perfectly in step.',
+  'adc.card.predgain.title': 'Prediction gain',
+  'adc.card.predgain.body':
+    'Removing the predictable part shrinks the error variance; the prediction gain $G_p=\\dfrac{\\sigma_x^2}{\\sigma_e^2}$ measures the saving — about one bit per sample for every 6 dB.',
+  'adc.card.dpcmrate.title': 'Bit-rate saving',
+  'adc.card.dpcmrate.body':
+    'Because the smaller error needs fewer bits, DPCM transmits telephone speech at ~32 kbps versus 64 kbps for PCM (Example 7.4.2) at comparable quality.',
   // Stage C — adaptive delta modulation (§7.4.3)
   'adc.dm.mode': 'Mode',
   'adc.dm.linear': 'Linear DM',

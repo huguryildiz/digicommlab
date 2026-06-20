@@ -86,6 +86,16 @@ export function VectorQuantSection() {
               <HintText text={t('adc.card.voronoi.body')} />
             </p>
           </InfoCard>
+          <InfoCard title={t('adc.card.vqrate.title')} accent="orange">
+            <p>
+              <HintText text={t('adc.card.vqrate.body')} />
+            </p>
+          </InfoCard>
+          <InfoCard title={t('adc.card.vqadv.title')} accent="green">
+            <p>
+              <HintText text={t('adc.card.vqadv.body')} />
+            </p>
+          </InfoCard>
         </div>
 
         <TheoryBox title="Theory — vector quantization">
