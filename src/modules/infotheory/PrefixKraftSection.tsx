@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Panel, Readout, Formula, TheoryBox } from '@/components';
+import { Panel, Readout, Formula, TheoryBox, InfoCard } from '@/components';
 import { TreeSvg, layoutBinaryTree, type BinTree } from '@/lib/plot/svg';
 import {
   kraftSum,
@@ -83,7 +83,7 @@ export function PrefixKraftSection() {
     setRows((rs) => rs.map((r, j) => (j === i ? { ...r, code: code.replace(/[^01]/g, '') } : r)));
 
   return (
-    <div className="it-section">
+    <div className="module-layout">
       <aside className="it-controls">
         <Panel title={t('it.prefix.code')}>
           {rows.map((r, i) => (
@@ -141,6 +141,22 @@ export function PrefixKraftSection() {
         <Panel title={t('it.prefix.tree')}>
           <TreeSvg layout={layout} ariaLabel="Code tree" />
         </Panel>
+        <div className="info-cards">
+          <InfoCard title={t('it.prefix.card.prefix')} accent="green">
+            <p>{t('it.prefix.card.prefixBody')}</p>
+          </InfoCard>
+          <InfoCard title={t('it.prefix.card.kraft')} accent="orange">
+            <p>{t('it.prefix.card.kraftBody')}</p>
+            <Formula tex="\sum_k 2^{-l_k}\le 1" block />
+          </InfoCard>
+          <InfoCard title={t('it.prefix.card.ud')} accent="blue">
+            <p>{t('it.prefix.card.udBody')}</p>
+          </InfoCard>
+          <InfoCard title={t('it.prefix.card.thm')} accent="green">
+            <p>{t('it.prefix.card.thmBody')}</p>
+            <Formula tex="H(S)\le \bar L< H(S)+1" block />
+          </InfoCard>
+        </div>
         <TheoryBox title={t('it.theory.title')}>
           <p>
             <Formula
