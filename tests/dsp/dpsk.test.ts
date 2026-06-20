@@ -4,6 +4,7 @@ import {
   differentialDecode,
   dpskBitErrorProb,
   dpskSymbolErrorProb,
+  simulateDpsk,
 } from '@/lib/dsp/dpsk';
 
 describe('differential encode/decode', () => {
@@ -35,5 +36,24 @@ describe('DPSK error probability', () => {
     // BPSK reaches 1e-4 near 8.4 dB; binary DPSK crosses it near ~9.31 dB → < 1 dB gap.
     expect(dpskBitErrorProb(9.4)).toBeLessThan(1e-4);
     expect(dpskBitErrorProb(8.4)).toBeGreaterThan(1e-4);
+  });
+});
+
+describe('simulateDpsk (noncoherent differential detection)', () => {
+  it('binary BER tracks ½ e^{-Eb/N0} within Monte-Carlo tolerance', () => {
+    const r = simulateDpsk({ M: 2, ebN0Db: 6, numSymbols: 200000, seed: 7 });
+    const theory = dpskBitErrorProb(6);
+    expect(r.ber).toBeGreaterThan(theory * 0.8);
+    expect(r.ber).toBeLessThan(theory * 1.2);
+  });
+  it('is (near) error-free at very high SNR despite the unknown carrier phase', () => {
+    const r = simulateDpsk({ M: 4, ebN0Db: 20, numSymbols: 5000, seed: 1 });
+    expect(r.ser).toBeLessThan(0.01); // φ cancels via the differential product
+  });
+  it('reports consistent counts', () => {
+    const r = simulateDpsk({ M: 4, ebN0Db: 8, numSymbols: 3000, seed: 3 });
+    expect(r.totalSymbols).toBe(3000);
+    expect(r.totalBits).toBe(3000 * 2);
+    expect(r.ser).toBeCloseTo(r.symErrors / r.totalSymbols, 12);
   });
 });
