@@ -36,6 +36,15 @@ import {
   convolve,
 } from '@/lib/dsp/matchedfilter';
 import { sigmaFromN0, gaussian } from '@/lib/dsp/awgn';
+import {
+  lineCodeStream,
+  correlatorRun,
+  matchedFilterStream,
+  decide,
+  theoreticalPb,
+  sampleNoiseSigma,
+  type DetectCode,
+} from '@/lib/dsp/lcdetect';
 import { makeRng } from '@/lib/sim/sources';
 import { eyeTraces, eyeMetrics, type EyeTrace } from '@/lib/dsp/eye';
 import { zeroForcingTaps, mmseTaps, residualIsi } from '@/lib/dsp/equalizer';
@@ -170,20 +179,24 @@ export function buildEyeView(p: EyeParams): EyeView {
   const levels = pamLevels(bits, p.M);
   const clean = shapeHeld(levels, p.sps);
   const rx = convolve(clean, p.channel);
+  const sigma = Math.sqrt(p.noiseVar);
+  const rng = makeRng(42);
+  const rxNoisy = sigma > 0 ? rx.map(v => v + sigma * gaussian(rng)) : rx;
+
   const eqTaps =
     p.equalizer === 'zf'
       ? zeroForcingTaps(p.channel, p.nTaps)
       : p.equalizer === 'mmse'
         ? mmseTaps(p.channel, p.noiseVar, p.nTaps)
         : [1];
-  const equalized = convolve(rx, eqTaps);
-  const tracesBefore = eyeTraces(rx, p.sps, 2);
+  const equalized = convolve(rxNoisy, eqTaps);
+  const tracesBefore = eyeTraces(rxNoisy, p.sps, 2);
   const tracesAfter = eyeTraces(equalized, p.sps, 2);
   return {
     tracesBefore,
     tracesAfter,
     eqTaps,
-    combined: convolve(p.channel, eqTaps),
+    combined: convolve(p.channel, eqTaps), // noise not reflected in combined (tap design, not received signal)
     eyeHeightBefore: eyeMetrics(tracesBefore, p.sps).eyeHeight,
     eyeHeightAfter: eyeMetrics(tracesAfter, p.sps).eyeHeight,
     residualIsi: residualIsi(p.channel, eqTaps),
@@ -355,4 +368,72 @@ export function buildDistortionView(p: DistortionParams): DistortionView {
   const t = cleanPulse.map((_, i) => (i - (N - 1) / 2) / sps);
 
   return { freqs, mag: C.mag, phase: C.phase, tau, gT, t, cleanPulse, distorted };
+}
+
+// ── §8.3.2 Matched-filter / correlator detection of a line-coded stream ──────
+
+export interface DetectionParams {
+  code: DetectCode;
+  bits: number[];
+  ebN0Db: number;
+  useMatchedFilter: boolean;
+  sps: number;
+  seed: number;
+}
+
+export interface DetectionView {
+  t: number[]; // time (bit periods) for g/x, length = nBits*sps
+  g: number[]; // clean transmitted waveform
+  x: number[]; // received = g + AWGN
+  g0: number[]; // detector output (correlator or MF), noisy
+  g0t: number[]; // time axis for g0 (own length)
+  g0Clean: number[]; // detector output for the clean signal (reference)
+  sampleT: number[]; // decision instants (bit periods)
+  samples: number[]; // noisy decision statistic at each instant
+  bitsTx: number[];
+  bitsRx: number[];
+  errorFlags: boolean[];
+  threshold: number;
+  errors: number;
+  ber: number;
+  pbTheory: number;
+  nBits: number;
+}
+
+export function buildDetectionView(p: DetectionParams): DetectionView {
+  const { code, bits, ebN0Db, useMatchedFilter, sps, seed } = p;
+  const g = lineCodeStream(bits, code, sps);
+  const sigma = sampleNoiseSigma(code, ebN0Db, sps);
+  const rng = makeRng(seed);
+  const x = sigma > 0 ? g.map((v) => v + sigma * gaussian(rng)) : g.slice();
+
+  const run = useMatchedFilter ? matchedFilterStream : correlatorRun;
+  const noisy = run(x, code, sps);
+  const clean = run(g, code, sps);
+
+  const bitsRx = decide(noisy.samples, code);
+  const errorFlags = bits.map((b, i) => b !== bitsRx[i]);
+  const errors = errorFlags.reduce((s, e) => s + (e ? 1 : 0), 0);
+
+  const t = g.map((_, i) => i / sps);
+  const g0t = noisy.g0.map((_, i) => i / sps);
+
+  return {
+    t,
+    g,
+    x,
+    g0: noisy.g0,
+    g0t,
+    g0Clean: clean.g0,
+    sampleT: noisy.sampleT,
+    samples: noisy.samples,
+    bitsTx: bits.slice(),
+    bitsRx,
+    errorFlags,
+    threshold: code === 'unipolar-nrz' ? 0.5 : 0,
+    errors,
+    ber: bits.length ? errors / bits.length : 0,
+    pbTheory: theoreticalPb(code, ebN0Db),
+    nBits: bits.length,
+  };
 }
