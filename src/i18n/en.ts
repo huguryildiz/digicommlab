@@ -15,6 +15,7 @@ export const en: Record<string, string> = {
   'adc.tab.sampling2': 'Sampling',
   'adc.tab.quantization': 'Quantization',
   'adc.tab.waveform': 'Waveform Coding',
+  'adc.tab.linecode': 'Line Coding',
   'adc.tab.media': 'Source & Media Coding',
   'adc.sub.scalar': 'Scalar',
   'adc.sub.vector': 'Vector',
@@ -181,6 +182,24 @@ export const en: Record<string, string> = {
   'adc.card.bitrate.title': 'LPC Compression',
   'adc.card.bitrate.body':
     'LPC transmits $p$ coefficients + gain + pitch per frame (~2 400 bit/s) versus PCM at 64 000 bit/s — roughly 27× compression for telephony.',
+  // Line Coding — baseband signaling formats (§8.3)
+  'adc.lc.pattern': 'Bit pattern',
+  'adc.lc.count': 'Number of bits',
+  'adc.lc.codes': 'Line codes',
+  'adc.lc.dc': 'DC',
+  'adc.lc.transitions': 'Transitions',
+  'adc.lc.preset.alt': 'Alternating 1010',
+  'adc.lc.preset.burst': 'Bursty 11001011',
+  'adc.lc.preset.ones': 'All ones 1111',
+  'adc.card.linecode.title': 'Line coding',
+  'adc.card.linecode.body':
+    'A line code maps each bit to a voltage shape over one bit period $T_b$. NRZ holds the level for the whole bit; RZ returns to zero mid-bit, adding edges for timing.',
+  'adc.card.dcbalance.title': 'DC balance',
+  'adc.card.dcbalance.body':
+    'Polar, Manchester and bipolar AMI average to zero over balanced data, so they pass through AC-coupled (transformer) lines; unipolar NRZ (OOK) carries a DC offset that such lines block.',
+  'adc.card.selfclock.title': 'Self-clocking',
+  'adc.card.selfclock.body':
+    'Manchester guarantees one transition every bit, so the receiver can recover the clock from the data; long runs of equal bits in NRZ give no edges and the clock can drift.',
   // Digital Audio — oversampling Σ-Δ + TDM hierarchy (§7.6)
   'adc.da.tone': 'Tone frequency',
   'adc.da.osr': 'Oversampling ratio',

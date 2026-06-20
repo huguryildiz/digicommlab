@@ -4,11 +4,12 @@ import { t } from '@/i18n';
 import { SamplingSection } from './sections/sampling/SamplingSection';
 import { QuantizationTab } from './sections/quantization/QuantizationTab';
 import { WaveformTab } from './sections/waveform/WaveformTab';
+import { LineCodeSection } from './sections/linecode/LineCodeSection';
 import MediaTab from './sections/media/MediaTab';
 import './sampling-quantization.css';
 
-type Tab = 'sampling' | 'quantization' | 'waveform' | 'media';
-const TABS: Tab[] = ['sampling', 'quantization', 'waveform', 'media'];
+type Tab = 'sampling' | 'quantization' | 'waveform' | 'linecode' | 'media';
+const TABS: Tab[] = ['sampling', 'quantization', 'waveform', 'linecode', 'media'];
 
 /**
  * Analog-to-Digital Conversion (Proakis & Salehi, Ch. 7), book-aligned 4-tab shell:
@@ -34,6 +35,7 @@ export function AdcModule() {
             { value: 'sampling', label: t('adc.tab.sampling2') },
             { value: 'quantization', label: t('adc.tab.quantization') },
             { value: 'waveform', label: t('adc.tab.waveform') },
+            { value: 'linecode', label: t('adc.tab.linecode') },
             { value: 'media', label: t('adc.tab.media') },
           ]}
         />
@@ -41,6 +43,7 @@ export function AdcModule() {
       {tab === 'sampling' && <SamplingSection />}
       {tab === 'quantization' && <QuantizationTab />}
       {tab === 'waveform' && <WaveformTab />}
+      {tab === 'linecode' && <LineCodeSection />}
       {tab === 'media' && <MediaTab />}
     </div>
   );
