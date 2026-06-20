@@ -292,8 +292,8 @@ Noncoherent FSK · Multidim Signals · Repeaters · Synchronization) ·
 | 11.2 Modulation and Demodulation in OFDM        | 622  | ✅     | `ofdm.ts`                     |
 | 11.3 OFDM via FFT Algorithm                     | 626  | ✅     | `ofdm.ts` — FFT-based         |
 | 11.4 Spectral Characteristics of OFDM           | 629  | ✅     | `OfdmSection.tsx`             |
-| 11.5 Peak-to-Average Power Ratio (PAPR)         | 631  | ⬜     | —                             |
-| 11.6 Applications of OFDM                       | 633  | ⬜     | Informational (no simulation) |
+| 11.5 Peak-to-Average Power Ratio (PAPR)         | 631  | ✅     | `papr.ts`, OFDM ▸ PAPR sub-tab (CCDF + clipping) |
+| 11.6 Applications of OFDM                       | 633  | ✅     | OFDM ▸ Applications info cards (DSL/DVB/WiFi/LTE) |
 
 ---
 
@@ -365,18 +365,18 @@ Noncoherent FSK · Multidim Signals · Repeaters · Synchronization) ·
 | 14.2.1 Frequency Nonselective Fading                | 774  | ✅     | `fading.ts` — flat fading                |
 | 14.2.2 Frequency Selective Fading                   | 777  | ✅     | `fading.ts`                              |
 | 14.2.3 Models for the Doppler Power Spectrum        | 778  | ✅     | `doppler.ts`, `DopplerSection.tsx`       |
-| 14.2.4 Propagation Models for Mobile Radio          | 781  | 🔶     | `shadowing.ts` — log-normal              |
+| 14.2.4 Propagation Models for Mobile Radio          | 781  | ✅     | `shadowing.ts`/`linkbudget.ts` (Hata/log-dist + log-normal) |
 | 14.3 Performance of Binary Mod. in Rayleigh Fading  | 783  | ✅     | `RayleighBerSection.tsx`                 |
 | 14.3.1 Prob. of Error — Freq. Nonselective          | 783  | ✅     | BER curve                                |
 | 14.3.2 Signal Diversity                             | 786  | ✅     | `diversity.ts`                           |
 | 14.3.3 RAKE Demodulator                             | 792  | ✅     | `rake.ts`, `RakeSection.tsx`             |
-| 14.3.4 OFDM in Frequency Selective Channels         | 794  | 🔶     | `OfdmSection.tsx` (partial)              |
+| 14.3.4 OFDM in Frequency Selective Channels         | 794  | ✅     | OFDM ▸ Equalization (per-subcarrier `H[k]`, CP)  |
 | 14.4 Multiple Antenna Systems (MIMO)                | 795  | ✅     | `mimo.ts`, `MimoSection.tsx`             |
 | 14.4.1 Channel Models for MIMO                      | 796  | ✅     | `mimo.ts`                                |
 | 14.4.2 Signal Transmission in MIMO                  | 797  | ✅     | `mimo.ts`                                |
 | 14.4.3 Detection in MIMO                            | 799  | ✅     | `mimo.ts`                                |
-| 14.4.4 Error Rate Performance                       | 800  | 🔶     | `MimoSection.tsx`                        |
-| 14.4.5 Space-Time Codes                             | 802  | ⬜     | —                                        |
+| 14.4.4 Error Rate Performance                       | 800  | ✅     | `mimo.ts` `mimoSpatialMuxBer` (ZF/MMSE), MIMO ▸ Error rate |
+| 14.4.5 Space-Time Codes                             | 802  | ✅     | `alamoutiBerAntipodal`, MIMO ▸ Space-Time (Alamouti) |
 | 14.5 Link Budget Analysis for Radio Channels        | 810  | ✅     | `linkbudget.ts`, `LinkBudgetSection.tsx` |
 
 ---
@@ -390,15 +390,15 @@ Noncoherent FSK · Multidim Signals · Repeaters · Synchronization) ·
 | 15.1 Model of SS Digital Comm. System         | 826  | ✅     | `spread.ts`                              |
 | 15.2 DS Spread-Spectrum Systems               | 827  | ✅     | `spread.ts`, `SpreadSpectrumSection.tsx` |
 | 15.2.1 Despreading on Narrowband Interference | 830  | ✅     | `SpreadSpectrumSection.tsx`              |
-| 15.2.2 Probability of Error at the Detector   | 831  | 🔶     | Partial                                  |
-| 15.3 Applications of DS SS                    | 836  | 🔶     | CDMA section exists                      |
+| 15.2.2 Probability of Error at the Detector   | 831  | ✅     | `dsssDetectorPe`, DS-SS detector P_e readout |
+| 15.3 Applications of DS SS                    | 836  | ✅     | `cdma.ts`, CDMA section + PN Codes tab    |
 | 15.3.2 CDMA                                   | 837  | ✅     | `cdma.ts`, `CdmaSection.tsx`             |
-| 15.3.3 Communication over Multipath Channels  | 838  | 🔶     | Linked to RAKE                           |
-| 15.4 Generation of PN Sequences               | 840  | ⬜     | —                                        |
+| 15.3.3 Communication over Multipath Channels  | 838  | ✅     | RAKE tab (`rake.ts`) + DS-SS spreading    |
+| 15.4 Generation of PN Sequences               | 840  | ✅     | `pnseq.ts`, PN Codes tab (LFSR/m-seq/Gold) |
 | 15.5 Frequency-Hopped Spread Spectrum         | 843  | ✅     | `fhss.ts`, `FhssSection.tsx`             |
 | 15.5.1 Slow FH and Partial-Band Interference  | 844  | ✅     | `fhss.ts`                                |
-| 15.5.2 Fast Frequency Hopping                 | 847  | 🔶     | `fhss.ts` (partial)                      |
-| 15.6 Synchronization of SS Systems            | 849  | ⬜     | —                                        |
+| 15.5.2 Fast Frequency Hopping                 | 847  | ✅     | `fastFhBerBfsk`, FHSS hops-per-bit diversity |
+| 15.6 Synchronization of SS Systems            | 849  | ✅     | `ssync.ts`, SS Sync tab (acquisition + DLL) |
 | 15.7 Digital Cellular Communication Systems   | 856  | ⬜     | Informational                            |
 
 ---
