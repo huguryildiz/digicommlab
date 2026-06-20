@@ -24,6 +24,12 @@ describe('InfoTheoryModule', () => {
     expect(screen.getByLabelText(/Binary entropy function/i)).toBeTruthy();
   });
 
+  it('switches to the Mutual Info tab and shows the Venn diagram', () => {
+    renderModule();
+    fireEvent.click(screen.getByRole('tab', { name: /Mutual Info/i }));
+    expect(screen.getByLabelText(/Entropy Venn diagram/i)).toBeTruthy();
+  });
+
   it('switches to the Lempel-Ziv tab and shows the dictionary', () => {
     renderModule();
     fireEvent.click(screen.getByRole('tab', { name: /Lempel-Ziv/i }));

@@ -71,3 +71,21 @@
   padding: 3px 8px;
   border-bottom: 1px solid var(--border);
 }
+.it-joint {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.it-joint th {
+  color: var(--text-dim);
+  font-weight: 500;
+  padding: 4px 6px;
+}
+.it-joint td {
+  padding: 4px;
+}
+.it-joint input {
+  width: 100%;
+  font-family: var(--mono);
+  text-align: center;
+}
