@@ -895,6 +895,30 @@ export const en: Record<string, string> = {
   'baseband.readout.residualIsi': 'Residual ISI',
   'baseband.theory.eye': 'Eye diagram, ISI & equalization',
   'baseband.reset': 'Reset',
+  // Eye Pattern & ISI (§10.3)
+  'baseband.tab.isi': 'Eye Pattern',
+  'baseband.isi.M': 'PAM levels M',
+  'baseband.isi.isiGain': 'ISI strength',
+  'baseband.isi.K': 'ISI span (symbols)',
+  'baseband.isi.annotations': 'Show interpretation',
+  'baseband.panel.isiFormation': 'Eye-pattern formation — superposition of all symbol patterns',
+  'baseband.panel.isiAnnotated': 'Eye diagram interpretation',
+  'baseband.readout.patternCount': 'Patterns superimposed',
+  'baseband.readout.peakDistortion': 'Peak distortion',
+  'baseband.readout.noiseMargin': 'Noise margin',
+  'baseband.theory.isi': 'Intersymbol interference & the eye pattern',
+  'baseband.card.isiForm.title': 'Intersymbol interference',
+  'baseband.card.isiForm.body':
+    'Each symbol leaks into its neighbours’ sampling instants: $y_m=x_0 a_m+\\sum_{n\\neq m}a_n x_{m-n}+w_m$. Overlapping every possible symbol pattern traces out the eye.',
+  'baseband.card.isiMargin.title': 'Eye opening = noise margin',
+  'baseband.card.isiMargin.body':
+    'The vertical opening at the sampling instant $t=mT$ is the margin against additive noise before the detector makes an error. ISI shrinks it.',
+  'baseband.card.isiJitter.title': 'Jitter & zero-crossings',
+  'baseband.card.isiJitter.body':
+    'ISI spreads the zero-crossings, narrowing the time window over which the received signal can be sampled reliably and increasing timing jitter.',
+  'baseband.card.isiSlope.title': 'Sensitivity to timing error',
+  'baseband.card.isiSlope.body':
+    'The slope of the eye sides near the crossing sets the sensitivity to a sampling-time error: steeper sides mean a small timing offset costs more margin.',
   // Pulse-shaping info cards
   'baseband.card.nyquist.title': 'Nyquist criterion',
   'baseband.card.nyquist.body':

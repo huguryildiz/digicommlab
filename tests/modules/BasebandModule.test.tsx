@@ -43,6 +43,11 @@ describe('BasebandModule', () => {
     fireEvent.click(screen.getByRole('tab', { name: /Eye, ISI & Equalization/i }));
     expect(screen.getByLabelText(/Eye diagram before equalization/i)).toBeTruthy();
   });
+  it('switches to the Eye Pattern tab and shows the formation panel', () => {
+    renderModule();
+    fireEvent.click(screen.getByRole('tab', { name: 'Eye Pattern' }));
+    expect(screen.getByLabelText(/Eye pattern forming as the superposition/i)).toBeTruthy();
+  });
   it('switches to the Partial Response tab and shows the PR pulse panel', () => {
     renderModule();
     fireEvent.click(screen.getByRole('tab', { name: /Partial Response/i }));
