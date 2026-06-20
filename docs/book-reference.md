@@ -328,8 +328,8 @@ Noncoherent FSK · Multidim Signals · Repeaters · Synchronization) ·
 | 13.2 Linear Block Codes                        | 694  | ✅     | `blockcodes.ts`, `BlockCodesSection.tsx`        |
 | 13.2.1 Decoding / Performance of LBC           | 700  | ✅     | `blockcodes.ts` — syndrome decoding             |
 | 13.2.2 Some Important Linear Block Codes       | 707  | ✅     | `blockcodes.ts` — Hamming etc.                  |
-| 13.2.3 Error Detection vs. Error Correction    | 708  | 🔶     | Partial in `BlockCodesSection.tsx`              |
-| 13.2.4 Burst-Error-Correcting Codes            | 709  | ⬜     | —                                               |
+| 13.2.3 Error Detection vs. Error Correction    | 708  | ✅     | `BlockCodesSection.tsx` — detection sim         |
+| 13.2.4 Burst-Error-Correcting Codes            | 709  | ✅     | `BlockCodesSection.tsx` — interleaver sim       |
 | 13.3 Convolutional Codes                       | 711  | ✅     | `convcodes.ts`, `ConvCodesSection.tsx`          |
 | 13.3.1 Basic Properties                        | 712  | ✅     | `convcodes.ts`                                  |
 | 13.3.2 ML Decoding — Viterbi Algorithm         | 717  | ✅     | `convcodes.ts` — Viterbi                        |
