@@ -8,6 +8,7 @@ import {
   Readout,
   Formula,
   TheoryBox,
+  InfoCard,
   TransportControls,
 } from '@/components';
 import { Canvas } from '@/lib/plot/Canvas';
@@ -182,6 +183,28 @@ export function BlockCodesSection() {
           </Panel>
         )}
 
+        <div className="info-cards">
+          <InfoCard title={t('cc.bc.card.lbc')} accent="green">
+            <p>{t('cc.bc.card.lbcBody')}</p>
+          </InfoCard>
+          <InfoCard title={t('cc.bc.card.dist')} accent="green">
+            <p>{t('cc.bc.card.distBody')}</p>
+          </InfoCard>
+          <InfoCard title={t('cc.bc.card.cd')} accent="orange">
+            <p>{t('cc.bc.card.cdBody')}</p>
+            <Formula tex="e_c=\left\lfloor\tfrac{d_{\min}-1}{2}\right\rfloor,\quad e_d=d_{\min}-1" block />
+          </InfoCard>
+          <InfoCard title={t('cc.bc.card.arq')} accent="blue">
+            <p>{t('cc.bc.card.arqBody')}</p>
+          </InfoCard>
+          <InfoCard title={t('cc.bc.card.burst')} accent="orange">
+            <p>{t('cc.bc.card.burstBody')}</p>
+          </InfoCard>
+          <InfoCard title={t('cc.bc.card.inter')} accent="blue">
+            <p>{t('cc.bc.card.interBody')}</p>
+          </InfoCard>
+        </div>
+
         <TheoryBox title={t('cc.theory')}>
           <Formula
             tex="c = xG,\qquad s = rH^{\mathsf T},\qquad G=[I_k\,|\,P],\ H=[P^{\mathsf T}\,|\,I_{n-k}]"
@@ -189,6 +212,10 @@ export function BlockCodesSection() {
           />
           <Formula
             tex="\text{Hamming}\,(2^m{-}1,\ 2^m{-}m{-}1,\ 3),\qquad t=\left\lfloor\tfrac{d_{\min}-1}{2}\right\rfloor"
+            block
+          />
+          <Formula
+            tex="e_c=\left\lfloor\tfrac{d_{\min}-1}{2}\right\rfloor,\quad e_d=d_{\min}-1,\quad e_c+e_d\le d_{\min}-1\ (e_c\le e_d)"
             block
           />
         </TheoryBox>
