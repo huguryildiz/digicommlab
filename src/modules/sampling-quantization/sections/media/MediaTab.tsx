@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { Segmented } from '@/components';
 import { t } from '@/i18n';
 import { LpcSection } from './LpcSection';
-import { PlaceholderSection } from '../PlaceholderSection';
+import { DigitalAudioSection } from './DigitalAudioSection';
+import { JpegSection } from './JpegSection';
 
 type Sub = 'lpc' | 'audio' | 'jpeg';
 
@@ -26,8 +27,8 @@ export default function MediaTab() {
         />
       </div>
       {sub === 'lpc' && <LpcSection />}
-      {sub === 'audio' && <PlaceholderSection bodyKey="adc.placeholder.audio" />}
-      {sub === 'jpeg' && <PlaceholderSection bodyKey="adc.placeholder.jpeg" />}
+      {sub === 'audio' && <DigitalAudioSection />}
+      {sub === 'jpeg' && <JpegSection />}
     </div>
   );
 }

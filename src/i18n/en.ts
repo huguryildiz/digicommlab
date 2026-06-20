@@ -169,6 +169,52 @@ export const en: Record<string, string> = {
   'adc.card.bitrate.title': 'LPC Compression',
   'adc.card.bitrate.body':
     'LPC transmits $p$ coefficients + gain + pitch per frame (~2 400 bit/s) versus PCM at 64 000 bit/s — roughly 27× compression for telephony.',
+  // Digital Audio — oversampling Σ-Δ + TDM hierarchy (§7.6)
+  'adc.da.tone': 'Tone frequency',
+  'adc.da.osr': 'Oversampling ratio',
+  'adc.da.window': 'Decode window',
+  'adc.da.dsLevel': 'TDM level',
+  'adc.da.snr': 'Ideal SNR (1st-order)',
+  'adc.da.bits': 'Output resolution',
+  'adc.da.channels': 'Voice channels',
+  'adc.da.rate': 'Aggregate rate',
+  'adc.da.overhead': 'Framing overhead',
+  'adc.da.panel.bitstream': 'Input & Σ-Δ bitstream',
+  'adc.da.panel.recon': 'Reconstruction',
+  'adc.da.panel.psd': 'Quantization-noise PSD',
+  'adc.da.panel.tdm': 'TDM / DS hierarchy',
+  'adc.card.oversample.title': 'Oversampling',
+  'adc.card.oversample.body':
+    'Sampling far above Nyquist (ratio OSR) spreads the quantization noise over a wide band, so only a small in-band fraction remains — trading speed for amplitude resolution.',
+  'adc.card.noiseshape.title': 'Noise shaping',
+  'adc.card.noiseshape.body':
+    'The first-order Σ-Δ loop has noise transfer $\\mathrm{NTF}(z)=1-z^{-1}$, pushing the 1-bit quantization noise to high frequencies; each doubling of OSR adds ≈ 9 dB of SNR.',
+  'adc.card.tdm.title': 'Time-division multiplexing',
+  'adc.card.tdm.body':
+    'Each frame is split into slots, one 8-bit PCM sample per user. 24 channels make a DS-1 at $24\\times64\\,\\text{kbps}+\\text{framing}=1.544\\,\\text{Mbps}$; higher levels multiplex DS-1s.',
+  // JPEG image coding — 8×8 DCT (§7.7)
+  'adc.jpeg.preset': 'Source block',
+  'adc.jpeg.quality': 'JPEG quality',
+  'adc.jpeg.nonzero': 'Non-zero coeffs',
+  'adc.jpeg.compaction': 'Energy compaction (top 8)',
+  'adc.jpeg.psnr': 'PSNR',
+  'adc.jpeg.panel.original': 'Original block',
+  'adc.jpeg.panel.dct': 'DCT coefficients',
+  'adc.jpeg.panel.quantized': 'Quantized levels',
+  'adc.jpeg.panel.recon': 'Reconstructed block',
+  'adc.jpeg.preset.gradient': 'Smooth gradient',
+  'adc.jpeg.preset.edge': 'Vertical edge',
+  'adc.jpeg.preset.texture': 'Checker texture',
+  'adc.jpeg.preset.ramp': 'Diagonal ramp',
+  'adc.card.dct.title': 'DCT energy compaction',
+  'adc.card.dct.body':
+    'The 2-D DCT packs most block energy into a few low-frequency coefficients $X(u,v)$; for smooth blocks the top 8 of 64 hold over $99\\%$ of the energy.',
+  'adc.card.qtable.title': 'Perceptual quantization',
+  'adc.card.qtable.body':
+    'Each coefficient is divided by a step $Q(u,v)$ from Table 7.5 — coarser for high spatial frequencies the eye barely sees, which is where most coefficients become zero.',
+  'adc.card.quality.title': 'Quality factor',
+  'adc.card.quality.body':
+    'Quality 50 uses the base table; higher quality shrinks the steps (finer, larger files), lower quality scales them up — more zeros, smaller files, visible artefacts.',
   'nav.modulation': 'Digital Modulation & Detection',
   'nav.baseband': 'Baseband & ISI',
   'nav.huffman': 'Huffman & Entropy',
