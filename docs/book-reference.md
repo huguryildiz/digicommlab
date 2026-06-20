@@ -19,23 +19,23 @@ printed numbers (PDF page offset ~+14).
 
 ## Book structure (chapter map)
 
-| Ch  | Title                                          | Page | Status | Platform relevance                                                   |
-| --- | ---------------------------------------------- | ---- | ------ | -------------------------------------------------------------------- |
-| 1   | Introduction                                   | 1    | ⬜     | General system model, channel models                                 |
-| 2   | Signals and Linear Systems                     | 21   | ✅     | Fourier, spectrum, convolution, filter design, Hilbert, bandpass/I-Q |
-| 3   | Amplitude Modulation                           | 117  | ✅     | AM (DSB-SC, SSB, VSB), demodulation                                  |
-| 4   | Angle Modulation                               | 161  | ✅     | FM/PM signals, spectrum                                              |
-| 5   | Probability and Random Processes               | 190  | ✅     | Noise, AWGN, PSD, Gaussian processes                                 |
-| 6   | Effect of Noise on Analog Communication        | 255  | ✅     | SNR analysis, threshold effect, pre-emphasis                         |
+| Ch  | Title                                          | Page | Status | Platform relevance                                                                                             |
+| --- | ---------------------------------------------- | ---- | ------ | -------------------------------------------------------------------------------------------------------------- |
+| 1   | Introduction                                   | 1    | ⬜     | General system model, channel models                                                                           |
+| 2   | Signals and Linear Systems                     | 21   | ✅     | Fourier, spectrum, convolution, filter design, Hilbert, bandpass/I-Q                                           |
+| 3   | Amplitude Modulation                           | 117  | ✅     | AM (DSB-SC, SSB, VSB), demodulation                                                                            |
+| 4   | Angle Modulation                               | 161  | ✅     | FM/PM signals, spectrum                                                                                        |
+| 5   | Probability and Random Processes               | 190  | ✅     | Noise, AWGN, PSD, Gaussian processes                                                                           |
+| 6   | Effect of Noise on Analog Communication        | 255  | ✅     | SNR analysis, threshold effect, pre-emphasis                                                                   |
 | 7   | Analog-to-Digital Conversion                   | 296  | ✅     | Sampling, scalar/Lloyd-Max/vector quant., PCM+companding, DPCM, delta+ADM, LPC, Σ-Δ/TDM, JPEG DCT, line coding |
-| 8   | Digital Modulation in AWGN Channel             | ~340 | ✅     | Modulation & detection, SER/BER                                      |
-| 9   | Noncoherent Modulation / Memory                | ~470 | 🔶     | DPSK, noncoherent FSK, CPFSK                                         |
-| 10  | Digital Transmission — Bandlimited Channels    | 543  | ✅     | Baseband, Nyquist, ISI, eye diagram                                  |
-| 11  | Multicarrier Modulation and OFDM               | 621  | ✅     | OFDM modulation/demodulation                                         |
-| 12  | An Introduction to Information Theory          | 642  | ✅     | Entropy, Huffman, Lempel-Ziv, capacity                               |
-| 13  | Coding for Reliable Communications             | 689  | ✅     | Block codes, convolutional, BCH, RS, concatenated                    |
-| 14  | Data Transmission in Fading Multipath Channels | 769  | ✅     | Rayleigh, Doppler, RAKE, MIMO, link budget                           |
-| 15  | Spread-Spectrum Communication Systems          | 825  | ✅     | DS-SS, CDMA, FHSS                                                    |
+| 8   | Digital Modulation Methods in an AWGN Channel  | 347  | ✅     | Modulation & detection, SER/BER, DPSK, carrier-phase & symbol-timing sync, regenerative repeaters              |
+| 9   | Multidimensional Digital Modulation            | 485  | ✅     | Orthogonal/biorthogonal/simplex signals, union bound, noncoherent FSK, CPFSK (CPFSK in wireless)               |
+| 10  | Digital Transmission — Bandlimited Channels    | 543  | ✅     | Baseband, Nyquist, ISI, eye diagram                                                                            |
+| 11  | Multicarrier Modulation and OFDM               | 621  | ✅     | OFDM modulation/demodulation                                                                                   |
+| 12  | An Introduction to Information Theory          | 642  | ✅     | Entropy, Huffman, Lempel-Ziv, capacity                                                                         |
+| 13  | Coding for Reliable Communications             | 689  | ✅     | Block codes, convolutional, BCH, RS, concatenated                                                              |
+| 14  | Data Transmission in Fading Multipath Channels | 769  | ✅     | Rayleigh, Doppler, RAKE, MIMO, link budget                                                                     |
+| 15  | Spread-Spectrum Communication Systems          | 825  | ✅     | DS-SS, CDMA, FHSS                                                                                              |
 
 ---
 
@@ -153,22 +153,22 @@ styled by `.rp__card*` in `random-process.css`.
 `src/lib/dsp/linkbudget.ts` (§6.4, shared with wireless), reuses `analog.ts` (`amSignal`,
 `envelopeDetect`, `emphasisSnrGainDb`, `preEmphasisMagDb`).
 
-| Subsection                                       | Page | Status | Repo mapping                                  |
-| ------------------------------------------------ | ---- | ------ | --------------------------------------------- |
-| 6.1 Effect of Noise on AM Systems                | 255  | ✅     | `AmNoiseTab.tsx` (4 sub-tabs)                 |
-| 6.1.1 Baseband System                            | 256  | ✅     | `am/BasebandSection.tsx`                       |
-| 6.1.2 DSB-SC AM                                  | 256  | ✅     | `am/DsbScSection.tsx` (real coherent chain)    |
-| 6.1.3 SSB AM                                     | 258  | ✅     | `am/SsbSection.tsx`                            |
-| 6.1.4 Conventional AM                            | 259  | ✅     | `am/ConventionalAmSection.tsx` (envelope+thr.) |
+| Subsection                                       | Page | Status | Repo mapping                                         |
+| ------------------------------------------------ | ---- | ------ | ---------------------------------------------------- |
+| 6.1 Effect of Noise on AM Systems                | 255  | ✅     | `AmNoiseTab.tsx` (4 sub-tabs)                        |
+| 6.1.1 Baseband System                            | 256  | ✅     | `am/BasebandSection.tsx`                             |
+| 6.1.2 DSB-SC AM                                  | 256  | ✅     | `am/DsbScSection.tsx` (real coherent chain)          |
+| 6.1.3 SSB AM                                     | 258  | ✅     | `am/SsbSection.tsx`                                  |
+| 6.1.4 Conventional AM                            | 259  | ✅     | `am/ConventionalAmSection.tsx` (envelope+thr.)       |
 | 6.2 Effect of Noise on Angle Modulation          | 263  | ✅     | `angle/NoisePsdSection.tsx` (FM/PM, `angleNoisePsd`) |
-| 6.2.1 Threshold Effect                           | 271  | ✅     | `angle/ThresholdSection.tsx` (Fig 6.5 family)  |
-| 6.2.2 Pre-emphasis and De-emphasis (FM)          | 274  | ✅     | `angle/EmphasisSection.tsx` (Eq. 6.2.42)       |
-| 6.3 Comparison of Analog-Modulation Systems      | 277  | ✅     | `ComparisonSection.tsx` (curves + table)       |
-| 6.4 Transmission Losses and Noise                | 278  | ✅     | `LinkBudgetTab.tsx` (4 sub-tabs), `linkbudget.ts` |
-| 6.4.1 Thermal Noise Sources                      | 279  | ✅     | `link/ThermalNoiseSection.tsx` (kTB)           |
-| 6.4.2 Effective Noise Temperature / Noise Figure | 280  | ✅     | `link/NoiseFigureSection.tsx` (Friis cascade)  |
-| 6.4.3 Transmission Losses                        | 283  | ✅     | `link/PathLossSection.tsx` (path loss)         |
-| 6.4.4 Repeaters for Signal Transmission          | 284  | ✅     | `link/RepeaterSection.tsx` (K-segment SNR)     |
+| 6.2.1 Threshold Effect                           | 271  | ✅     | `angle/ThresholdSection.tsx` (Fig 6.5 family)        |
+| 6.2.2 Pre-emphasis and De-emphasis (FM)          | 274  | ✅     | `angle/EmphasisSection.tsx` (Eq. 6.2.42)             |
+| 6.3 Comparison of Analog-Modulation Systems      | 277  | ✅     | `ComparisonSection.tsx` (curves + table)             |
+| 6.4 Transmission Losses and Noise                | 278  | ✅     | `LinkBudgetTab.tsx` (4 sub-tabs), `linkbudget.ts`    |
+| 6.4.1 Thermal Noise Sources                      | 279  | ✅     | `link/ThermalNoiseSection.tsx` (kTB)                 |
+| 6.4.2 Effective Noise Temperature / Noise Figure | 280  | ✅     | `link/NoiseFigureSection.tsx` (Friis cascade)        |
+| 6.4.3 Transmission Losses                        | 283  | ✅     | `link/PathLossSection.tsx` (path loss)               |
+| 6.4.4 Repeaters for Signal Transmission          | 284  | ✅     | `link/RepeaterSection.tsx` (K-segment SNR)           |
 
 ---
 
@@ -180,70 +180,80 @@ Source & Media Coding — with the former standalone `deltamod` module absorbed 
 sub-tab) · **DSP:** `src/lib/dsp/sampling.ts`, `quantize.ts`, `lloydmax.ts`, `vq.ts`, `pcm.ts`,
 `companding.ts`, `dpcm.ts`, `deltamod.ts`, `lpc.ts`, `sigmadelta.ts`, `tdm.ts`, `dct.ts`, `linecode.ts`
 
-| Subsection                             | Page | Status | Repo mapping                        |
-| -------------------------------------- | ---- | ------ | ----------------------------------- |
-| 7.1 Sampling and Signal Reconstruction | 297  | ✅     | `sampling.ts`, `SamplingSection.tsx` |
-| 7.1.1 The Sampling Theorem             | 297  | ✅     | `sampling.ts` — Nyquist             |
-| 7.2 Quantization                       | 301  | ✅     | `quantize.ts`                       |
-| 7.2.1 Scalar Quantization              | 302  | ✅     | `quantize.ts` SQNR; `lloydmax.ts` (Lloyd-Max), `ScalarQuantSection.tsx` |
-| 7.2.2 Vector Quantization              | 309  | ✅     | `vq.ts` (LBG/Voronoi), `VectorQuantSection.tsx` |
-| 7.3 Encoding                           | 311  | ✅     | `pcm.ts` (NBC/Gray), `PcmSection.tsx` |
-| 7.4 Waveform Coding                    | 312  | ✅     | `pcm.ts`, `dpcm.ts`, `deltamod.ts`  |
-| 7.4.1 PCM + companding                 | 313  | ✅     | `pcm.ts`, `companding.ts` (μ-law/A-law), `PcmSection.tsx` |
-| 7.4.2 DPCM                             | 316  | ✅     | `dpcm.ts`, `DpcmSection.tsx`         |
-| 7.4.3 Delta Modulation (+ ADM)         | 318  | ✅     | `deltamod.ts` (linear + adaptive), `DeltaModSection.tsx` |
-| 7.5 Analysis-Synthesis (LPC)           | 321  | ✅     | `lpc.ts` (autocorr/Levinson, pitch, formants), `LpcSection.tsx` |
+| Subsection                             | Page | Status | Repo mapping                                                              |
+| -------------------------------------- | ---- | ------ | ------------------------------------------------------------------------- |
+| 7.1 Sampling and Signal Reconstruction | 297  | ✅     | `sampling.ts`, `SamplingSection.tsx`                                      |
+| 7.1.1 The Sampling Theorem             | 297  | ✅     | `sampling.ts` — Nyquist                                                   |
+| 7.2 Quantization                       | 301  | ✅     | `quantize.ts`                                                             |
+| 7.2.1 Scalar Quantization              | 302  | ✅     | `quantize.ts` SQNR; `lloydmax.ts` (Lloyd-Max), `ScalarQuantSection.tsx`   |
+| 7.2.2 Vector Quantization              | 309  | ✅     | `vq.ts` (LBG/Voronoi), `VectorQuantSection.tsx`                           |
+| 7.3 Encoding                           | 311  | ✅     | `pcm.ts` (NBC/Gray), `PcmSection.tsx`                                     |
+| 7.4 Waveform Coding                    | 312  | ✅     | `pcm.ts`, `dpcm.ts`, `deltamod.ts`                                        |
+| 7.4.1 PCM + companding                 | 313  | ✅     | `pcm.ts`, `companding.ts` (μ-law/A-law), `PcmSection.tsx`                 |
+| 7.4.2 DPCM                             | 316  | ✅     | `dpcm.ts`, `DpcmSection.tsx`                                              |
+| 7.4.3 Delta Modulation (+ ADM)         | 318  | ✅     | `deltamod.ts` (linear + adaptive), `DeltaModSection.tsx`                  |
+| 7.5 Analysis-Synthesis (LPC)           | 321  | ✅     | `lpc.ts` (autocorr/Levinson, pitch, formants), `LpcSection.tsx`           |
 | 7.6 Digital Audio Transmission         | 325  | ✅     | `sigmadelta.ts` (Σ-Δ), `tdm.ts` (DS hierarchy), `DigitalAudioSection.tsx` |
-| 7.7 JPEG Image-Coding Standard         | 332  | ✅     | `dct.ts` (8×8 DCT, Table 7.5), `JpegSection.tsx` |
-| 8.3 Baseband line coding (ADC tab)     | ~345 | ✅     | `linecode.ts` (NRZ/RZ/AMI/Manchester), `LineCodeSection.tsx` |
+| 7.7 JPEG Image-Coding Standard         | 332  | ✅     | `dct.ts` (8×8 DCT, Table 7.5), `JpegSection.tsx`                          |
+| 8.3 Baseband line coding (ADC tab)     | ~345 | ✅     | `linecode.ts` (NRZ/RZ/AMI/Manchester), `LineCodeSection.tsx`              |
 
 ---
 
-### Chapter 8 — Digital Modulation in AWGN Channel (pp. ~340–470) ✅
+### Chapter 8 — Digital Modulation Methods in an AWGN Channel (pp. 347–484) ✅
 
-**Module:** `src/modules/modulation/` · **DSP:** `src/lib/dsp/modulation.ts`, `detector.ts`, `ser.ts`, `awgn.ts`, `gram-schmidt.ts`, `matchedfilter.ts`, `carrierbasis.ts`
+**Module:** `src/modules/modulation/` (7 tabs: Constellation & Detection · Optimum Receiver · DPSK ·
+Noncoherent FSK · Multidim Signals · Repeaters · Synchronization) ·
+**DSP:** `src/lib/dsp/modulation.ts`, `detector.ts`, `ser.ts`, `awgn.ts`, `gram-schmidt.ts`,
+`matchedfilter.ts`, `carrierbasis.ts`, `dpsk.ts`, `pll.ts`, `timing.ts`, `repeater.ts`
 
-| Subsection                              | Page | Status | Repo mapping                         |
-| --------------------------------------- | ---- | ------ | ------------------------------------ |
-| 8.1 Geometric Representation of Signals | ~341 | ✅     | `gram-schmidt.ts`, constellation     |
-| 8.2 PAM                                 | ~345 | ✅     | `modulation.ts` — M-PAM              |
-| 8.3 2-D Signals: PSK & QAM              | ~350 | ✅     | `modulation.ts` — PSK, QAM           |
-| 8.4 Multidimensional / Orthogonal (FSK) | ~360 | ✅     | `modulation.ts` — M-FSK              |
-| 8.5 Optimum Receiver                    | ~369 | ✅     | `OptimumReceiverSection.tsx`         |
-| 8.5.1 Correlation Demodulator           | ~369 | ✅     | `detector.ts`                        |
-| 8.5.2 Matched Filter                    | ~375 | ✅     | `matchedfilter.ts`                   |
-| 8.5.3 Optimum Detector (ML/MAP)         | ~381 | ✅     | `detector.ts` — ML/MAP               |
-| 8.6 Probability of Error                | ~404 | ✅     | `ser.ts`                             |
-| 8.6.2 M-ary PAM                         | ~408 | ✅     | `ser.ts` — PAM SER                   |
-| 8.6.3 Coherent PSK                      | ~413 | ✅     | `ser.ts` — PSK SER                   |
-| 8.6.5 QAM                               | ~418 | ✅     | `ser.ts` — QAM SER                   |
-| 8.6.6 M-ary Orthogonal                  | ~423 | ✅     | `ser.ts` — FSK SER                   |
-| 8.6.10 Modulation Comparison            | ~432 | ✅     | `ModulationModule.tsx` comparison    |
-| 8.7 Performance Analysis / Link Budget  | ~436 | 🔶     | `linkbudget.ts` (in wireless module) |
+| Subsection                                       | Page | Status | Repo mapping                                     |
+| ------------------------------------------------ | ---- | ------ | ------------------------------------------------ |
+| 8.1 Geometric Representation of Signal Waveforms | 348  | ✅     | `gram-schmidt.ts`, optrx + constellation         |
+| 8.2.1 / 8.2.2 Binary Antipodal / Orthogonal      | 352  | ✅     | `modulation.ts` — `bpsk` / `bfsk`                |
+| 8.3.1 Correlation-Type Demodulator               | 362  | ✅     | `OptimumReceiverSection`, `model.ts`             |
+| 8.3.2 Matched-Filter Demodulator                 | 371  | ✅     | `matchedfilter.ts`                               |
+| 8.3.3 Performance of Optimum Detector (binary)   | 379  | ✅     | `ser.ts`, `peakSnr`                              |
+| 8.4.1 Optimum Receiver for M-ary                 | 384  | ✅     | `detector.ts` — ML/MAP                           |
+| 8.4.2 Union Bound                                | 396  | ✅     | `ser.ts` `unionBoundSer`; Multidim-tab overlay   |
+| 8.5.1–8.5.3 M-ary PAM / ASK + Pe                 | 398  | ✅     | `modulation.ts` `mask`, `carrierbasis`, `ser.ts` |
+| 8.6.1–8.6.3 PSK geo / demod / coherent Pe        | 406  | ✅     | `modulation.ts` `mpsk`, `ser.ts`                 |
+| 8.6.4 Differential Encoding & DPSK               | 416  | ✅     | `dpsk.ts`, `DpskSection` (NEW)                   |
+| 8.6.5 Probability of Error for DPSK              | 418  | ✅     | `dpsk.ts` — `½e^{-Eb/N0}` + Eq.8.6.37 integral   |
+| 8.7.1–8.7.3 QAM geo / demod / Pe                 | 419  | ✅     | `modulation.ts` `mqam`, `ser.ts`                 |
+| 8.8.1 Carrier-Phase Estimation — PLL             | 429  | ✅     | `pll.ts`, `SyncSection` (Carrier Phase)          |
+| 8.8.2 Costas Loop                                | 437  | 🔶     | `SyncSection` InfoCard                           |
+| 8.8.3–8.8.5 Carrier-phase est. PAM / PSK / QAM   | 439  | 🔶     | `pll.ts` `mlPhaseEstimate`; InfoCards            |
+| 8.9.1 Early–Late Gate Synchronizer               | 447  | ✅     | `timing.ts`, `SyncSection` (Symbol Timing)       |
+| 8.9.3 / 8.9.4 ML timing / Spectral-line          | 451  | 🔶     | `SyncSection` InfoCards + TheoryBox              |
+| 8.10 Regenerative Repeaters                      | 456  | ✅     | `repeater.ts`, `RepeaterSection` (NEW)           |
 
 > **Rule:** Theoretical `P_s`/`P_b` curves and decision regions must be fully consistent with
-> §8.5–8.6 (including Gray coding, `E_b/N_0` axis).
+> §8.3–8.7 (including Gray coding, `E_b/N_0` axis). DPSK `½e^{-Eb/N0}` (Eq. 8.6.42),
+> regenerative-vs-analog reproduces Example 8.10.1 (11.3 vs 29.6 dB).
 
 ---
 
-### Chapter 9 — Noncoherent Modulation & Systems with Memory (pp. ~470–540) 🔶
+### Chapter 9 — Multidimensional Digital Modulation (pp. 485–542) ✅
 
-**Module:** `src/modules/wireless/` (partial) · **DSP:** `src/lib/dsp/cpm.ts`
+**Module:** `src/modules/modulation/` (Multidim Signals + Noncoherent FSK tabs); CPFSK lives in
+`src/modules/wireless/` · **DSP:** `src/lib/dsp/multidim.ts`, `noncoherent.ts`, `ser.ts`
+(`unionBoundSer`), `carrierbasis.ts` (`fskBasis`), `cpm.ts` (wireless)
 
-| Subsection                                        | Page | Status | Repo mapping                |
-| ------------------------------------------------- | ---- | ------ | --------------------------- |
-| 9.1 Carrier Phase Estimation                      | ~470 | ⬜     | —                           |
-| 9.2 Carrier Recovery for Suppressed-Carrier       | ~475 | ⬜     | —                           |
-| 9.3 Symbol Timing Estimation                      | ~485 | ⬜     | —                           |
-| 9.4 DPSK                                          | ~495 | ⬜     | —                           |
-| 9.5 Noncoherent Detection                         | ~504 | ⬜     | —                           |
-| 9.5.1 Noncoherent Binary FSK Receiver             | ~505 | ⬜     | —                           |
-| 9.5.2 Optimum Detector for Noncoherent Binary FSK | ~507 | ⬜     | —                           |
-| 9.5.3 Prob. of Error for M-ary FSK (noncoherent)  | ~510 | ⬜     | —                           |
-| 9.6 Modulation Systems with Memory                | ~513 | 🔶     | `cpm.ts`, `CpmSection.tsx`  |
-| 9.6.1 Continuous-Phase FSK (CPFSK)                | ~513 | ✅     | `cpm.ts` — CPFSK simulation |
-| 9.6.2 Spectral Characteristics of CPFSK           | ~524 | 🔶     | `CpmSection.tsx`            |
-| 9.7 Comparison of Modulation Methods              | ~525 | ⬜     | —                           |
+| Subsection                                        | Page | Status | Repo mapping                                      |
+| ------------------------------------------------- | ---- | ------ | ------------------------------------------------- |
+| 9.1.1 M-ary Orthogonal — Pe                       | 488  | ✅     | `multidim.ts` `orthogonalPe`; `mfsk` bank         |
+| 9.1.2 Union Bound on Orthogonal                   | 491  | ✅     | `multidim.ts`; Multidim-tab overlay (NEW)         |
+| 9.2 Biorthogonal Signals + Pe                     | 492  | ✅     | `multidim.ts` `biorthogonalSet` (NEW)             |
+| 9.3 Simplex Signals + Pe                          | 497  | ✅     | `multidim.ts` `simplexPe`, `simplexGainDb` (NEW)  |
+| 9.4 Binary-Coded Signals + Pe                     | 499  | 🔶     | deferred to Channel Coding module (Ch 13)         |
+| 9.5.1 Demodulation of M-ary FSK (coherent)        | 503  | ✅     | `carrierbasis.ts` `fskBasis`, correlator bank     |
+| 9.5.2 Optimum Detector for Noncoherent Binary FSK | 507  | ✅     | `noncoherent.ts` `squareLawDecide` (NEW)          |
+| 9.5.3 Pe for Noncoherent M-ary FSK                | 510  | ✅     | `noncoherent.ts` Eq.9.5.40 / `½e^{-Eb/2N0}` (NEW) |
+| 9.6.1 Continuous-Phase FSK (CPFSK)                | 513  | ✅     | `cpm.ts` — CPFSK simulation (wireless)            |
+| 9.6.2 Spectral Characteristics of CPFSK           | 524  | 🔶     | `wireless/sections/CpmSection.tsx`                |
+
+> **Note:** §9.4 binary-coded signals — the book defers their performance to Ch 13; covered by the
+> Channel Coding module. §9.6 CPFSK is implemented in the Wireless module (cross-linked, not duplicated).
 
 ---
 
