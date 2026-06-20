@@ -186,6 +186,30 @@ export const channelcoding: Record<string, string> = {
   'cc.pc.card.turboBody':
     'Iterating with soft (probabilistic) row/column guesses instead of hard flips is exactly the idea behind turbo codes (next tab).',
 
+  // Turbo codes (§13.5)
+  'cc.tab.turbo': 'Turbo',
+  'cc.tb.params': 'Turbo code & channel',
+  'cc.tb.reroll': 'Reroll noise',
+  'cc.tb.iter': 'Iteration',
+  'cc.tb.errors': 'Bit errors',
+  'cc.tb.llrTitle': 'Per-bit reliability over iterations (play to decode)',
+  'cc.tb.berTitle': 'Bit errors vs iteration',
+  'cc.tb.card.rsc': 'Recursive systematic code',
+  'cc.tb.card.rscBody':
+    'Each constituent encoder is systematic (the data bits pass through) with parity from a feedback shift register — a single low-weight input then yields high-weight parity.',
+  'cc.tb.card.parallel': 'Parallel concatenation',
+  'cc.tb.card.parallelBody':
+    'Two RSC encoders run in parallel; the second sees an interleaved copy of the data. The interleaver makes low-weight codewords rare (low multiplicity).',
+  'cc.tb.card.bcjr': 'BCJR / MAP decoding',
+  'cc.tb.card.bcjrBody':
+    'Each component is decoded by the forward–backward (BCJR) algorithm, producing a soft per-bit log-likelihood ratio rather than a hard decision.',
+  'cc.tb.card.iter': 'Iterative (turbo) decoding',
+  'cc.tb.card.iterBody':
+    'The two decoders trade extrinsic LLRs through the interleaver; after a few iterations the reliabilities sharpen and the errors vanish — the "turbo" effect.',
+  'cc.tb.card.shannon': 'Near-capacity',
+  'cc.tb.card.shannonBody':
+    'Turbo codes were the first practical codes to operate within a fraction of a dB of the Shannon limit.',
+
   // Tab 5 — Cyclic / CRC
   'cc.cy.code': 'Generator polynomial',
   'cc.cy.sel': 'Code / CRC preset',

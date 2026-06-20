@@ -11,6 +11,7 @@ import { ReedSolomonSection } from './ReedSolomonSection';
 import { CodesVsShannonSection } from './CodesVsShannonSection';
 import { ProductCodesSection } from './ProductCodesSection';
 import { ConcatenatedSection } from './ConcatenatedSection';
+import { TurboSection } from './TurboSection';
 import './channel-coding.css';
 
 type Tab =
@@ -23,7 +24,8 @@ type Tab =
   | 'rs'
   | 'compare'
   | 'product'
-  | 'concat';
+  | 'concat'
+  | 'turbo';
 
 const TABS: { value: Tab; label: string }[] = [
   { value: 'channels', label: t('cc.tab.channels') },
@@ -36,6 +38,7 @@ const TABS: { value: Tab; label: string }[] = [
   { value: 'compare', label: t('cc.tab.compare') },
   { value: 'product', label: t('cc.tab.product') },
   { value: 'concat', label: t('cc.tab.concat') },
+  { value: 'turbo', label: t('cc.tab.turbo') },
 ];
 
 export function ChannelCodingModule() {
@@ -65,6 +68,7 @@ export function ChannelCodingModule() {
       {tab === 'compare' && <CodesVsShannonSection />}
       {tab === 'product' && <ProductCodesSection />}
       {tab === 'concat' && <ConcatenatedSection />}
+      {tab === 'turbo' && <TurboSection />}
     </div>
   );
 }
