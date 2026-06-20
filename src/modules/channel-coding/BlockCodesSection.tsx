@@ -1,14 +1,25 @@
 import { useMemo, useState } from 'react';
-import { Panel, Select, Slider, Readout, Formula, TheoryBox } from '@/components';
+import {
+  Panel,
+  Select,
+  Slider,
+  Segmented,
+  Readout,
+  Formula,
+  TheoryBox,
+  TransportControls,
+} from '@/components';
 import { Canvas } from '@/lib/plot/Canvas';
 import { linScale, logScale, drawLine, drawVLine, drawText } from '@/lib/plot/draw';
 import { CHART, alpha } from '@/lib/plot/colors';
+import { useSimulationLoop } from '@/lib/sim/useSimulationLoop';
 import {
   CODES,
   encode,
   decode,
   syndromeTable,
   errorCorrectionT,
+  errorDetectionD,
   allCodewords,
   hammingDistance,
   uncodedBerBpsk,
@@ -144,6 +155,8 @@ export function BlockCodesSection() {
             {recovered ? t('cc.bc.ok') : t('cc.bc.fail')} ({numErr} {t('cc.bc.errBits')}, t = {tt})
           </p>
         </Panel>
+
+        <DetectionCorrectionSim />
 
         <Panel title={t('cc.bc.curve')}>
           <Canvas
@@ -315,4 +328,171 @@ function drawCube(ctx: CanvasRenderingContext2D, w: number, h: number, code: Lin
   }
   ctx.textAlign = 'start';
   drawText(ctx, ax, 0.5, 0.08, `codewords {000, 111},  d_min = ${code.dmin}`, CHART.dim, 0, 0);
+}
+
+type DcMode = 'correct' | 'detect' | 'combined';
+
+interface DcVerdict {
+  key: 'vNone' | 'vCorrected' | 'vDetected' | 'vUndetected';
+  tone: 'default' | 'ok' | 'warn' | 'err';
+}
+
+/**
+ * Bounded-distance decoding along the worst-case line to the nearest codeword (Fig. 13.5/13.6):
+ * distance to transmitted = errCount, to the nearest other codeword = dmin − errCount.
+ */
+function classifyDecode(
+  errCount: number,
+  dmin: number,
+  mode: DcMode,
+  ec: number,
+  ed: number,
+): DcVerdict {
+  if (errCount <= 0) return { key: 'vNone', tone: 'default' };
+  if (mode === 'correct') {
+    if (errCount <= ec) return { key: 'vCorrected', tone: 'ok' };
+    if (errCount >= dmin - ec) return { key: 'vUndetected', tone: 'err' };
+    return { key: 'vDetected', tone: 'warn' };
+  }
+  if (mode === 'detect') {
+    return errCount <= ed
+      ? { key: 'vDetected', tone: 'warn' }
+      : { key: 'vUndetected', tone: 'err' };
+  }
+  // combined: correct ≤ ec, detect ≤ ed (= dmin−1−ec)
+  if (errCount <= ec) return { key: 'vCorrected', tone: 'ok' };
+  if (errCount <= ed) return { key: 'vDetected', tone: 'warn' };
+  return { key: 'vUndetected', tone: 'err' };
+}
+
+/** §13.2.3 — live Hamming-sphere explorer: an injected received vector drifts outward past e_c/e_d. */
+function DetectionCorrectionSim() {
+  const [dmin, setDmin] = useState(3);
+  const [mode, setMode] = useState<DcMode>('correct');
+  const [ecSel, setEcSel] = useState(0);
+  const [errCount, setErrCount] = useState(0);
+
+  const ecMax = errorCorrectionT(dmin);
+  const ed = errorDetectionD(dmin);
+  const ecEff = mode === 'detect' ? 0 : mode === 'combined' ? Math.min(ecSel, ecMax) : ecMax;
+  const edEff = mode === 'detect' ? ed : mode === 'combined' ? dmin - 1 - ecEff : ed;
+  const verdict = classifyDecode(errCount, dmin, mode, ecEff, edEff);
+
+  const loop = useSimulationLoop({
+    ticksPerSecond: 1.5,
+    onTick: () => setErrCount((e) => (e >= dmin ? 0 : e + 1)),
+    onReset: () => setErrCount(0),
+  });
+
+  return (
+    <Panel title={t('cc.bc.dcTitle')}>
+      <div className="cc-readouts">
+        <Slider
+          label={t('cc.bc.dcDmin')}
+          value={dmin}
+          min={3}
+          max={9}
+          step={1}
+          onChange={(v) => {
+            setDmin(v);
+            setErrCount(0);
+          }}
+        />
+        {mode === 'combined' && (
+          <Slider
+            label={t('cc.bc.dcEcSel')}
+            value={ecSel}
+            min={0}
+            max={ecMax}
+            step={1}
+            onChange={setEcSel}
+          />
+        )}
+      </div>
+      <Segmented<DcMode>
+        ariaLabel={t('cc.bc.dcMode')}
+        value={mode}
+        options={[
+          { value: 'correct', label: t('cc.bc.modeCorrect') },
+          { value: 'detect', label: t('cc.bc.modeDetect') },
+          { value: 'combined', label: t('cc.bc.modeCombined') },
+        ]}
+        onChange={setMode}
+      />
+      <TransportControls loop={loop} />
+      <Canvas
+        height={170}
+        ariaLabel="Hamming-sphere detection and correction line"
+        deps={[dmin, mode, ecEff, edEff, errCount]}
+        draw={(ctx, w, h) => drawSphereLine(ctx, w, h, dmin, ecEff, edEff, errCount)}
+      />
+      <div className="cc-readouts">
+        <Readout label="e_c" value={ecMax} tone="ok" />
+        <Readout label="e_d" value={ed} />
+        <Readout label={t('cc.bc.dcErrors')} value={errCount} />
+        <Readout
+          label={t('cc.bc.dcVerdict')}
+          value={t(`cc.bc.${verdict.key}`)}
+          tone={verdict.tone}
+        />
+      </div>
+    </Panel>
+  );
+}
+
+/** Draw the 0…d_min distance line with c1/c2 spheres, the detect band and the moving received point. */
+function drawSphereLine(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  dmin: number,
+  ec: number,
+  ed: number,
+  errCount: number,
+): void {
+  const ax = { x: linScale([0, dmin], [40, w - 40]), y: linScale([0, 1], [h, 0]) };
+  const yc = h * 0.5;
+  // detection band (between codewords) — shaded amber
+  ctx.fillStyle = alpha(CHART.orange, 0.12);
+  ctx.fillRect(ax.x(0), yc - 26, ax.x(ed) - ax.x(0), 52);
+  // correction spheres around c1 (0) and c2 (dmin)
+  ctx.fillStyle = alpha(CHART.green, 0.18);
+  ctx.fillRect(ax.x(0), yc - 20, ax.x(ec) - ax.x(0), 40);
+  ctx.fillStyle = alpha(CHART.blue, 0.18);
+  ctx.fillRect(ax.x(dmin - ec), yc - 20, ax.x(dmin) - ax.x(dmin - ec), 40);
+  // baseline + integer ticks
+  ctx.strokeStyle = alpha(CHART.dim, 0.7);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(ax.x(0), yc);
+  ctx.lineTo(ax.x(dmin), yc);
+  ctx.stroke();
+  ctx.fillStyle = CHART.dim;
+  ctx.font = '10px ui-monospace, monospace';
+  ctx.textAlign = 'center';
+  for (let d = 0; d <= dmin; d++) {
+    ctx.beginPath();
+    ctx.moveTo(ax.x(d), yc - 4);
+    ctx.lineTo(ax.x(d), yc + 4);
+    ctx.stroke();
+    ctx.fillText(String(d), ax.x(d), yc + 18);
+  }
+  // codeword endpoints
+  for (const [d, col, label] of [
+    [0, CHART.green, 'c1'],
+    [dmin, CHART.blue, 'c2'],
+  ] as const) {
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.arc(ax.x(d), yc, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillText(label, ax.x(d), yc - 26);
+  }
+  // moving received point at distance errCount
+  ctx.fillStyle = CHART.pink;
+  ctx.beginPath();
+  ctx.arc(ax.x(errCount), yc, 6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillText('r', ax.x(errCount), yc - 26);
+  ctx.textAlign = 'start';
 }
