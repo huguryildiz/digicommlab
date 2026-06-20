@@ -5,7 +5,6 @@ const base: DetectionParams = {
   code: 'polar-nrz',
   bits: [0, 1, 0, 1, 1, 0, 0, 1, 0, 0],
   ebN0Db: 12,
-  useMatchedFilter: false,
   sps: 32,
   seed: 7,
 };
@@ -35,9 +34,18 @@ describe('buildDetectionView', () => {
     expect(a.errors).toBe(b.errors);
     expect(a.x).toEqual(b.x);
   });
-  it('matched-filter view exposes a longer g0 trace than the signal', () => {
-    const v = buildDetectionView({ ...base, useMatchedFilter: true });
-    expect(v.g0.length).toBeGreaterThan(v.g.length);
-    expect(v.g0t.length).toBe(v.g0.length);
+  it('computes both correlator and matched-filter traces; MF is longer than the signal', () => {
+    const v = buildDetectionView(base);
+    expect(v.corr.length).toBe(v.g.length); // correlator runs sample-for-sample
+    expect(v.corrT.length).toBe(v.corr.length);
+    expect(v.mf.length).toBeGreaterThan(v.g.length); // convolution adds sps−1 samples
+    expect(v.mfT.length).toBe(v.mf.length);
+  });
+  it('correlator and matched filter agree at the sampling instants', () => {
+    const v = buildDetectionView(base);
+    for (const k of v.sampleT.keys()) {
+      const corrIdx = Math.round(v.sampleT[k] * 32);
+      expect(v.mf[corrIdx]).toBeCloseTo(v.corr[corrIdx], 6);
+    }
   });
 });

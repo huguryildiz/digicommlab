@@ -3,7 +3,6 @@ import { useState, useMemo, useRef } from 'react';
 import {
   Panel,
   Slider,
-  Toggle,
   Select,
   Readout,
   InfoCard,
@@ -16,7 +15,13 @@ import { t } from '@/i18n';
 import { useSimulationLoop } from '@/lib/sim/useSimulationLoop';
 import type { DetectCode } from '@/lib/dsp/lcdetect';
 import { buildDetectionView, type DetectionParams } from './model';
-import { LcSignalPanel, LcReceivedPanel, LcCorrelatorPanel, LcDecisionPanel } from './panels';
+import {
+  LcSignalPanel,
+  LcReceivedPanel,
+  LcCorrelatorPanel,
+  LcMatchedFilterPanel,
+  LcDecisionPanel,
+} from './panels';
 
 const CODES: { value: DetectCode; key: string }[] = [
   { value: 'polar-nrz', key: 'baseband.detect.code.polarNrz' },
@@ -32,7 +37,6 @@ export function DetectionSection() {
   const [code, setCode] = useState<DetectCode>('polar-nrz');
   const [bits, setBits] = useState<number[]>(DEFAULT_BITS);
   const [ebN0Db, setEbN0Db] = useState(10);
-  const [useMatchedFilter, setUseMatchedFilter] = useState(false);
   const [seed, setSeed] = useState(7);
   const [resetKey, setResetKey] = useState(0);
 
@@ -61,11 +65,10 @@ export function DetectionSection() {
         code,
         bits,
         ebN0Db,
-        useMatchedFilter,
         sps: SPS,
         seed,
       } as DetectionParams),
-    [code, bits, ebN0Db, useMatchedFilter, seed],
+    [code, bits, ebN0Db, seed],
   );
 
   const toggleBit = (i: number) => setBits((b) => b.map((v, k) => (k === i ? (v ? 0 : 1) : v)));
@@ -82,7 +85,6 @@ export function DetectionSection() {
     setCode('polar-nrz');
     setBits(DEFAULT_BITS);
     setEbN0Db(10);
-    setUseMatchedFilter(false);
     setSeed(7);
     setProgress(DEFAULT_BITS.length);
     loop.stop();
@@ -108,11 +110,6 @@ export function DetectionSection() {
             unit="dB"
             precision={1}
             onChange={setEbN0Db}
-          />
-          <Toggle
-            label={t('baseband.detect.mf')}
-            checked={useMatchedFilter}
-            onChange={setUseMatchedFilter}
           />
         </Panel>
 
@@ -162,14 +159,11 @@ export function DetectionSection() {
         <Panel title={t('baseband.detect.panel.received')}>
           <LcReceivedPanel key={`r${resetKey}`} view={view} progress={progress} />
         </Panel>
-        <Panel
-          title={
-            useMatchedFilter
-              ? t('baseband.detect.panel.mfout')
-              : t('baseband.detect.panel.correlator')
-          }
-        >
+        <Panel title={t('baseband.detect.panel.correlator')}>
           <LcCorrelatorPanel key={`c${resetKey}`} view={view} progress={progress} />
+        </Panel>
+        <Panel title={t('baseband.detect.panel.mfout')}>
+          <LcMatchedFilterPanel key={`m${resetKey}`} view={view} progress={progress} />
         </Panel>
         <Panel title={t('baseband.detect.panel.decision')}>
           <LcDecisionPanel key={`d${resetKey}`} view={view} progress={progress} />

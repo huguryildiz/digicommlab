@@ -833,7 +833,6 @@ export const en: Record<string, string> = {
   'baseband.detect.code.polarRz': 'Polar RZ',
   'baseband.detect.code.unipolarNrz': 'Unipolar NRZ (OOK)',
   'baseband.detect.ebn0': 'Eb/N0',
-  'baseband.detect.mf': 'Matched-filter view',
   'baseband.detect.bits': 'Bit stream',
   'baseband.detect.randomize': 'Randomize bits',
   'baseband.detect.animation': 'Animation',

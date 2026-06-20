@@ -8,6 +8,7 @@ import {
   drawVLine,
   drawText,
   drawStems,
+  drawScatter,
   type Axes,
 } from '@/lib/plot/draw';
 import { useZoom } from '@/lib/plot/useZoom';
@@ -990,13 +991,27 @@ export function LcReceivedPanel({ view, progress }: { view: DetectionView; progr
   );
 }
 
+/** Mark each decision instant with a dashed vertical line and a dot on the sampled value. */
+function drawSampleMarkers(
+  ctx: CanvasRenderingContext2D,
+  ax: Axes,
+  view: DetectionView,
+  yLo: number,
+  yHi: number,
+  progress: number,
+): void {
+  for (let k = 0; k < view.nBits; k++) {
+    if (view.sampleT[k] > progress) continue;
+    drawVLine(ctx, ax, view.sampleT[k], yLo, yHi, alpha(COL_MARK, 0.45), true, 1);
+  }
+}
+
 export function LcCorrelatorPanel({ view, progress }: { view: DetectionView; progress: number }) {
-  const tMax = view.g0t[view.g0t.length - 1] || view.nBits;
   const [lo, hi, onWheel, , onPan] = useZoom(0, view.nBits, {
     minSpan: 1,
-    maxSpan: tMax,
+    maxSpan: view.nBits,
     clampMin: 0,
-    clampMax: tMax,
+    clampMax: view.nBits,
   });
   return (
     <Canvas
@@ -1010,12 +1025,50 @@ export function LcCorrelatorPanel({ view, progress }: { view: DetectionView; pro
         drawAxes(ctx, ax, [lo, hi], { xLabel: '$t\\,(T_b)$', yLabel: '$g_0(t)$' });
         drawBitBoundaries(ctx, ax, view.nBits, -1.4, 1.4, null, 0);
         drawLine(ctx, ax, [lo, hi], [view.threshold, view.threshold], alpha(COL_ERR, 0.7), 1.5, true);
-        drawLine(ctx, ax, view.g0t, view.g0Clean, alpha(CHART.dim, 0.5), 1.5);
-        const c = clipTo(view.g0t, view.g0, progress);
+        drawSampleMarkers(ctx, ax, view, -1.4, 1.4, progress);
+        drawLine(ctx, ax, view.corrT, view.corrClean, alpha(CHART.dim, 0.5), 1.5);
+        const c = clipTo(view.corrT, view.corr, progress);
         drawLine(ctx, ax, c.t, c.y, COL_Y, 2);
         drawLegend(ctx, w, [
           { color: CHART.dim, label: 'clean' },
           { color: COL_Y, label: 'noisy' },
+        ]);
+      }}
+    />
+  );
+}
+
+export function LcMatchedFilterPanel({ view, progress }: { view: DetectionView; progress: number }) {
+  const [lo, hi, onWheel, , onPan] = useZoom(0, view.nBits, {
+    minSpan: 1,
+    maxSpan: view.nBits,
+    clampMin: 0,
+    clampMax: view.nBits,
+  });
+  return (
+    <Canvas
+      height={190}
+      ariaLabel="Matched-filter output peaking at the decision instants"
+      deps={[view, lo, hi, progress]}
+      onWheel={onWheel}
+      onPan={onPan}
+      draw={(ctx, w, h) => {
+        const ax = axesFor(w, h, [lo, hi], [-1.4, 1.4]);
+        drawAxes(ctx, ax, [lo, hi], { xLabel: '$t\\,(T_b)$', yLabel: '$y(t)=(x*h)/E$' });
+        drawBitBoundaries(ctx, ax, view.nBits, -1.4, 1.4, null, 0);
+        drawLine(ctx, ax, [lo, hi], [view.threshold, view.threshold], alpha(COL_ERR, 0.7), 1.5, true);
+        drawSampleMarkers(ctx, ax, view, -1.4, 1.4, progress);
+        drawLine(ctx, ax, view.mfT, view.mfClean, alpha(CHART.dim, 0.5), 1.5);
+        const c = clipTo(view.mfT, view.mf, progress);
+        drawLine(ctx, ax, c.t, c.y, COL_H, 2);
+        // Dots on the matched-filter samples at the decision instants.
+        for (let k = 0; k < view.nBits; k++) {
+          if (view.sampleT[k] > progress) continue;
+          drawScatter(ctx, ax, [view.sampleT[k]], [view.samples[k]], COL_MARK, 3.5);
+        }
+        drawLegend(ctx, w, [
+          { color: CHART.dim, label: 'clean' },
+          { color: COL_H, label: 'noisy' },
         ]);
       }}
     />
@@ -1041,7 +1094,7 @@ export function LcDecisionPanel({ view, progress }: { view: DetectionView; progr
         drawAxes(ctx, ax, [lo, hi], { xLabel: '$t\\,(T_b)$', yLabel: '$y(t)$' });
         drawBitBoundaries(ctx, ax, view.nBits, -1.6, 1.8, null, 0);
         drawLine(ctx, ax, [lo, hi], [view.threshold, view.threshold], alpha(COL_ERR, 0.7), 1.5, true);
-        const c = clipTo(view.g0t, view.g0, progress);
+        const c = clipTo(view.corrT, view.corr, progress);
         drawLine(ctx, ax, c.t, c.y, alpha(COL_Y, 0.7), 1.5);
         // Decision markers: green = correct, red = error.
         for (let k = 0; k < view.nBits; k++) {

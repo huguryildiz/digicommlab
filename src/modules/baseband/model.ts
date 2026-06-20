@@ -417,7 +417,6 @@ export interface DetectionParams {
   code: DetectCode;
   bits: number[];
   ebN0Db: number;
-  useMatchedFilter: boolean;
   sps: number;
   seed: number;
 }
@@ -426,9 +425,14 @@ export interface DetectionView {
   t: number[]; // time (bit periods) for g/x, length = nBits*sps
   g: number[]; // clean transmitted waveform
   x: number[]; // received = g + AWGN
-  g0: number[]; // detector output (correlator or MF), noisy
-  g0t: number[]; // time axis for g0 (own length)
-  g0Clean: number[]; // detector output for the clean signal (reference)
+  // Correlator (integrate-and-dump) realization, reset each bit → sawtooth ramps.
+  corr: number[]; // noisy correlator output
+  corrT: number[]; // time axis for corr
+  corrClean: number[]; // correlator output for the clean signal (reference)
+  // Matched-filter realization y(t)=(x∗h)/E, continuous, peaks at the sampling instants.
+  mf: number[]; // noisy matched-filter output
+  mfT: number[]; // time axis for mf (length = x.length + sps − 1)
+  mfClean: number[]; // matched-filter output for the clean signal (reference)
   sampleT: number[]; // decision instants (bit periods)
   samples: number[]; // noisy decision statistic at each instant
   bitsTx: number[];
@@ -442,32 +446,35 @@ export interface DetectionView {
 }
 
 export function buildDetectionView(p: DetectionParams): DetectionView {
-  const { code, bits, ebN0Db, useMatchedFilter, sps, seed } = p;
+  const { code, bits, ebN0Db, sps, seed } = p;
   const g = lineCodeStream(bits, code, sps);
   const sigma = sampleNoiseSigma(code, ebN0Db, sps);
   const rng = makeRng(seed);
   const x = sigma > 0 ? g.map((v) => v + sigma * gaussian(rng)) : g.slice();
 
-  const run = useMatchedFilter ? matchedFilterStream : correlatorRun;
-  const noisy = run(x, code, sps);
-  const clean = run(g, code, sps);
+  // Both equivalent realizations are computed so the student can see them side by side;
+  // they coincide at the sampling instants (Proakis §8.3.2).
+  const corr = correlatorRun(x, code, sps);
+  const corrClean = correlatorRun(g, code, sps);
+  const mf = matchedFilterStream(x, code, sps);
+  const mfClean = matchedFilterStream(g, code, sps);
 
-  const bitsRx = decide(noisy.samples, code);
+  const bitsRx = decide(corr.samples, code);
   const errorFlags = bits.map((b, i) => b !== bitsRx[i]);
   const errors = errorFlags.reduce((s, e) => s + (e ? 1 : 0), 0);
 
-  const t = g.map((_, i) => i / sps);
-  const g0t = noisy.g0.map((_, i) => i / sps);
-
   return {
-    t,
+    t: g.map((_, i) => i / sps),
     g,
     x,
-    g0: noisy.g0,
-    g0t,
-    g0Clean: clean.g0,
-    sampleT: noisy.sampleT,
-    samples: noisy.samples,
+    corr: corr.g0,
+    corrT: corr.g0.map((_, i) => i / sps),
+    corrClean: corrClean.g0,
+    mf: mf.g0,
+    mfT: mf.g0.map((_, i) => i / sps),
+    mfClean: mfClean.g0,
+    sampleT: corr.sampleT,
+    samples: corr.samples,
     bitsTx: bits.slice(),
     bitsRx,
     errorFlags,
