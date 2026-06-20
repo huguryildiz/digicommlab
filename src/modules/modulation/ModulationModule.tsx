@@ -30,6 +30,7 @@ import {
 import { OptimumReceiverSection } from './OptimumReceiverSection';
 import { DpskSection } from './DpskSection';
 import { NoncoherentFskSection } from './NoncoherentFskSection';
+import { MultidimSection } from './MultidimSection';
 import './modulation.css';
 
 const M_OPTIONS: Record<Scheme, number[]> = {
@@ -48,7 +49,7 @@ const BATCH = 40;
 export function ModulationModule() {
   const { tab: slug = '' } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
-  const tab = (slug as 'detection' | 'optrx' | 'dpsk' | 'noncoh') || 'detection';
+  const tab = (slug as 'detection' | 'optrx' | 'dpsk' | 'noncoh' | 'multidim') || 'detection';
 
   const handleTabChange = (v: string) => {
     navigate(v === 'detection' ? '/modulation' : `/modulation/${v}`, { replace: true });
@@ -186,7 +187,7 @@ export function ModulationModule() {
 
   return (
     <div className="modulation__tabwrap">
-      <Segmented<'detection' | 'optrx' | 'dpsk' | 'noncoh'>
+      <Segmented<'detection' | 'optrx' | 'dpsk' | 'noncoh' | 'multidim'>
         ariaLabel={t('modulation.optrx.tabs')}
         value={tab}
         onChange={handleTabChange}
@@ -195,11 +196,13 @@ export function ModulationModule() {
           { value: 'optrx', label: t('modulation.optrx.tab.optrx') },
           { value: 'dpsk', label: t('modulation.dpsk.tab') },
           { value: 'noncoh', label: t('modulation.noncoh.tab') },
+          { value: 'multidim', label: t('modulation.multidim.tab') },
         ]}
       />
       {tab === 'optrx' && <OptimumReceiverSection />}
       {tab === 'dpsk' && <DpskSection />}
       {tab === 'noncoh' && <NoncoherentFskSection />}
+      {tab === 'multidim' && <MultidimSection />}
       <div className="module-layout" hidden={tab !== 'detection'}>
         <aside className="modulation__controls">
           <Panel title={t('nav.modulation')}>
