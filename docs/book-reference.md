@@ -27,7 +27,7 @@ printed numbers (PDF page offset ~+14).
 | 4   | Angle Modulation                               | 161  | ✅     | FM/PM signals, spectrum                                              |
 | 5   | Probability and Random Processes               | 190  | ✅     | Noise, AWGN, PSD, Gaussian processes                                 |
 | 6   | Effect of Noise on Analog Communication        | 255  | ✅     | SNR analysis, threshold effect, pre-emphasis                         |
-| 7   | Analog-to-Digital Conversion                   | 296  | ✅     | Sampling, quantization, PCM, Delta Mod.                              |
+| 7   | Analog-to-Digital Conversion                   | 296  | ✅     | Sampling, scalar/Lloyd-Max/vector quant., PCM+companding, DPCM, delta+ADM, LPC, Σ-Δ/TDM, JPEG DCT, line coding |
 | 8   | Digital Modulation in AWGN Channel             | ~340 | ✅     | Modulation & detection, SER/BER                                      |
 | 9   | Noncoherent Modulation / Memory                | ~470 | 🔶     | DPSK, noncoherent FSK, CPFSK                                         |
 | 10  | Digital Transmission — Bandlimited Channels    | 543  | ✅     | Baseband, Nyquist, ISI, eye diagram                                  |
@@ -175,8 +175,10 @@ styled by `.rp__card*` in `random-process.css`.
 ### Chapter 7 — Analog-to-Digital Conversion (pp. 296–338) ✅
 
 **Module:** `src/modules/sampling-quantization/` (single "Analog-to-Digital Conversion" module;
-`AdcModule.tsx` wraps the Sampling & Quantization view and the Delta Modulation view —
-`src/modules/deltamod/` — as two tabs) · **DSP:** `src/lib/dsp/sampling.ts`, `quantize.ts`, `pcm.ts`, `deltamod.ts`
+`AdcModule.tsx` is a 5-tab shell — Sampling · Quantization · Waveform Coding · Line Coding ·
+Source & Media Coding — with the former standalone `deltamod` module absorbed as a Waveform
+sub-tab) · **DSP:** `src/lib/dsp/sampling.ts`, `quantize.ts`, `lloydmax.ts`, `vq.ts`, `pcm.ts`,
+`companding.ts`, `dpcm.ts`, `deltamod.ts`, `lpc.ts`, `sigmadelta.ts`, `tdm.ts`, `dct.ts`, `linecode.ts`
 
 | Subsection                             | Page | Status | Repo mapping                        |
 | -------------------------------------- | ---- | ------ | ----------------------------------- |
