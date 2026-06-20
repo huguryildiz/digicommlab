@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { eyeTraces, eyeMetrics, isiEyePatterns } from '@/lib/dsp/eye';
+import { eyeTraces, eyeMetrics, isiEyePatterns, eyeAnnotations } from '@/lib/dsp/eye';
 import { convolve } from '@/lib/dsp/matchedfilter';
 
 // A clean 2-PAM signal: symbols ±1 held for sps samples each.
@@ -53,5 +53,22 @@ describe('isiEyePatterns', () => {
     expect(open).toBeGreaterThan(0);
     expect(mid).toBeLessThan(open);
     expect(heavy).toBeLessThan(mid);
+  });
+});
+
+describe('eyeAnnotations', () => {
+  it('marks an open eye with positive margin and tiny distortion at isiGain=0', () => {
+    const a = eyeAnnotations(isiEyePatterns(16, 2, 2, 0), 16);
+    expect(a.noiseMargin).toBeGreaterThan(0);
+    expect(a.peakDistortion).toBeLessThan(0.1);
+    expect(a.samplingT).toBeCloseTo(1, 1); // centre of the 2-symbol window
+    expect(a.noiseMargin).toBeCloseTo((a.eyeHi - a.eyeLo) / 2, 6);
+  });
+
+  it('shrinks the margin and grows the distortion as ISI increases', () => {
+    const lo = eyeAnnotations(isiEyePatterns(16, 2, 2, 0.1), 16);
+    const hi = eyeAnnotations(isiEyePatterns(16, 2, 2, 0.6), 16);
+    expect(hi.noiseMargin).toBeLessThan(lo.noiseMargin);
+    expect(hi.peakDistortion).toBeGreaterThan(lo.peakDistortion);
   });
 });

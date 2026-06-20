@@ -116,3 +116,107 @@ export function isiEyePatterns(
   }
   return traces;
 }
+
+export interface EyeAnnotations {
+  /** Best sampling instant (t/T) — column of maximum central opening. */
+  samplingT: number;
+  /** Inner upper / lower envelope of the central eye at the sampling instant. */
+  eyeHi: number;
+  eyeLo: number;
+  /** Nominal decision levels (centre of the upper / lower rail). */
+  idealHi: number;
+  idealLo: number;
+  /** Peak ISI deviation of the rail at the sampling instant. */
+  peakDistortion: number;
+  /** Half the vertical eye opening = margin against additive noise. */
+  noiseMargin: number;
+  /** Zero-crossing region (t/T) — its spread is the timing jitter. */
+  crossLeftT: number;
+  crossRightT: number;
+  /** Width (t/T) over which the eye stays open (sampling time-window). */
+  openWindow: number;
+  /** |dy/dt| of the eye side near the crossing = sensitivity to timing error. */
+  slope: number;
+}
+
+/**
+ * Quantitative eye-diagram interpretation (Proakis Fig. 10.8b): best sampling time,
+ * noise margin, peak distortion, zero-crossing jitter, sampling window, and the eye-side
+ * slope. Derived from the per-column value distribution of the overlaid traces.
+ */
+export function eyeAnnotations(traces: EyeTrace[], sps: number): EyeAnnotations {
+  const empty: EyeAnnotations = {
+    samplingT: 1, eyeHi: 0, eyeLo: 0, idealHi: 0, idealLo: 0,
+    peakDistortion: 0, noiseMargin: 0, crossLeftT: 1, crossRightT: 1,
+    openWindow: 0, slope: 0,
+  };
+  if (traces.length === 0) return empty;
+  const cols = traces[0].samples.length;
+
+  let peak = 1;
+  for (const tr of traces) for (const v of tr.samples) if (Math.abs(v) > peak) peak = Math.abs(v);
+  const MIN_GAP = peak * 0.05;
+
+  // Central gap = the value-gap straddling y=0 at a given column (the open eye around 0).
+  const centralGap = (col: number): { lo: number; hi: number } | null => {
+    const vals = traces.map((tr) => tr.samples[col]).sort((a, b) => a - b);
+    let best: { lo: number; hi: number } | null = null;
+    for (let j = 1; j < vals.length; j++) {
+      const lo = vals[j - 1];
+      const hi = vals[j];
+      if (hi - lo > MIN_GAP && lo <= 0 && hi >= 0) best = { lo, hi };
+    }
+    return best;
+  };
+
+  // Best sampling column = the widest central opening. A 2-symbol window has open eyes at
+  // every symbol centre (t/T = 0, 1, 2), so break ties toward the centre column (t/T = 1).
+  const mid = Math.floor(cols / 2);
+  const EPS = peak * 1e-3;
+  let samplingCol = mid;
+  let bestOpen = -1;
+  let bestDist = Infinity;
+  for (let c = 0; c < cols; c++) {
+    const g = centralGap(c);
+    const o = g ? g.hi - g.lo : 0;
+    const dist = Math.abs(c - mid);
+    if (o > bestOpen + EPS || (o > bestOpen - EPS && dist < bestDist)) {
+      bestOpen = o;
+      bestDist = dist;
+      samplingCol = c;
+    }
+  }
+
+  const g = centralGap(samplingCol) ?? { lo: 0, hi: 0 };
+  const eyeHi = g.hi;
+  const eyeLo = g.lo;
+
+  // Rail spread at the sampling instant → ideal level + peak distortion.
+  const atCol = traces.map((tr) => tr.samples[samplingCol]);
+  const upper = atCol.filter((v) => v >= 0);
+  const lower = atCol.filter((v) => v < 0);
+  const uMax = Math.max(eyeHi, ...upper);
+  const uMin = Math.min(eyeHi, ...upper);
+  const idealHi = (uMax + uMin) / 2;
+  const peakDistortion = (uMax - uMin) / 2;
+  const idealLo = lower.length ? (Math.max(...lower) + Math.min(...lower)) / 2 : -idealHi;
+  const noiseMargin = (eyeHi - eyeLo) / 2;
+
+  // Zero-crossing window: walk outward from the sampling column until the central eye
+  // closes (the gap straddling 0 disappears) — these are the two crossings bounding the eye.
+  let crossLeftCol = samplingCol;
+  while (crossLeftCol > 0 && centralGap(crossLeftCol - 1)) crossLeftCol--;
+  let crossRightCol = samplingCol;
+  while (crossRightCol < cols - 1 && centralGap(crossRightCol + 1)) crossRightCol++;
+  const toT = (c: number): number => c / sps;
+  const samplingT = toT(samplingCol);
+  const crossLeftT = toT(crossLeftCol);
+  const crossRightT = toT(crossRightCol);
+  const openWindow = crossRightT - crossLeftT;
+  const slope = samplingT > crossLeftT ? eyeHi / (samplingT - crossLeftT) : 0;
+
+  return {
+    samplingT, eyeHi, eyeLo, idealHi, idealLo,
+    peakDistortion, noiseMargin, crossLeftT, crossRightT, openWindow, slope,
+  };
+}
