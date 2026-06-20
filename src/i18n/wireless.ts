@@ -4,6 +4,66 @@ export const wireless: Record<string, string> = {
 
   'wl.title': 'Wireless Communications',
   'wl.subtitle': 'Multipath fading channels: delay spread, frequency selectivity, and Doppler.',
+  'wl.reset': 'Reset',
+
+  // OFDM sub-tabs (Ch 11)
+  'wl.ofdm.subtab.ariaLabel': 'OFDM sub-topic',
+  'wl.ofdm.subtab.eq': 'Equalization',
+  'wl.ofdm.subtab.papr': 'PAPR',
+  'wl.ofdm.subtab.apps': 'Applications',
+  'wl.ofdm.theory.title': 'Why OFDM works',
+  'wl.ofdm.theory.body':
+    'OFDM splits one fast, frequency-selective channel into many slow, flat subchannels. A cyclic prefix longer than the channel delay spread turns the linear multipath convolution into a circular one, so each subcarrier sees a single complex gain H[k] and is corrected by one complex division — at the cost of noise enhancement on deep-fade subcarriers.',
+  'wl.ofdm.card.cp.title': 'Cyclic prefix',
+  'wl.ofdm.card.cp.body':
+    'The tail of each symbol is copied to its front. If it is at least as long as the channel delay spread, the multipath leaves the symbol body as a clean circular convolution — no inter-symbol or inter-carrier interference.',
+  'wl.ofdm.card.eq.title': 'One-tap equalizer',
+  'wl.ofdm.card.eq.body':
+    'Each subcarrier is divided by its own channel gain, $\\hat{X}[k]=Y[k]/H[k]$ — a single complex multiply per subcarrier instead of a long time-domain equalizer.',
+  'wl.ofdm.card.orth.title': 'Subcarrier orthogonality',
+  'wl.ofdm.card.orth.body':
+    'Subcarriers are spaced at $1/T$ so each sits on the spectral nulls of all the others; the receiver FFT separates them without cross-talk.',
+
+  // OFDM Applications (§11.6)
+  'wl.ofdm.apps.title': 'OFDM in the real world',
+  'wl.ofdm.apps.intro': 'Where multicarrier modulation is deployed and the parameters each system uses.',
+  'wl.ofdm.apps.theory.title': 'Common thread',
+  'wl.ofdm.apps.theory.body':
+    'Every system below picks the subcarrier count and cyclic-prefix length to match its channel: a longer delay spread needs a longer CP, and a more time-variant channel needs wider subcarrier spacing (fewer subcarriers).',
+  'wl.ofdm.apps.dsl.title': 'DSL / ADSL (DMT)',
+  'wl.ofdm.apps.dsl.body':
+    'Discrete multitone over copper pairs uses up to 256 subcarriers with per-subcarrier bit loading — more bits on clean tones, fewer on noisy ones.',
+  'wl.ofdm.apps.dvb.title': 'DVB-T',
+  'wl.ofdm.apps.dvb.body':
+    'Terrestrial digital TV uses 2k/8k subcarriers with a long guard interval to survive echoes in single-frequency broadcast networks.',
+  'wl.ofdm.apps.wifi.title': 'Wi-Fi 802.11a/g/n',
+  'wl.ofdm.apps.wifi.body':
+    '64-point FFT, 52 active subcarriers, 0.8 µs cyclic prefix in a 20 MHz channel — short symbols for low-latency indoor links.',
+  'wl.ofdm.apps.lte.title': 'LTE / 4G',
+  'wl.ofdm.apps.lte.body':
+    'Scalable OFDMA with 15 kHz subcarrier spacing and FFT sizes from 128 to 2048, letting one design span 1.4–20 MHz bandwidths.',
+
+  // PAPR (§11.5)
+  'wl.papr.title': 'Peak-to-average power',
+  'wl.papr.subcarriers': 'Number of subcarriers N',
+  'wl.papr.clip': 'Clip ratio (dB above RMS)',
+  'wl.papr.trials': 'Monte-Carlo symbols',
+  'wl.papr.ccdf.title': 'PAPR distribution (CCDF)',
+  'wl.papr.env.title': 'Symbol envelope & clipping',
+  'wl.papr.readout.papr': 'PAPR (this symbol)',
+  'wl.papr.readout.clipped': 'PAPR after clipping',
+  'wl.papr.readout.evm': 'Clipping EVM',
+  'wl.papr.theory.title': 'The PAPR problem',
+  'wl.papr.theory.body':
+    'Because an OFDM symbol sums N independent subcarriers, they occasionally add in phase and produce a large peak. A high peak-to-average ratio forces the power amplifier into an expensive linear back-off; clipping the peaks cheaply lowers PAPR but adds in-band distortion (EVM) and out-of-band spectral regrowth.',
+  'wl.papr.card.papr.title': 'PAPR',
+  'wl.papr.card.papr.body': 'The ratio of the instantaneous peak power to the average power of the symbol.',
+  'wl.papr.card.ccdf.title': 'CCDF',
+  'wl.papr.card.ccdf.body':
+    'The complementary CDF gives the probability a symbol exceeds a PAPR threshold. The empirical curve tracks the theoretical $1-(1-e^{-\\gamma})^N$ and rises with N.',
+  'wl.papr.card.clip.title': 'Clipping vs back-off',
+  'wl.papr.card.clip.body':
+    'Hard-clipping the envelope lowers PAPR but injects distortion (EVM). The clip ratio trades distortion against amplifier efficiency.',
 
   'wl.gen.title': 'Channel scenario',
   'wl.gen.nTaps': 'Number of paths (taps)',
