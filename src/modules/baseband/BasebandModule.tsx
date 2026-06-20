@@ -4,6 +4,7 @@ import { Segmented } from '@/components';
 import { t } from '@/i18n';
 import { PulseShapingSection } from './PulseShapingSection';
 import { ReceiverSection } from './ReceiverSection';
+import { DetectionSection } from './DetectionSection';
 import { PowerSpectrumSection } from './PowerSpectrumSection';
 import { PartialResponseSection } from './PartialResponseSection';
 import { PrDetectionSection } from './PrDetectionSection';
@@ -11,10 +12,11 @@ import { EyeEqualizationSection } from './EyeEqualizationSection';
 import { ChannelDistortionSection } from './ChannelDistortionSection';
 import './baseband.css';
 
-type Tab = 'pulse' | 'receiver' | 'psd' | 'pr' | 'prdet' | 'eye' | 'distortion';
+type Tab = 'pulse' | 'receiver' | 'detect' | 'psd' | 'pr' | 'prdet' | 'eye' | 'distortion';
 const TABS: { value: Tab; key: string }[] = [
   { value: 'pulse', key: 'baseband.tab.pulse' },
   { value: 'receiver', key: 'baseband.tab.receiver' },
+  { value: 'detect', key: 'baseband.tab.detect' },
   { value: 'psd', key: 'baseband.tab.psd' },
   { value: 'pr', key: 'baseband.tab.pr' },
   { value: 'prdet', key: 'baseband.tab.prdet' },
@@ -37,6 +39,7 @@ export function BasebandModule() {
       />
       {tab === 'pulse' && <PulseShapingSection />}
       {tab === 'receiver' && <ReceiverSection />}
+      {tab === 'detect' && <DetectionSection />}
       {tab === 'psd' && <PowerSpectrumSection />}
       {tab === 'pr' && <PartialResponseSection />}
       {tab === 'prdet' && <PrDetectionSection />}

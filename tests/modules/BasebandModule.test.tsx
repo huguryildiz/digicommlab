@@ -31,6 +31,13 @@ describe('BasebandModule', () => {
     fireEvent.click(screen.getByRole('tab', { name: /Optimum Receiver/i }));
     expect(screen.getByLabelText(/Transmit pulse and its matched filter/i)).toBeTruthy();
   });
+  it('switches to the Matched-Filter Detection tab and shows the decision panel', () => {
+    renderModule();
+    fireEvent.click(screen.getByRole('tab', { name: /Matched-Filter Detection/i }));
+    expect(
+      screen.getByLabelText(/Decision statistic sampled per bit with errors circled/i),
+    ).toBeTruthy();
+  });
   it('switches to the eye tab and shows the eye diagram', () => {
     renderModule();
     fireEvent.click(screen.getByRole('tab', { name: /Eye, ISI & Equalization/i }));
