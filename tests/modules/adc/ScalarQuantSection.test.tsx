@@ -9,4 +9,9 @@ describe('ScalarQuantSection', () => {
     expect(screen.getByText('SQNR (theory)')).toBeInTheDocument();
     expect(screen.getByText('Uniform quantization')).toBeInTheDocument(); // info card
   });
+  it('offers a Lloyd-Max mode with a source-pdf selector', () => {
+    render(<ScalarQuantSection />);
+    expect(screen.getByText('Source distribution')).toBeInTheDocument(); // pdf selector
+    expect(screen.getByText('Optimal quantizer')).toBeInTheDocument(); // info card
+  });
 });

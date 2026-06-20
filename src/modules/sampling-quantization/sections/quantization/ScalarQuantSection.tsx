@@ -8,12 +8,15 @@ import {
   TheoryBox,
   Formula,
   HintText,
+  Segmented,
 } from '@/components';
 import { t } from '@/i18n';
 import { PRESETS, signalPeak, type Tone } from '@/lib/dsp/signals';
 import type { QuantizerType } from '@/lib/dsp/quantize';
+import { lloydMaxDesign, uniformDistortion, type SourcePdf } from '@/lib/dsp/lloydmax';
 import { buildSamplingView } from '@/modules/sampling-quantization/model';
 import { QuantPanel, ErrorPanel } from '@/modules/sampling-quantization/panels';
+import { LloydMaxPanel } from './lloydmax-panel';
 import '@/modules/sampling-quantization/sampling-quantization.css';
 
 type PresetKey = 'single' | 'two' | 'three';
@@ -33,6 +36,9 @@ export function ScalarQuantSection() {
   const [toneFreq, setToneFreq] = useState(2);
   const [bits, setBits] = useState(3);
   const [type, setType] = useState<QuantizerType>('midrise');
+  const [mode, setMode] = useState<'uniform' | 'optimal'>('uniform');
+  const [pdf, setPdf] = useState<SourcePdf>('gaussian');
+  const [nLevels, setNLevels] = useState(8);
 
   const tones: Tone[] = useMemo(() => {
     if (preset === 'single') return [{ freq: toneFreq, amp: 1 }];
@@ -56,6 +62,9 @@ export function ScalarQuantSection() {
       }),
     [tones, mMax, bits, type],
   );
+
+  const lm = useMemo(() => lloydMaxDesign(pdf, nLevels), [pdf, nLevels]);
+  const uniDist = useMemo(() => uniformDistortion(pdf, nLevels, 4), [pdf, nLevels]);
 
   return (
     <div className="module-layout">
@@ -100,34 +109,81 @@ export function ScalarQuantSection() {
               { value: 'midtread', label: t('sampling.midtread') },
             ]}
           />
+          <Select<SourcePdf>
+            label={t('adc.lm.pdf')}
+            value={pdf}
+            onChange={setPdf}
+            options={[
+              { value: 'gaussian', label: t('adc.lm.gaussian') },
+              { value: 'uniform', label: t('adc.lm.uniformsrc') },
+              { value: 'laplacian', label: t('adc.lm.laplacian') },
+            ]}
+          />
+          <Slider
+            label={t('adc.lm.levels')}
+            value={nLevels}
+            min={2}
+            max={32}
+            step={2}
+            onChange={setNLevels}
+          />
         </Panel>
       </aside>
 
       <div className="sampling__content">
-        <div className="sampling__readouts">
-          <Readout label={t('sampling.readout.levels')} value={2 ** bits} />
-          <Readout label={t('sampling.readout.delta')} value={view.delta.toFixed(3)} />
-          <Readout label={t('sampling.readout.noise')} value={view.noisePower.toExponential(2)} />
-          <Readout
-            label={t('sampling.readout.sqnrTheory')}
-            value={view.sqnrTheoryDb.toFixed(2)}
-            unit="dB"
-          />
-          <Readout
-            label={t('sampling.readout.sqnrMeasured')}
-            value={Number.isFinite(view.sqnrMeasuredDb) ? view.sqnrMeasuredDb.toFixed(2) : '∞'}
-            unit="dB"
+        <div className="adc__subtabbar">
+          <Segmented<'uniform' | 'optimal'>
+            ariaLabel={t('adc.lm.mode')}
+            value={mode}
+            onChange={setMode}
+            options={[
+              { value: 'uniform', label: t('adc.lm.uniform') },
+              { value: 'optimal', label: t('adc.lm.optimal') },
+            ]}
           />
         </div>
 
-        <div className="sampling__panels">
-          <Panel title={t('sampling.panel.quant')}>
-            <QuantPanel view={view} mMax={mMax} bits={bits} type={type} />
-          </Panel>
-          <Panel title={t('sampling.panel.error')}>
-            <ErrorPanel view={view} delta={view.delta} />
-          </Panel>
-        </div>
+        {mode === 'uniform' ? (
+          <>
+            <div className="sampling__readouts">
+              <Readout label={t('sampling.readout.levels')} value={2 ** bits} />
+              <Readout label={t('sampling.readout.delta')} value={view.delta.toFixed(3)} />
+              <Readout
+                label={t('sampling.readout.noise')}
+                value={view.noisePower.toExponential(2)}
+              />
+              <Readout
+                label={t('sampling.readout.sqnrTheory')}
+                value={view.sqnrTheoryDb.toFixed(2)}
+                unit="dB"
+              />
+              <Readout
+                label={t('sampling.readout.sqnrMeasured')}
+                value={Number.isFinite(view.sqnrMeasuredDb) ? view.sqnrMeasuredDb.toFixed(2) : '∞'}
+                unit="dB"
+              />
+            </div>
+            <div className="sampling__panels">
+              <Panel title={t('sampling.panel.quant')}>
+                <QuantPanel view={view} mMax={mMax} bits={bits} type={type} />
+              </Panel>
+              <Panel title={t('sampling.panel.error')}>
+                <ErrorPanel view={view} delta={view.delta} />
+              </Panel>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="sampling__readouts">
+              <Readout label={t('adc.lm.distortion')} value={lm.distortion.toFixed(4)} />
+              <Readout label={t('adc.lm.distUniform')} value={uniDist.toFixed(4)} />
+              <Readout label={t('adc.lm.sqnrOpt')} value={lm.sqnrDb.toFixed(2)} unit="dB" />
+            </div>
+            <Panel title={t('adc.lm.panel')}>
+              <LloydMaxPanel pdf={pdf} levels={nLevels} />
+            </Panel>
+          </>
+        )}
 
         <div className="info-cards">
           <InfoCard title={t('adc.card.quant.title')} accent="green">
@@ -143,6 +199,11 @@ export function ScalarQuantSection() {
           <InfoCard title={t('adc.card.midrisetread.title')} accent="orange">
             <p>
               <HintText text={t('adc.card.midrisetread.body')} />
+            </p>
+          </InfoCard>
+          <InfoCard title={t('adc.card.optimal.title')} accent="blue">
+            <p>
+              <HintText text={t('adc.card.optimal.body')} />
             </p>
           </InfoCard>
         </div>
