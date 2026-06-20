@@ -180,19 +180,20 @@ styled by `.rp__card*` in `random-process.css`.
 
 | Subsection                             | Page | Status | Repo mapping                        |
 | -------------------------------------- | ---- | ------ | ----------------------------------- |
-| 7.1 Sampling and Signal Reconstruction | 297  | ✅     | `sampling.ts`, `SamplingModule.tsx` |
+| 7.1 Sampling and Signal Reconstruction | 297  | ✅     | `sampling.ts`, `SamplingSection.tsx` |
 | 7.1.1 The Sampling Theorem             | 297  | ✅     | `sampling.ts` — Nyquist             |
 | 7.2 Quantization                       | 301  | ✅     | `quantize.ts`                       |
-| 7.2.1 Scalar Quantization              | 302  | ✅     | `quantize.ts` — SQNR                |
-| 7.2.2 Vector Quantization              | 309  | ⬜     | —                                   |
-| 7.3 Encoding                           | 311  | 🔶     | `pcm.ts` (PCM encoding, partial)    |
-| 7.4 Waveform Coding                    | 312  | ✅     | `pcm.ts`, `deltamod.ts`             |
-| 7.4.1 PCM                              | 313  | ✅     | `pcm.ts` — SQNR ≈ 6.02n+1.76 dB     |
-| 7.4.2 DPCM                             | 316  | ⬜     | —                                   |
-| 7.4.3 Delta Modulation                 | 318  | ✅     | `deltamod.ts`, `DeltaModModule.tsx` |
-| 7.5 Analysis-Synthesis Techniques      | 321  | ⬜     | —                                   |
-| 7.6 Digital Audio Transmission         | 325  | ⬜     | —                                   |
-| 7.7 JPEG Image-Coding Standard         | 332  | ⬜     | —                                   |
+| 7.2.1 Scalar Quantization              | 302  | ✅     | `quantize.ts` SQNR; `lloydmax.ts` (Lloyd-Max), `ScalarQuantSection.tsx` |
+| 7.2.2 Vector Quantization              | 309  | ✅     | `vq.ts` (LBG/Voronoi), `VectorQuantSection.tsx` |
+| 7.3 Encoding                           | 311  | ✅     | `pcm.ts` (NBC/Gray), `PcmSection.tsx` |
+| 7.4 Waveform Coding                    | 312  | ✅     | `pcm.ts`, `dpcm.ts`, `deltamod.ts`  |
+| 7.4.1 PCM + companding                 | 313  | ✅     | `pcm.ts`, `companding.ts` (μ-law/A-law), `PcmSection.tsx` |
+| 7.4.2 DPCM                             | 316  | ✅     | `dpcm.ts`, `DpcmSection.tsx`         |
+| 7.4.3 Delta Modulation (+ ADM)         | 318  | ✅     | `deltamod.ts` (linear + adaptive), `DeltaModSection.tsx` |
+| 7.5 Analysis-Synthesis (LPC)           | 321  | ✅     | `lpc.ts` (autocorr/Levinson, pitch, formants), `LpcSection.tsx` |
+| 7.6 Digital Audio Transmission         | 325  | ✅     | `sigmadelta.ts` (Σ-Δ), `tdm.ts` (DS hierarchy), `DigitalAudioSection.tsx` |
+| 7.7 JPEG Image-Coding Standard         | 332  | ✅     | `dct.ts` (8×8 DCT, Table 7.5), `JpegSection.tsx` |
+| 8.3 Baseband line coding (ADC tab)     | ~345 | ✅     | `linecode.ts` (NRZ/RZ/AMI/Manchester), `LineCodeSection.tsx` |
 
 ---
 
