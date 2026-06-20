@@ -10,6 +10,8 @@ import {
   Formula,
   TransportControls,
   Segmented,
+  InfoCard,
+  HintText,
 } from '@/components';
 import { t } from '@/i18n';
 import type { Scheme } from '@/lib/dsp/modulation';
@@ -365,6 +367,21 @@ export function ModulationModule() {
             priors={view.priors}
             constellation={view.constellation}
           />
+
+          <div className="info-cards">
+            <InfoCard title={t('modulation.detection.card.awgn.title')} accent="green">
+              <HintText text={t('modulation.detection.card.awgn.body')} />
+            </InfoCard>
+            <InfoCard title={t('modulation.detection.card.ml.title')} accent="blue">
+              <HintText text={t('modulation.detection.card.ml.body')} />
+            </InfoCard>
+            <InfoCard title={t('modulation.detection.card.gray.title')} accent="orange">
+              <HintText text={t('modulation.detection.card.gray.body')} />
+            </InfoCard>
+            <InfoCard title={t('modulation.detection.card.union.title')} accent="blue">
+              <HintText text={t('modulation.detection.card.union.body')} />
+            </InfoCard>
+          </div>
 
           <TheoryBox title={t('modulation.theory.title')}>
             <p>

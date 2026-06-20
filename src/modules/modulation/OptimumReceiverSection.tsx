@@ -7,6 +7,8 @@ import {
   TheoryBox,
   Formula,
   TransportControls,
+  InfoCard,
+  HintText,
 } from '@/components';
 import { t } from '@/i18n';
 import { makeRng } from '@/lib/sim/sources';
@@ -214,16 +216,31 @@ export function OptimumReceiverSection() {
           )}
         </Panel>
 
+        <div className="info-cards">
+          <InfoCard title={t('modulation.optrx.card.signalspace.title')} accent="green">
+            <HintText text={t('modulation.optrx.card.signalspace.body')} />
+          </InfoCard>
+          <InfoCard title={t('modulation.optrx.card.correlator.title')} accent="blue">
+            <HintText text={t('modulation.optrx.card.correlator.body')} />
+          </InfoCard>
+          <InfoCard title={t('modulation.optrx.card.matched.title')} accent="orange">
+            <HintText text={t('modulation.optrx.card.matched.body')} />
+          </InfoCard>
+          <InfoCard title={t('modulation.optrx.card.ml.title')} accent="blue">
+            <HintText text={t('modulation.optrx.card.ml.body')} />
+          </InfoCard>
+        </div>
+
         <TheoryBox title={t('modulation.optrx.theory.title')}>
           <p>
             <Formula
-              tex="r_k=\int_0^T r(t)\,\varphi_k(t)\,dt \quad(\text{correlator, §7.5.1})"
+              tex="r_k=\int_0^T r(t)\,\varphi_k(t)\,dt \quad(\text{correlator, §8.3.1})"
               block
             />
           </p>
           <p>
             <Formula
-              tex="\hat{m}=\arg\min_i \lVert r-s_i\rVert^2 \quad(\text{min-distance, §7.5.3})"
+              tex="\hat{m}=\arg\min_i \lVert r-s_i\rVert^2 \quad(\text{min-distance, §8.4.1})"
               block
             />
           </p>

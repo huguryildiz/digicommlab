@@ -421,6 +421,32 @@ export const en: Record<string, string> = {
   'modulation.optrx.custom.preset.example711': 'Book Example 7.1.1',
   'modulation.optrx.custom.preset.orthogonal': 'Orthogonal pair',
   'modulation.optrx.custom.preset.simplex3': 'Simplex (M=3)',
+  // Detection-tab info cards (Ch 8 — AWGN, ML/MAP, Gray, union bound)
+  'modulation.detection.card.awgn.title': 'AWGN vector channel',
+  'modulation.detection.card.awgn.body':
+    'The received point is the sent symbol plus noise, $r=s_m+n$; each coordinate of $n$ is Gaussian with variance $N_0/2$ — the constellation point you sent, blurred (§8.3).',
+  'modulation.detection.card.ml.title': 'Minimum-distance decision',
+  'modulation.detection.card.ml.body':
+    'The ML detector picks the nearest signal point, $\\hat{m}=\\arg\\min_m\\lVert r-s_m\\rVert^2$. With unequal priors the MAP rule shifts the boundary by $N_0\\ln P(s_m)$ (§8.4.1).',
+  'modulation.detection.card.gray.title': 'Gray coding & BER',
+  'modulation.detection.card.gray.body':
+    'Adjacent symbols differ in one bit, so the most likely (nearest-neighbour) error flips a single bit: $P_b\\approx P_M/\\log_2 M$, with $\\mathcal{E}_s=\\mathcal{E}_b\\log_2 M$ (§8.6).',
+  'modulation.detection.card.union.title': 'Union bound',
+  'modulation.detection.card.union.body':
+    'Summing pairwise error probabilities bounds the symbol error: $P_M\\le(M-1)\\,Q(d_{\\min}/\\sqrt{2N_0})$ — set by the closest pair $d_{\\min}$ (§8.4.2).',
+  // Optimum-receiver info cards (Ch 8 — signal space, correlator, matched filter, ML)
+  'modulation.optrx.card.signalspace.title': 'Signal space (Gram-Schmidt)',
+  'modulation.optrx.card.signalspace.body':
+    'Any M waveforms become vectors in an N-dimensional space ($N\\le M$) via an orthonormal basis: $s_{mk}=\\int_0^T s_m(t)\\,\\varphi_k(t)\\,dt$ (§8.1).',
+  'modulation.optrx.card.correlator.title': 'Correlation demodulator',
+  'modulation.optrx.card.correlator.body':
+    'N parallel correlators project the received signal onto each basis function: $r_k=\\int_0^T r(t)\\,\\varphi_k(t)\\,dt=s_{mk}+n_k$ (§8.3.1).',
+  'modulation.optrx.card.matched.title': 'Matched filter',
+  'modulation.optrx.card.matched.body':
+    'A filter $h(t)=\\varphi(T-t)$ matched to the pulse maximizes the sampling-instant SNR: $\\mathrm{SNR}_{\\max}=2\\mathcal{E}/N_0$ (§8.3.2).',
+  'modulation.optrx.card.ml.title': 'Optimum (ML) detector',
+  'modulation.optrx.card.ml.body':
+    'Maximize the correlation metric $C(r,s_m)=2\\,r\\!\\cdot\\! s_m-\\lVert s_m\\rVert^2$ — equivalently, choose the nearest point $\\arg\\min_m\\lVert r-s_m\\rVert^2$ (§8.4.1).',
   // DPSK — Differential PSK (§8.6.4–8.6.5)
   'modulation.dpsk.tab': 'DPSK',
   'modulation.dpsk.title': 'Differential PSK',
@@ -728,4 +754,35 @@ export const en: Record<string, string> = {
   'baseband.readout.eyeHeight': 'Eye height',
   'baseband.readout.residualIsi': 'Residual ISI',
   'baseband.theory.eye': 'Eye diagram, ISI & equalization',
+  'baseband.reset': 'Reset',
+  // Pulse-shaping info cards
+  'baseband.card.nyquist.title': 'Nyquist criterion',
+  'baseband.card.nyquist.body':
+    'A pulse gives zero ISI when its sampled values vanish at every other symbol time: $x(nT)=\\delta[n]$. In frequency this means the folded spectrum is flat, $\\sum_m X(f+m/T)=T$.',
+  'baseband.card.excess.title': 'Excess bandwidth α',
+  'baseband.card.excess.body':
+    'The roll-off $\\alpha$ trades bandwidth for a gentler pulse. The occupied bandwidth is $W=(1+\\alpha)/2T$; $\\alpha=0$ is the brick-wall sinc, $\\alpha=1$ doubles the Nyquist band.',
+  'baseband.card.rrc.title': 'Root raised cosine split',
+  'baseband.card.rrc.body':
+    'Putting $\\sqrt{X_{rc}(f)}$ in both the transmit and receive filter makes the receiver matched to the pulse, and their product $X_{rc}(f)$ still satisfies the zero-ISI Nyquist condition.',
+  // Receiver info cards
+  'baseband.card.matched.title': 'Matched filter',
+  'baseband.card.matched.body':
+    'The filter $h(t)=p(T-t)$ maximizes SNR at the sampling instant by correlating the received signal with a time-reversed copy of the pulse.',
+  'baseband.card.snr.title': 'Peak SNR',
+  'baseband.card.snr.body':
+    'At $t=T$ the matched-filter output equals the pulse energy $E$, and the peak SNR is $2E/N_0$ — the best any linear receiver can do in white noise.',
+  'baseband.card.correlator.title': 'Correlator = matched filter',
+  'baseband.card.correlator.body':
+    'Sampling the matched-filter output at $t=T$ gives exactly the correlation $\\int r(t)\\,p(t)\\,dt$; the correlator and matched filter are two views of the same optimum receiver.',
+  // Eye / equalizer info cards
+  'baseband.card.isi.title': 'Intersymbol interference',
+  'baseband.card.isi.body':
+    'A dispersive channel smears each symbol into its neighbors: $y_m=x_0 a_m+\\sum_{n\\neq m}a_n x_{m-n}+\\nu_m$. The eye closes as the interfering tail grows.',
+  'baseband.card.zf.title': 'Zero-forcing equalizer',
+  'baseband.card.zf.body':
+    'The zero-forcing filter inverts the channel, $W(z)=1/H(z)$, forcing the residual ISI to zero — but it can amplify noise where $|H(f)|$ is small.',
+  'baseband.card.mmse.title': 'MMSE equalizer',
+  'baseband.card.mmse.body':
+    'The MMSE filter minimizes $E|w*r-a|^2$, balancing ISI removal against noise enhancement — it keeps the eye open better than zero-forcing at low SNR.',
 };
