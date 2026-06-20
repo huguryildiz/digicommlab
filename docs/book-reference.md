@@ -320,7 +320,7 @@ Noncoherent FSK · Multidim Signals · Repeaters · Synchronization) ·
 
 ### Chapter 13 — Coding for Reliable Communications (pp. 689–768) ✅
 
-**Module:** `src/modules/channel-coding/` · **DSP:** `src/lib/dsp/blockcodes.ts`, `convcodes.ts`, `cyclic.ts`, `bch.ts`, `reedsolomon.ts`, `gf2m.ts`, `codes.ts`, `concatenated.ts`, `codingcompare.ts`
+**Module:** `src/modules/channel-coding/` · **DSP:** `src/lib/dsp/blockcodes.ts`, `convcodes.ts`, `cyclic.ts`, `bch.ts`, `reedsolomon.ts`, `gf2m.ts`, `codes.ts`, `concatenated.ts`, `codingcompare.ts`, `productcodes.ts`, `turbocodes.ts`, `ldpc.ts`, `tcm.ts`
 
 | Subsection                                     | Page | Status | Repo mapping                                    |
 | ---------------------------------------------- | ---- | ------ | ----------------------------------------------- |
@@ -333,15 +333,16 @@ Noncoherent FSK · Multidim Signals · Repeaters · Synchronization) ·
 | 13.3 Convolutional Codes                       | 711  | ✅     | `convcodes.ts`, `ConvCodesSection.tsx`          |
 | 13.3.1 Basic Properties                        | 712  | ✅     | `convcodes.ts`                                  |
 | 13.3.2 ML Decoding — Viterbi Algorithm         | 717  | ✅     | `convcodes.ts` — Viterbi                        |
-| 13.3.3 Other Decoding Algorithms               | 722  | ⬜     | —                                               |
-| 13.3.4 Bounds on Error Probability             | 722  | 🔶     | `ConvCodesSection.tsx`                          |
+| 13.3.3 Other Decoding Algorithms               | 722  | ✅     | `convcodes.ts` — survey + complexity            |
+| 13.3.4 Bounds on Error Probability             | 722  | ✅     | `convcodes.ts` — distance spectrum/bound        |
 | 13.4 Good Codes — Combination of Simple Codes  | 725  | ✅     | `concatenated.ts`, `ConcatenatedSection.tsx`    |
-| 13.4.1 Product Codes                           | 727  | ⬜     | —                                               |
+| 13.4.1 Product Codes                           | 727  | ✅     | `productcodes.ts`, `ProductCodesSection.tsx`    |
 | 13.4.2 Concatenated Codes                      | 728  | ✅     | `concatenated.ts`                               |
-| 13.5 Turbo Codes and Iterative Decoding        | 728  | ⬜     | —                                               |
-| 13.6 Low-Density Parity-Check (LDPC) Codes     | 741  | ⬜     | —                                               |
-| 13.7 Coding for Bandwidth-Constrained Channels | 747  | ⬜     | —                                               |
-| 13.7.2 Trellis-Coded Modulation                | 749  | ⬜     | —                                               |
+| 13.5 Turbo Codes and Iterative Decoding        | 728  | ✅     | `turbocodes.ts`, `TurboSection.tsx`             |
+| 13.6 Low-Density Parity-Check (LDPC) Codes     | 741  | ✅     | `ldpc.ts`, `LdpcSection.tsx`                    |
+| 13.7 Coding for Bandwidth-Constrained Channels | 747  | ✅     | `tcm.ts`, `TcmSection.tsx`                      |
+| 13.7.2 Trellis-Coded Modulation                | 749  | ✅     | `tcm.ts` — set partitioning                     |
+| 13.8 Practical Applications                    | 756  | ✅     | info cards (Concat + TCM tabs)                  |
 | **Extra:** Cyclic Codes                        | —    | ✅     | `cyclic.ts`, `CyclicCodesSection.tsx`           |
 | **Extra:** BCH Codes                           | —    | ✅     | `bch.ts`, `gf2m.ts`, `GfBchSection.tsx`         |
 | **Extra:** Reed-Solomon Codes                  | —    | ✅     | `reedsolomon.ts`, `ReedSolomonSection.tsx`      |
