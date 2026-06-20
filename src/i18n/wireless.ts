@@ -359,4 +359,62 @@ export const wireless: Record<string, string> = {
   'wl.cdma.readout.sir': 'SIR',
   'wl.cdma.readout.ber': 'BER at operating point',
   'wl.cdma.readout.capacity': 'User capacity @ BER 1e-3',
+
+  // ── Retrofit: Fading channel cards/theory ──
+  'wl.fading.theory.title': 'Multipath fading channels',
+  'wl.fading.theory.body':
+    'When a signal arrives via multiple reflected paths, the copies add constructively or destructively depending on their relative delays. The power-delay profile (PDP) gives the average power at each delay τ; the RMS delay spread σ_τ sets the coherence bandwidth B_c ≈ 1/(2πσ_τ), the frequency range over which |H(f)| stays correlated. Narrowband signals (bandwidth ≪ B_c) see a flat fade; wider signals are frequency-selective. Doppler makes the envelope fluctuate in time with coherence time T_c. With no line-of-sight (K=0) the envelope is Rayleigh; a dominant LOS path (K>0) makes it Rician.',
+  'wl.fading.card.multipath.title': 'Multipath & delay spread',
+  'wl.fading.card.multipath.body':
+    'Reflections create delayed copies, each with delay $\\tau_k$ and power $P_k$. The RMS delay spread $\\sigma_\\tau$ summarises how spread out the echoes are — larger $\\sigma_\\tau$ means more inter-symbol interference for wideband signals.',
+  'wl.fading.card.coherence.title': 'Coherence bandwidth',
+  'wl.fading.card.coherence.body':
+    'The coherence bandwidth $B_c \\approx 1/(2\\pi\\sigma_\\tau)$ is the frequency span over which $H(f)$ is roughly constant. Signals narrower than $B_c$ fade flat; wider ones are frequency-selective.',
+  'wl.fading.card.distrib.title': 'Rayleigh vs Rician',
+  'wl.fading.card.distrib.body':
+    'With many scattered paths and no LOS, the envelope $|r|$ is Rayleigh ($K=0$). A dominant LOS path (Rician $K>0$) shifts probability toward the mean and shallows the fades.',
+
+  // ── Retrofit: Doppler cards/theory ──
+  'wl.doppler.theory.title': 'Doppler effect and time-selective fading',
+  'wl.doppler.theory.body':
+    'A moving receiver shifts each scattered path by a Doppler frequency proportional to the cosine of its arrival angle. The superposition occupies ±f_m = v·f_c/c around the carrier. The classical (Jakes) isotropic model gives a U-shaped power spectrum S(f) with energy piled at the band edges. The channel stays correlated only within the coherence time T_c ≈ 1/(2π f_m); faster mobiles fade more often but for shorter durations.',
+  'wl.doppler.card.spread.title': 'Doppler spread',
+  'wl.doppler.card.spread.body':
+    'The maximum shift $f_m = v f_c / c$ sets the one-sided width of the received spectrum. Higher speed or carrier frequency widens it and makes the channel vary faster.',
+  'wl.doppler.card.jakes.title': 'Jakes spectrum',
+  'wl.doppler.card.jakes.body':
+    'Isotropic scattering gives the classical U shape $S(f)=1/\\bigl(\\pi f_m\\sqrt{1-(f/f_m)^2}\\bigr)$, $|f|<f_m$ — energy peaks at $\\pm f_m$ from head-on and trailing paths.',
+  'wl.doppler.card.coherence.title': 'Coherence time',
+  'wl.doppler.card.coherence.body':
+    'The coherence time $T_c \\approx 1/(2\\pi f_m)$ is how long the channel stays roughly constant. Transmissions spaced by more than $T_c$ fade independently — the basis of time interleaving.',
+
+  // ── Retrofit: BER/diversity cards/theory ──
+  'wl.ber.theory.title': 'Fading channels: BER and outage',
+  'wl.ber.theory.body.ber':
+    'On AWGN the bit-error probability falls exponentially with $E_b/N_0$. On Rayleigh fading, deep fades dominate the average so $P_b$ decays only as $1/\\bar\\gamma_b$ — a severe penalty. $L$-branch maximal-ratio combining restores the slope to $1/\\bar\\gamma_b^{L}$: extra branches make a simultaneous deep fade exponentially less likely.',
+  'wl.ber.theory.body.outage':
+    'Outage is the probability the instantaneous SNR $\\gamma$ falls below a threshold $\\gamma_{th}$. Without shadowing ($\\sigma=0$) the Rayleigh CDF gives $P_{out}=1-e^{-\\gamma_{th}/\\bar\\gamma}$. Log-normal shadowing randomises the local mean SNR itself, so a larger fade margin is needed for the same outage.',
+  'wl.ber.card.penalty.title': 'Fading penalty',
+  'wl.ber.card.penalty.body':
+    'On Rayleigh fading $P_b\\approx \\tfrac{1}{4\\bar\\gamma_b}$ at high SNR — polynomial, not exponential, so the gap to AWGN grows with SNR.',
+  'wl.ber.card.diversity.title': 'Diversity order',
+  'wl.ber.card.diversity.body':
+    '$L$-branch MRC achieves diversity order $L$: the log-log BER slope steepens to $\\bar\\gamma_b^{-L}$. Each independent branch divides the deep-fade probability.',
+  'wl.ber.card.outage.title': 'Shadowing & outage',
+  'wl.ber.card.outage.body':
+    'Log-normal shadowing ($\\sigma$ dB) makes the local mean SNR random. Outage integrates over both Rayleigh fading and the shadow, demanding extra fade margin in coverage planning.',
+
+  // ── Retrofit: RAKE cards/theory ──
+  'wl.rake.theory.title': 'RAKE receivers turn multipath into diversity',
+  'wl.rake.theory.body':
+    'Paths separated by at least one chip $T_c=1/W$ are resolvable. A RAKE receiver assigns one correlator finger to each resolvable path, de-spreads each with a chip-aligned code replica, and combines the $L$ finger outputs by MRC: $\\bar\\gamma_b=\\sum_l\\gamma_l$. The no-RAKE curve falls as $1/\\bar\\gamma_b$; the RAKE curve falls as $1/\\bar\\gamma_b^{L}$, steepening toward the AWGN bound with each finger — multipath becomes free diversity.',
+  'wl.rake.card.resolvable.title': 'Resolvable paths',
+  'wl.rake.card.resolvable.body':
+    'Two paths are resolvable when their delay differs by more than one chip $T_c=1/W$. A higher chip rate $W$ shortens $T_c$ and separates paths that were previously merged.',
+  'wl.rake.card.fingers.title': 'RAKE fingers',
+  'wl.rake.card.fingers.body':
+    'Each finger is a correlator locked to one path: it multiplies by a delayed PN replica and integrates over $T_b$. The peak appears only when the replica is chip-aligned with that path.',
+  'wl.rake.card.mrc.title': 'MRC of fingers',
+  'wl.rake.card.mrc.body':
+    'Maximal-ratio combining weights each finger by its channel gain before summing, maximising $\\gamma_{\\text{MRC}}=\\sum_l\\gamma_l$ and turning $L$ Rayleigh fades into $L$-th order diversity.',
 };

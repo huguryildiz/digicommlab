@@ -5,9 +5,10 @@ import type { ScenarioParams } from './model';
 interface Props {
   params: ScenarioParams;
   set: (patch: Partial<ScenarioParams>) => void;
+  reset: () => void;
 }
 
-export function ScenarioControls({ params, set }: Props) {
+export function ScenarioControls({ params, set, reset }: Props) {
   return (
     <Panel title={t('wl.gen.title')}>
       <Slider
@@ -50,6 +51,9 @@ export function ScenarioControls({ params, set }: Props) {
         value={params.fD}
         onChange={(v) => set({ fD: v })}
       />
+      <button type="button" onClick={reset}>
+        {t('wl.reset')}
+      </button>
     </Panel>
   );
 }
