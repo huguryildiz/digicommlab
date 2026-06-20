@@ -90,3 +90,105 @@ export function mimoCapacity(snrDb: number, nt: number, nr: number, trials: numb
   }
   return sum / trials;
 }
+
+/** Receiver type for spatial-multiplexing detection. */
+export type MimoDetector = 'zf' | 'mmse';
+
+/**
+ * Invert a square complex matrix by Gauss–Jordan elimination with partial
+ * pivoting. Used for the small N_t × N_t Gram matrices in linear MIMO detection.
+ */
+function invertComplex(A: Complex[][]): Complex[][] {
+  const n = A.length;
+  const M = A.map((row, i) =>
+    row
+      .map((c) => ({ ...c }))
+      .concat(Array.from({ length: n }, (_, j): Complex => ({ re: i === j ? 1 : 0, im: 0 }))),
+  );
+  for (let col = 0; col < n; col++) {
+    let piv = col;
+    let best = M[col][col].re ** 2 + M[col][col].im ** 2;
+    for (let r = col + 1; r < n; r++) {
+      const mag = M[r][col].re ** 2 + M[r][col].im ** 2;
+      if (mag > best) {
+        best = mag;
+        piv = r;
+      }
+    }
+    if (piv !== col) [M[col], M[piv]] = [M[piv], M[col]];
+    const diag = M[col][col];
+    for (let j = 0; j < 2 * n; j++) M[col][j] = cDiv(M[col][j], diag);
+    for (let r = 0; r < n; r++) {
+      if (r === col) continue;
+      const factor = M[r][col];
+      for (let j = 0; j < 2 * n; j++) M[r][j] = cSub(M[r][j], cMul(factor, M[col][j]));
+    }
+  }
+  return M.map((row) => row.slice(n));
+}
+
+/**
+ * BER of an uncoded BPSK spatial-multiplexing MIMO link with a linear (ZF or MMSE)
+ * receiver, over seeded Monte-Carlo with H i.i.d. CN(0,1). N_t independent BPSK
+ * streams; ZF uses W = (HᴴH)⁻¹Hᴴ, MMSE adds N₀·I to the Gram matrix (Es = 1).
+ * Requires N_r ≥ N_t. Proakis & Salehi §14.4.4 (Error Rate Performance), p.800.
+ */
+export function mimoSpatialMuxBer(
+  snrDb: number,
+  nt: number,
+  nr: number,
+  detector: MimoDetector,
+  trials: number,
+  seed: number,
+): number {
+  const rho = 10 ** (snrDb / 10);
+  const n0 = nt / rho; // total transmit power split across N_t streams
+  const noiseSd = Math.sqrt(n0 / 2); // per complex dimension
+  const rng = makeRng(seed);
+  let errors = 0;
+  let bits = 0;
+  for (let t = 0; t < trials; t++) {
+    // H (N_r × N_t), entries CN(0,1).
+    const H: Complex[][] = [];
+    for (let i = 0; i < nr; i++) {
+      const row: Complex[] = [];
+      for (let j = 0; j < nt; j++)
+        row.push({ re: gaussian(rng) / Math.SQRT2, im: gaussian(rng) / Math.SQRT2 });
+      H.push(row);
+    }
+    // BPSK symbol vector x ∈ {±1}^{N_t} and received y = H x + n.
+    const x = Array.from({ length: nt }, () => (rng() < 0.5 ? -1 : 1));
+    const y: Complex[] = [];
+    for (let i = 0; i < nr; i++) {
+      let acc: Complex = { re: noiseSd * gaussian(rng), im: noiseSd * gaussian(rng) };
+      for (let j = 0; j < nt; j++) acc = cAdd(acc, cMul(H[i][j], { re: x[j], im: 0 }));
+      y.push(acc);
+    }
+    // Gram G = HᴴH (N_t × N_t); MMSE adds N₀·I. Also matched-filter output Hᴴy.
+    const G: Complex[][] = [];
+    const hy: Complex[] = [];
+    for (let a = 0; a < nt; a++) {
+      const row: Complex[] = [];
+      for (let b = 0; b < nt; b++) {
+        let acc: Complex = { re: 0, im: 0 };
+        for (let i = 0; i < nr; i++) acc = cAdd(acc, cMul(cConj(H[i][a]), H[i][b]));
+        if (detector === 'mmse' && a === b) acc = cAdd(acc, { re: n0, im: 0 });
+        row.push(acc);
+      }
+      G.push(row);
+      let mf: Complex = { re: 0, im: 0 };
+      for (let i = 0; i < nr; i++) mf = cAdd(mf, cMul(cConj(H[i][a]), y[i]));
+      hy.push(mf);
+    }
+    // xhat = G⁻¹ · (Hᴴy); decide each stream by the sign of the real part.
+    const Ginv = invertComplex(G);
+    for (let a = 0; a < nt; a++) {
+      let est: Complex = { re: 0, im: 0 };
+      for (let b = 0; b < nt; b++) est = cAdd(est, cMul(Ginv[a][b], hy[b]));
+      const decided = est.re >= 0 ? 1 : -1;
+      if (decided !== x[a]) errors++;
+      bits++;
+    }
+  }
+  return errors / bits;
+}
